@@ -37,7 +37,7 @@ Estructures i unitats
     }
 
     public boolean canSendUnitToLocation(int locX, int locY) {
-        return (in.memoryManager.getTimesSendUnitLocation(locX, locY) < 2);
+        return (in.memoryManager.getTimesSendUnitLocation(locX, locY) < 1);
     }
 
 

@@ -12,6 +12,8 @@ public class UnitPlayer {
             in.staticVariables.update();
             in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_COUNTER);
 
+            Location target = in.soldier.getSoldierTarget();
+
             in.move.sendResourcesMessage();
 
 			/*If this unit is a base, try spawning a soldier at direction dir*/
@@ -20,12 +22,12 @@ public class UnitPlayer {
             }
 
 			else if (in.unitController.getType() == UnitType.SOLDIER){
-			    Location target = in.soldier.getSoldierTarget();
 			    in.move.myMove(target);
-			    in.attack.tryAttackBestTarget(target);
             } else if (in.unitController.getType() == UnitType.WORKER) {
                 in.worker.run();
             }
+
+            in.attack.tryAttackBestTarget(target);
 
             in.unitController.yield(); //End of turn
         }
