@@ -21,7 +21,7 @@ public class Attack {
             myAttack = GameConstants.ARCHER_ATTACK;
         } else if (in.staticVariables.type == UnitType.BASE) {
             myAttack = GameConstants.BASE_ATTACK;
-            aoe = true;
+            //aoe = true;
         } else if (in.staticVariables.type == UnitType.CATAPULT) {
             myAttack = GameConstants.CATAPULT_ATTACK;
         } else if (in.staticVariables.type == UnitType.EXPLORER) {

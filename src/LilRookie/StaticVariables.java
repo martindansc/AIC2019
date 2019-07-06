@@ -11,6 +11,7 @@ public class StaticVariables {
     public Team opponent;
     public Team allies;
     public Direction[] dirs;
+    public Resource[] resources;
     public Location myLocation;
     public UnitType type;
     public UnitInfo[] units;
@@ -18,6 +19,9 @@ public class StaticVariables {
     public UnitInfo[] allenemies;
     public TownInfo[] enemytowns;
     public TownInfo[] myTowns;
+    public float wood;
+    public float iron;
+    public float crystal;
 
     public StaticVariables(Injection in) {
         this.in = in;
@@ -27,6 +31,7 @@ public class StaticVariables {
         dirs = Direction.values();
         type = in.unitController.getType();
         enemytowns = in.unitController.getTowns(allies, true);
+        resources = Resource.values();
     }
 
     public void update() {
@@ -36,5 +41,8 @@ public class StaticVariables {
         allenemies = in.unitController.senseUnits(allies, true);
         units = in.unitController.senseUnits();
         myTowns = in.unitController.getTowns(allies, false);
+        wood = in.unitController.getWood();
+        iron = in.unitController.getIron();
+        crystal = in.unitController.getCrystal();
     }
 }

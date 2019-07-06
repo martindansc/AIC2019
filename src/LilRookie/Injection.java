@@ -13,6 +13,7 @@ public class Injection {
     public final Pathfinder pathfinder;
     public final Soldier soldier;
     public final Worker worker;
+    public final Market market;
 
 
     Injection (UnitController uc) {
@@ -24,5 +25,6 @@ public class Injection {
         this.pathfinder = new Pathfinder(this);
         this.soldier = new Soldier(this);
         this.worker = new Worker(this);
+        this.market = new Market(this);
     }
 }
