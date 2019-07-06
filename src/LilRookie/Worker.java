@@ -1,34 +1,55 @@
 package LilRookie;
 import aic2019.*;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 
 public class Worker {
-    //General direction
-    Direction dirDestination;
-    //Direction used in last round
-    Direction lastDirection;
+    private StaticVariables variables;
+    private UnitController uc;
 
+    //Stores the current objective of the worker
+    private String currentAction;
+
+    //true if direction is random, false if its going to a desired location
+    Boolean directionIsRandom;
     //Location of the closest resource
-    Location resource;
+    private Location objectiveLocation;
+    //RandomDirection
+    Direction randomDir;
 
-    //Generate worker without a fixed destination
-    public Worker(){
+    public Worker(StaticVariables variables) {
+        this.variables = variables;
+        uc = variables.uc;
 
-        //Get a first random direction
-        /*Generate a random number from 0 to 7, both included*/
+        fixRandomDirection();
+    }
+
+    public void fixObjectiveLocation(Location loc, Boolean resourceObjective){
+        directionIsRandom = false;
+        objectiveLocation = loc;
+        if(resourceObjective) currentAction = "GOTORESOURCE";
+        else currentAction = "GOTOTOWN";
+    }
+
+    public void fixRandomDirection(){
+        directionIsRandom = true;
         int randomNumber = (int)(Math.random()*8);
-
-        /*Get corresponding direction*/
-        dirDestination = Direction.values()[randomNumber];
+        randomDir = Direction.values()[randomNumber];
+        currentAction = "GOTORANDOM";
     }
 
-    //Generate worker with a fixed destination
-    public Worker(Direction destination){
-        dirDestination = destination;
-    }
+    public void work(){
+        if(currentAction == "GOTORANDOM"){
+            if (uc.canMove()) {
+                if(uc.canMove(randomDir)){
+                    uc.move(randomDir);
+                }
+            }
+        }
+        else if(currentAction == "GOTORESOURCE"){
 
-    //Generate worker with destination to resource
-    public Worker(Location resource){
+        }
+        else if(currentAction == "GOTOTOWN"){
 
-        //dirDestination = utils.getDirectionFromLocations()
+        }
     }
 }
