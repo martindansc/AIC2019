@@ -30,7 +30,6 @@ public class StaticVariables {
         allies = in.unitController.getTeam();
         dirs = Direction.values();
         type = in.unitController.getType();
-        enemytowns = in.unitController.getTowns(allies, true);
         resources = Resource.values();
     }
 
@@ -41,6 +40,7 @@ public class StaticVariables {
         allenemies = in.unitController.senseUnits(allies, true);
         units = in.unitController.senseUnits();
         myTowns = in.unitController.getTowns(allies, false);
+        enemytowns = in.unitController.getTowns(allies, true);
         wood = in.unitController.getWood();
         iron = in.unitController.getIron();
         crystal = in.unitController.getCrystal();

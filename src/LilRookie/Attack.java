@@ -12,7 +12,8 @@ public class Attack {
 
     public boolean tryAttackBestTarget(Location town)  {
         UnitInfo[] enemies = in.staticVariables.allenemies;
-        if(!in.unitController.canAttack() || enemies.length == 0) return false;
+        if(!in.unitController.canAttack()) return false;
+        if (enemies.length == 0 && town.isEqual(in.staticVariables.myLocation)) return false;
 
         int myAttack = 0;
         boolean aoe = false;
@@ -72,15 +73,9 @@ public class Attack {
             in.unitController.attack(bestLoc);
             return true;
         } else {
-            boolean found = false;
-            for (TownInfo mytown : in.staticVariables.myTowns) {
-                if (mytown.getLocation().isEqual(town)) {
-                    found = true;
-                    break;
-                }
-            }
-            if (in.unitController.canAttack(town) && !found) {
+            if (in.unitController.canAttack(town) && in.unitController.senseTown(town).getOwner() != in.staticVariables.allies) {
                 in.unitController.attack(town);
+                return true;
             }
         }
 
