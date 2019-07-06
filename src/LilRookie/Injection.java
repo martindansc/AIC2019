@@ -9,6 +9,7 @@ public class Injection {
     public final StaticVariables staticVariables;
     public final MemoryManager memoryManager;
     public final Attack attack;
+    public final Worker worker;
 
 
     Injection (UnitController uc) {
@@ -16,5 +17,6 @@ public class Injection {
         this.staticVariables = new StaticVariables(this);
         this.memoryManager = new MemoryManager(this);
         this.attack = new Attack(this);
+        this.worker = new Worker(this);
     }
 }

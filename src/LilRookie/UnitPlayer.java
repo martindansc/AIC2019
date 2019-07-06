@@ -19,16 +19,14 @@ public class UnitPlayer {
 			/*Get corresponding direction*/
 			Direction dir = Direction.values()[randomNumber];
 
-			/*move in direction dir if possible*/
-			if (uc.canMove(dir)) uc.move(dir);
-
 			/*If this unit is a base, try spawning a soldier at direction dir*/
 			if (uc.getType() == UnitType.BASE) {
-                if (uc.canSpawn(dir, UnitType.SOLDIER)) uc.spawn(dir, UnitType.SOLDIER);
+                //if (uc.canSpawn(dir, UnitType.SOLDIER)) uc.spawn(dir, UnitType.SOLDIER);
+                if (uc.canSpawn(dir, UnitType.WORKER)) uc.spawn(dir, UnitType.WORKER);
             }
 
 			else {
-			    in.attack.tryAttackBestTarget();
+			    in.worker.run();
             }
 
             uc.yield(); //End of turn

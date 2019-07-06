@@ -3,8 +3,7 @@ import aic2019.*;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 
 public class Worker {
-    private StaticVariables variables;
-    private UnitController uc;
+    private final Injection in;
 
     //Stores the current objective of the worker
     private String currentAction;
@@ -16,10 +15,8 @@ public class Worker {
     //RandomDirection
     Direction randomDir;
 
-    public Worker(StaticVariables variables) {
-        this.variables = variables;
-        uc = variables.uc;
-
+    public Worker(Injection in) {
+        this.in = in;
         fixRandomDirection();
     }
 
@@ -37,19 +34,49 @@ public class Worker {
         currentAction = "GOTORANDOM";
     }
 
-    public void work(){
+    public void run(){
         if(currentAction == "GOTORANDOM"){
-            if (uc.canMove()) {
-                if(uc.canMove(randomDir)){
-                    uc.move(randomDir);
+            //Scout viewing zone
+            //TODO
+
+            //If worker wants to move to wall change direction
+            Location nextLocation =  in.staticVariables.myLocation.add(randomDir);
+            if(in.unitController.isOutOfMap(nextLocation)){
+                int randomNumber = (int)(Math.random()*8);
+                randomDir = Direction.values()[randomNumber];
+            }
+            //Move unit if possible
+            if (in.unitController.canMove()) {
+                if(in.unitController.canMove(randomDir)){
+                    in.unitController.move(randomDir);
+                }
+                //If wanted possition is not accessible try the others
+                else{
+                    Boolean hasMoved = false;
+                    int currentDirIndx = (int)(Math.random()*8);
+                    while(!hasMoved){
+                        Direction auxiliarRandomDir = Direction.values()[currentDirIndx];
+                        if(in.unitController.canMove(auxiliarRandomDir)){
+                            in.unitController.move(auxiliarRandomDir);
+                            hasMoved = true;
+                        }
+                        else{
+                            currentDirIndx = (currentDirIndx + 1)%8;
+                        }
+                    }
                 }
             }
+            //Scout viewing zone
+            //TODO
         }
         else if(currentAction == "GOTORESOURCE"){
-
+            //Scout viewing zone
+            //TODO
         }
         else if(currentAction == "GOTOTOWN"){
 
+            //Scout viewing zone
+            //TODO
         }
     }
 }
