@@ -9,7 +9,8 @@ public class UnitPlayer {
         StaticVariables variables = new StaticVariables(uc);
 
         Attack attack = new Attack(variables);
-
+        Move move = new Move(variables, uc);
+        Soldier soldier = new Soldier(variables);
 
         while (true){
             variables.update();
@@ -18,18 +19,17 @@ public class UnitPlayer {
 			int randomNumber = (int)(Math.random()*8);
 
 			/*Get corresponding direction*/
-			Direction dir = Direction.values()[randomNumber];
-
-			/*move in direction dir if possible*/
-			if (uc.canMove(dir)) uc.move(dir);
+			Direction dir = variables.dirs[randomNumber];
 
 			/*If this unit is a base, try spawning a soldier at direction dir*/
 			if (uc.getType() == UnitType.BASE) {
                 if (uc.canSpawn(dir, UnitType.SOLDIER)) uc.spawn(dir, UnitType.SOLDIER);
             }
 
-			else {
-			    attack.tryAttackBestTarget();
+			else if (uc.getType() == UnitType.SOLDIER){
+			    Location target = soldier.getSoldierTarget();
+			    move.myMove(target);
+			    attack.tryAttackBestTarget(target);
             }
 
             uc.yield(); //End of turn

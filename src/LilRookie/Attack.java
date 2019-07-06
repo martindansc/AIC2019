@@ -12,7 +12,7 @@ public class Attack {
         uc = variables.uc;
     }
 
-    public boolean tryAttackBestTarget()  {
+    public boolean tryAttackBestTarget(Location town)  {
         UnitInfo[] enemies = variables.allenemies;
         if(!uc.canAttack() || enemies.length == 0) return false;
 
@@ -73,6 +73,17 @@ public class Attack {
         } else if (bestTarget != null) {
             uc.attack(bestLoc);
             return true;
+        } else {
+            boolean found = false;
+            for (TownInfo mytown : variables.myTowns) {
+                if (mytown.getLocation().isEqual(town)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (uc.canAttack(town) && !found) {
+                uc.attack(town);
+            }
         }
 
         return false;

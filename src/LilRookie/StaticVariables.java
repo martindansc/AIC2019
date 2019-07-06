@@ -15,6 +15,8 @@ public class StaticVariables {
     public UnitInfo[] units;
     public UnitInfo[] enemies;
     public UnitInfo[] allenemies;
+    public TownInfo[] enemytowns;
+    public TownInfo[] myTowns;
 
     public StaticVariables(UnitController uc) {
         this.uc = uc;
@@ -23,6 +25,7 @@ public class StaticVariables {
         allies = uc.getTeam();
         dirs = Direction.values();
         type = uc.getType();
+        enemytowns = uc.getTowns(allies, true);
     }
 
     public void update() {
@@ -31,5 +34,6 @@ public class StaticVariables {
         enemies = uc.senseUnits(opponent, false);
         allenemies = uc.senseUnits(allies, true);
         units = uc.senseUnits();
+        myTowns = uc.getTowns(allies, false);
     }
 }
