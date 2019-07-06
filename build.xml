@@ -215,7 +215,7 @@
 		</java>
 	</target>
 
-	<target name="run_web" depends="instrument">
+	<target name="run_no_prints_web" depends="instrument">
 		<!-- Parameters -->
 		<get_property prop="package1" />
 		<get_property prop="package2" />
@@ -239,7 +239,7 @@
 		</java>
 	</target>
 
-	<target name="run_web_debug" depends="instrument">
+	<target name="run_no_prints_web_debug" depends="instrument">
 		<!-- Parameters -->
 		<get_property prop="package1" />
 		<get_property prop="package2" />
@@ -266,7 +266,7 @@
 		</java>
 	</target>
 
-	<target name="run_no_prints_web" depends="instrument">
+	<target name="run_web" depends="instrument">
 		<!-- Parameters -->
 		<get_property prop="package1" />
 		<get_property prop="package2" />
@@ -280,6 +280,33 @@
 		<!-- Run -->
 		<java classname="aic2019.Main" failonerror="true" fork="yes">
 			<jvmarg value="-noverify" />
+			<classpath refid="my_classpath" />
+			<arg value="${package1}" />
+			<arg value="${package2}" />
+			<arg value="${map}" />
+			<arg value="1" />
+			<arg value="0" />
+			<arg value="0" />
+		</java>
+	</target>
+
+	<target name="run_web_debug" depends="instrument">
+		<!-- Parameters -->
+		<get_property prop="package1" />
+		<get_property prop="package2" />
+		<get_property prop="map" />
+		<replace_point string="${package1}" char="_" to="folder1" />
+		<replace_point string="${package2}" char="_" to="folder2" />
+		<replace_point string="${package1}" char="/" to="path1" />
+		<replace_point string="${package2}" char="/" to="path2" />
+		<!-- Echo -->
+		<echo message="Running ${package1} vs ${package2}" />
+		<!-- Run -->
+		<java classname="aic2019.Main" failonerror="true" fork="yes">
+			<jvmarg value="-noverify" />
+			<jvmarg value="-Xdebug"/>
+			<jvmarg value="-Xnoagent"/>
+			<jvmarg value="-Xrunjdwp:transport=dt_socket,address=5556,server=y,suspend=y"/>
 			<classpath refid="my_classpath" />
 			<arg value="${package1}" />
 			<arg value="${package2}" />
