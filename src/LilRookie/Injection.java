@@ -16,6 +16,7 @@ public class Injection {
     public final Base base;
     public final Messages messages;
     public final Market market;
+    public final Map map;
 
 
     Injection (UnitController uc) {
@@ -30,5 +31,6 @@ public class Injection {
         this.base = new Base(this);
         this.messages = new Messages(this);
         this.market = new Market(this);
+        this.map = new Map(this);
     }
 }

@@ -17,10 +17,12 @@ public class Base {
         int[] message = in.memoryManager.getNewMessage(1);
 
         UnitType bestUnitType = this.chooseBestUnitType(message);
+
         int id = spawnAndGetIdIfPossible(bestDir, bestUnitType);
 
         if(id != -1 && message[0] != 0) {
             in.messages.sendToLocation(id, message[0], message[1]);
+            in.memoryManager.addTimeUnitLocation(message[0], message[1]);
             in.memoryManager.clearMessageMine(1);
         }
 
@@ -69,4 +71,5 @@ public class Base {
         }
         return -1;
     }
+
 }

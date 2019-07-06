@@ -80,5 +80,14 @@ public class MemoryManager {
         clearMessageUnit(in.staticVariables.myId, type);
     }
 
+    public void addTimeUnitLocation(int locX, int locY) {
+        int times = uc.read(constants.ID_MAP_CLAIMS + locX * 200 + locY);
+        times++;
+        uc.write(constants.ID_MAP_CLAIMS + locX * 200 + locY, times);
+    }
+
+    public int getTimesSendUnitLocation(int locX, int locY) {
+        return uc.read(constants.ID_MAP_CLAIMS + locX * 200 + locY);
+    }
 
 }

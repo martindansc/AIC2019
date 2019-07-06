@@ -1,5 +1,7 @@
 package LilRookie;
 
+import aic2019.*;
+
 public class Map {
 /*
 A tenir en compte en el mapa:
@@ -27,6 +29,16 @@ Estructures i unitats
         - Mes info?
 - Empty
 */
+
+    Injection in;
+
+    Map(Injection in) {
+        this.in = in;
+    }
+
+    public boolean canSendUnitToLocation(int locX, int locY) {
+        return (in.memoryManager.getTimesSendUnitLocation(locX, locY) < 2);
+    }
 
 
 }
