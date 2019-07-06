@@ -13,6 +13,8 @@ public class Injection {
     public final Pathfinder pathfinder;
     public final Soldier soldier;
     public final Worker worker;
+    public final Base base;
+    public final Messages messages;
     public final Market market;
 
 
@@ -25,6 +27,8 @@ public class Injection {
         this.pathfinder = new Pathfinder(this);
         this.soldier = new Soldier(this);
         this.worker = new Worker(this);
+        this.base = new Base(this);
+        this.messages = new Messages(this);
         this.market = new Market(this);
     }
 }

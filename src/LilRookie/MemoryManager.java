@@ -15,10 +15,6 @@ public class MemoryManager {
         this.uc = in.unitController;
     }
 
-    public void update() {
-        this.increaseValueByOne(constants.ALLIES_COUNTER);
-    }
-
     // HELPERS
 
 
@@ -41,6 +37,48 @@ public class MemoryManager {
         return uc.read(realId);
     }
 
+    // MESSAGING FUNCTIONS
+
+    public int getMessageId(int unitId,int type) {
+        return constants.ID_MESSAGING_BOX + unitId * constants.MAX_TYPE_MESSAGES + type * constants.MESSAGE_SIZE;
+    }
+
+    public boolean checkIfMessageInBoxPlayer(int to, int type) {
+        return (uc.read(this.getMessageId(to, type)) != 0);
+    }
+
+    public void sendMessageTo(int to, int type, int[] params) {
+        if(!checkIfMessageInBoxPlayer(to, type)) {
+            for (int i = 0; i < constants.MESSAGE_SIZE; i++) {
+                uc.write(getMessageId(to, type) + i, params[i]);
+            }
+        }
+    }
+
+    public int[] getNewMessage(int type) {
+       return getNewMessageUnit(in.staticVariables.myId, type);
+    }
+
+    public int[] getNewMessageUnit(int unitId, int type) {
+        int[] params = new int[constants.MESSAGE_SIZE];
+        for(int i = 0; i < constants.MESSAGE_SIZE; i++) {
+            int id = getMessageId(unitId, type) + i;
+            params[i] = uc.read(id);
+        }
+
+        return params;
+    }
+
+    public void clearMessageUnit(int unitId, int type) {
+        for(int i = 0; i < constants.MESSAGE_SIZE; i++) {
+            int id = getMessageId(unitId, type) + i;
+            uc.write(id, 0);
+        }
+    }
+
+    public void clearMessageMine(int type) {
+        clearMessageUnit(in.staticVariables.myId, type);
+    }
 
 
 }
