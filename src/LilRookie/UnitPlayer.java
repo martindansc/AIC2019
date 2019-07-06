@@ -8,7 +8,6 @@ public class UnitPlayer {
 
         Injection in = new Injection(uc);
 
-
         while (true){
             in.staticVariables.update();
             in.memoryManager.increaseValueByOne(in.constants.ALLIES_COUNTER);
@@ -17,19 +16,23 @@ public class UnitPlayer {
 			int randomNumber = (int)(Math.random()*8);
 
 			/*Get corresponding direction*/
-			Direction dir = Direction.values()[randomNumber];
+			Direction dir = in.staticVariables.dirs[randomNumber];
 
 			/*If this unit is a base, try spawning a soldier at direction dir*/
 			if (uc.getType() == UnitType.BASE) {
-                //if (uc.canSpawn(dir, UnitType.SOLDIER)) uc.spawn(dir, UnitType.SOLDIER);
-                if (uc.canSpawn(dir, UnitType.WORKER)) uc.spawn(dir, UnitType.WORKER);
+                if (uc.canSpawn(dir, UnitType.SOLDIER)) uc.spawn(dir, UnitType.SOLDIER);
+                //if (in.unitController.canSpawn(dir, UnitType.WORKER)) in.unitController.spawn(dir, UnitType.WORKER);
             }
 
-			else {
-			    in.worker.run();
+			else if (in.unitController.getType() == UnitType.SOLDIER){
+			    Location target = in.soldier.getSoldierTarget();
+			    in.move.myMove(target);
+			    in.attack.tryAttackBestTarget(target);
+            } else if (in.unitController.getType() == UnitType.WORKER) {
+                in.worker.run();
             }
 
-            uc.yield(); //End of turn
+            in.unitController.yield(); //End of turn
         }
 
     }
