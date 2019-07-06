@@ -7,25 +7,16 @@ public class UnitPlayer {
     public void run(UnitController uc) {
 
         Injection in = new Injection(uc);
-        int i = 1;
 
         while (true){
             in.staticVariables.update();
-            in.memoryManager.increaseValueByOne(in.constants.ALLIES_COUNTER);
+            in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_COUNTER);
 
-			/*Generate a random number from 0 to 7, both included*/
-			int randomNumber = (int)(Math.random()*8);
-
-			/*Get corresponding direction*/
-			Direction dir = in.staticVariables.dirs[randomNumber];
+            in.move.sendResourcesMessage();
 
 			/*If this unit is a base, try spawning a soldier at direction dir*/
 			if (uc.getType() == UnitType.BASE) {
-                //if (uc.canSpawn(dir, UnitType.SOLDIER)) uc.spawn(dir, UnitType.SOLDIER);
-                if(i>0){
-                    if (in.unitController.canSpawn(dir, UnitType.WORKER)) in.unitController.spawn(dir, UnitType.WORKER);
-                    --i;
-                }
+                in.base.run();
             }
 
 			else if (in.unitController.getType() == UnitType.SOLDIER){
