@@ -13,7 +13,8 @@ public class UnitPlayer {
         Soldier soldier = new Soldier(variables);
 
         while (true){
-            variables.update();
+            in.staticVariables.update();
+            in.memoryManager.increaseValueByOne(in.constants.ALLIES_COUNTER);
 
 			/*Generate a random number from 0 to 7, both included*/
 			int randomNumber = (int)(Math.random()*8);

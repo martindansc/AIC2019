@@ -4,11 +4,13 @@ import aic2019.*;
 
 public class Attack {
 
+    private final Injection in;
     private StaticVariables variables;
     private UnitController uc;
 
-    public Attack(StaticVariables variables) {
-        this.variables = variables;
+    public Attack(Injection in) {
+        this.in = in;
+        this.variables = in.staticVariables;
         uc = variables.uc;
     }
 
