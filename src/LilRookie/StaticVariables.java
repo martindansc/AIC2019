@@ -25,6 +25,7 @@ public class StaticVariables {
     public float wood;
     public float iron;
     public float crystal;
+    public UnitInfo unitInfo;
 
     public StaticVariables(Injection in) {
         this.in = in;
