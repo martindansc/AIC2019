@@ -5,6 +5,8 @@ import aic2019.*;
 public class StaticVariables {
 
     public UnitController uc;
+    private final Injection in;
+
 
     public int round;
     public Team opponent;
@@ -16,8 +18,9 @@ public class StaticVariables {
     public UnitInfo[] enemies;
     public UnitInfo[] allenemies;
 
-    public StaticVariables(UnitController uc) {
-        this.uc = uc;
+    public StaticVariables(Injection in) {
+        this.in = in;
+        this.uc = in.unitController;
 
         opponent = uc.getOpponent();
         allies = uc.getTeam();
