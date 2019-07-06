@@ -37,37 +37,39 @@ public class Worker {
     public void run(){
         if(currentAction == "GOTORANDOM"){
             //Scout viewing zone
-            //TODO
+            Boolean resourceFound = scout("random");
 
-            //If worker wants to move to wall change direction
-            Location nextLocation =  in.staticVariables.myLocation.add(randomDir);
-            if(in.unitController.isOutOfMap(nextLocation)){
-                int randomNumber = (int)(Math.random()*8);
-                randomDir = Direction.values()[randomNumber];
-            }
-            //Move unit if possible
-            if (in.unitController.canMove()) {
-                if(in.unitController.canMove(randomDir)){
-                    in.unitController.move(randomDir);
+            if(!resourceFound){
+                //If worker wants to move to wall change direction
+                Location nextLocation =  in.staticVariables.myLocation.add(randomDir);
+                if(in.unitController.isOutOfMap(nextLocation)){
+                    int randomNumber = (int)(Math.random()*8);
+                    randomDir = Direction.values()[randomNumber];
                 }
-                //If wanted possition is not accessible try the others
-                else{
-                    Boolean hasMoved = false;
-                    int currentDirIndx = (int)(Math.random()*8);
-                    while(!hasMoved){
-                        Direction auxiliarRandomDir = Direction.values()[currentDirIndx];
-                        if(in.unitController.canMove(auxiliarRandomDir)){
-                            in.unitController.move(auxiliarRandomDir);
-                            hasMoved = true;
-                        }
-                        else{
-                            currentDirIndx = (currentDirIndx + 1)%8;
+                //Move unit if possible
+                if (in.unitController.canMove()) {
+                    if(in.unitController.canMove(randomDir)){
+                        in.unitController.move(randomDir);
+                    }
+                    //If wanted possition is not accessible try the others
+                    else{
+                        Boolean hasMoved = false;
+                        int currentDirIndx = (int)(Math.random()*8);
+                        while(!hasMoved){
+                            Direction auxiliarRandomDir = Direction.values()[currentDirIndx];
+                            if(in.unitController.canMove(auxiliarRandomDir)){
+                                in.unitController.move(auxiliarRandomDir);
+                                hasMoved = true;
+                            }
+                            else{
+                                currentDirIndx = (currentDirIndx + 1)%8;
+                            }
                         }
                     }
                 }
+                //Scout viewing zone
+                //TODO
             }
-            //Scout viewing zone
-            //TODO
         }
         else if(currentAction == "GOTORESOURCE"){
             //Scout viewing zone
@@ -78,5 +80,34 @@ public class Worker {
             //Scout viewing zone
             //TODO
         }
+    }
+
+    public Boolean scout(String mode){
+        //TODO: actualitzar posicions del scout al mapa
+
+        //Si hi ha algun resource i estic en mode random retornar la loc del resource
+        if(mode == "random"){
+            ResourceInfo[] resourcesSeen = in.unitController.senseResources();
+            Location returnLocation = getClosestResource(resourcesSeen);
+            if(returnLocation != new Location(100000, 100000)){
+                currentAction = "GOTORESOURCE";
+                objectiveLocation = returnLocation;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Location getClosestResource(ResourceInfo[] resourcesSeen){
+        //TODO: buscar el mes proper a la base o poble(no a un mateix)
+        Location returnLocation = new Location(100000, 100000);
+        for(ResourceInfo rI : resourcesSeen){
+            int currentDistance = Math.abs(returnLocation.distanceSquared(in.staticVariables.myLocation));
+            int nextDistance = Math.abs(rI.getLocation().distanceSquared(in.staticVariables.myLocation));
+            if( nextDistance < currentDistance ){
+                returnLocation = rI.getLocation();
+            }
+        }
+        return returnLocation;
     }
 }
