@@ -99,24 +99,30 @@ public class Worker {
             //Si ja hem recol.lectat el que voliem del resource tornem a la town o base objectiu
             float wood = in.staticVariables.unitInfo.getWood();
             if(wood >= 60.0){ //60
-                objectiveBase = getClosestTownToResource();
+                objectiveBase = getClosestTownToLocation(objectiveLocation);
                 currentAction = "GOTOTOWN";
             }
             float iron = in.staticVariables.unitInfo.getIron();
             if( iron >= 20.0){ //20
-                objectiveBase = getClosestTownToResource();
+                objectiveBase = getClosestTownToLocation(objectiveLocation);
                 currentAction = "GOTOTOWN";
             }
             float crystal = in.staticVariables.unitInfo.getCrystal();
             if( crystal >= 6.0){ //6
-                objectiveBase = getClosestTownToResource();
+                objectiveBase = getClosestTownToLocation(objectiveLocation);
                 currentAction = "GOTOTOWN";
             }
             //Scout viewing zone
             //TODO
         }
         if(currentAction == "GOTOTOWN"){
-            //TODO: check if destination is own
+            //Check if destination is own
+            if(!objectiveBase.isEqual(in.staticVariables.allies.getInitialLocation())){
+                if(in.unitController.senseTown(objectiveBase).getOwner() != in.staticVariables.allies){
+                    objectiveBase = getClosestTownToLocation(in.unitController.getLocation());
+                }
+            }
+
             //Move to desired town or base
             if (!in.unitController.canMove()) return;
             Direction dir = in.pathfinder.getNextLocationTarget(objectiveBase);
@@ -185,12 +191,11 @@ public class Worker {
     }
 
     //Returns closest town or base
-    public Location getClosestTownToResource(){
+    public Location getClosestTownToLocation(Location location){
         Location loc = in.staticVariables.allies.getInitialLocation();
-        TownInfo[] towns = in.unitController.getTowns(in.unitController.getTeam(), false);
-        for(TownInfo tI : towns){
-            int currentDistance = Math.abs(loc.distanceSquared(objectiveLocation));
-            int nextDistance = Math.abs(tI.getLocation().distanceSquared(objectiveLocation));
+        for(TownInfo tI : in.staticVariables.myTowns){
+            int currentDistance = Math.abs(loc.distanceSquared(location));
+            int nextDistance = Math.abs(tI.getLocation().distanceSquared(location));
             if( nextDistance < currentDistance ){
                 loc = tI.getLocation();
             }
