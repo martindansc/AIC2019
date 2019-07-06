@@ -4,7 +4,6 @@ import aic2019.*;
 
 public class StaticVariables {
 
-    public UnitController uc;
     private final Injection in;
 
 
@@ -22,21 +21,20 @@ public class StaticVariables {
 
     public StaticVariables(Injection in) {
         this.in = in;
-        this.uc = in.unitController;
 
-        opponent = uc.getOpponent();
-        allies = uc.getTeam();
+        opponent = in.unitController.getOpponent();
+        allies = in.unitController.getTeam();
         dirs = Direction.values();
-        type = uc.getType();
-        enemytowns = uc.getTowns(allies, true);
+        type = in.unitController.getType();
+        enemytowns = in.unitController.getTowns(allies, true);
     }
 
     public void update() {
-        myLocation = uc.getLocation();
-        round = uc.getRound();
-        enemies = uc.senseUnits(opponent, false);
-        allenemies = uc.senseUnits(allies, true);
-        units = uc.senseUnits();
-        myTowns = uc.getTowns(allies, false);
+        myLocation = in.unitController.getLocation();
+        round = in.unitController.getRound();
+        enemies = in.unitController.senseUnits(opponent, false);
+        allenemies = in.unitController.senseUnits(allies, true);
+        units = in.unitController.senseUnits();
+        myTowns = in.unitController.getTowns(allies, false);
     }
 }

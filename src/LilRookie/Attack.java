@@ -5,43 +5,39 @@ import aic2019.*;
 public class Attack {
 
     private final Injection in;
-    private StaticVariables variables;
-    private UnitController uc;
 
     public Attack(Injection in) {
         this.in = in;
-        this.variables = in.staticVariables;
-        uc = variables.uc;
     }
 
     public boolean tryAttackBestTarget(Location town)  {
-        UnitInfo[] enemies = variables.allenemies;
-        if(!uc.canAttack() || enemies.length == 0) return false;
+        UnitInfo[] enemies = in.staticVariables.allenemies;
+        if(!in.unitController.canAttack() || enemies.length == 0) return false;
 
         int myAttack = 0;
         boolean aoe = false;
 
-        if (variables.type == UnitType.ARCHER) {
+        if (in.staticVariables.type == UnitType.ARCHER) {
             myAttack = GameConstants.ARCHER_ATTACK;
-        } else if (variables.type == UnitType.BASE) {
+        } else if (in.staticVariables.type == UnitType.BASE) {
             myAttack = GameConstants.BASE_ATTACK;
             aoe = true;
-        } else if (variables.type == UnitType.CATAPULT) {
+        } else if (in.staticVariables.type == UnitType.CATAPULT) {
             myAttack = GameConstants.CATAPULT_ATTACK;
-        } else if (variables.type == UnitType.EXPLORER) {
+        } else if (in.staticVariables.type == UnitType.EXPLORER) {
             myAttack = GameConstants.EXPLORER_ATTACK;
-        } else if (variables.type == UnitType.KNIGHT) {
+        } else if (in.staticVariables.type == UnitType.KNIGHT) {
             myAttack = GameConstants.KNIGHT_ATTACK;
-        } else if (variables.type == UnitType.MAGE) {
+        } else if (in.staticVariables.type == UnitType.MAGE) {
             myAttack = GameConstants.MAGE_ATTACK;
             aoe = true;
-        } else if (variables.type == UnitType.SOLDIER) {
+        } else if (in.staticVariables.type == UnitType.SOLDIER) {
             myAttack = GameConstants.SOLDIER_ATTACK;
-        } else if (variables.type == UnitType.TOWER) {
+        } else if (in.staticVariables.type == UnitType.TOWER) {
             myAttack = GameConstants.TOWER_ATTACK;
         }
 
-        if (aoe || variables.type == UnitType.CATAPULT) {
+        if (aoe || in.staticVariables.type == UnitType.CATAPULT) {
             return false;
         }
 
@@ -54,7 +50,7 @@ public class Attack {
 
         for (UnitInfo unit : enemies) {
             Location target = unit.getLocation();
-            if (uc.canAttack(target)) {
+            if (in.unitController.canAttack(target)) {
                 int health = unit.getHealth();
                 if (bestTargetHealth > health) {
                     bestTarget = unit;
@@ -70,21 +66,21 @@ public class Attack {
         }
 
         if (killableTarget != null) {
-            uc.attack(killableLoc);
+            in.unitController.attack(killableLoc);
             return true;
         } else if (bestTarget != null) {
-            uc.attack(bestLoc);
+            in.unitController.attack(bestLoc);
             return true;
         } else {
             boolean found = false;
-            for (TownInfo mytown : variables.myTowns) {
+            for (TownInfo mytown : in.staticVariables.myTowns) {
                 if (mytown.getLocation().isEqual(town)) {
                     found = true;
                     break;
                 }
             }
-            if (uc.canAttack(town) && !found) {
-                uc.attack(town);
+            if (in.unitController.canAttack(town) && !found) {
+                in.unitController.attack(town);
             }
         }
 

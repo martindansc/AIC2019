@@ -4,12 +4,10 @@ import aic2019.*;
 
 public class Pathfinder {
 
-    UnitController uc;
-    StaticVariables variables;
+    private Injection in;
 
-    public Pathfinder(StaticVariables variables, UnitController uc) {
-        this.uc = uc;
-        this.variables = variables;
+    public Pathfinder(Injection in) {
+        this.in = in;
     }
 
     final int INF = 1000000;
@@ -27,7 +25,7 @@ public class Pathfinder {
         if (prevTarget == null || !target.isEqual(prevTarget)) resetPathfinding();
 
         //If I'm at a minimum distance to the target, I'm free!
-        Location myLoc = variables.myLocation;
+        Location myLoc = in.staticVariables.myLocation;
         int d = myLoc.distanceSquared(target);
         if (d <= minDistToEnemy) resetPathfinding();
 
@@ -40,23 +38,23 @@ public class Pathfinder {
         if (lastObstacleFound != null) dir = myLoc.directionTo(lastObstacleFound);
 
         //This should not happen for a single unit, but whatever
-        if (uc.canMove(dir)) resetPathfinding();
+        if (in.unitController.canMove(dir)) resetPathfinding();
 
         //I rotate clockwise or counterclockwise (depends on 'rotateRight'). If I try to go out of the map I change the orientation
         //Note that we have to try at most 16 times since we can switch orientation in the middle of the loop. (It can be done more efficiently)
         for (int i = 0; i < 16; ++i){
-            if (uc.canMove(dir)){
+            if (in.unitController.canMove(dir)){
                 return dir;
             }
             Location newLoc = myLoc.add(dir);
-            if (uc.isOutOfMap(newLoc)) rotateRight = !rotateRight;
+            if (in.unitController.isOutOfMap(newLoc)) rotateRight = !rotateRight;
                 //If I could not go in that direction and it was not outside of the map, then this is the latest obstacle found
             else lastObstacleFound = myLoc.add(dir);
             if (rotateRight) dir = dir.rotateRight();
             else dir = dir.rotateLeft();
         }
 
-        if (uc.canMove(dir)) return dir;
+        if (in.unitController.canMove(dir)) return dir;
 
         return null;
     }

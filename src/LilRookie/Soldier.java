@@ -3,18 +3,18 @@ package LilRookie;
 import aic2019.*;
 
 public class Soldier {
-    private StaticVariables variables;
+    private Injection in;
 
-    public Soldier(StaticVariables variables) {
-        this.variables = variables;
+    public Soldier(Injection in) {
+        this.in = in;
     }
 
     public Location getSoldierTarget() {
         TownInfo closestTown = null;
         int distance = 10000;
-        for (TownInfo town : variables.enemytowns) {
+        for (TownInfo town : in.staticVariables.enemytowns) {
             Location townLoc = town.getLocation();
-            int currentDistance = variables.myLocation.distanceSquared(townLoc);
+            int currentDistance = in.staticVariables.myLocation.distanceSquared(townLoc);
             if (currentDistance < distance) {
                 distance = currentDistance;
                 closestTown = town;
@@ -23,7 +23,7 @@ public class Soldier {
         if (closestTown != null) {
             return closestTown.getLocation();
         } else {
-            return variables.myLocation;
+            return in.staticVariables.myLocation;
         }
     }
 }
