@@ -7,6 +7,7 @@ public class UnitPlayer {
     public void run(UnitController uc) {
 
         Injection in = new Injection(uc);
+        int i = 1;
 
         while (true){
             in.staticVariables.update();
@@ -20,8 +21,11 @@ public class UnitPlayer {
 
 			/*If this unit is a base, try spawning a soldier at direction dir*/
 			if (uc.getType() == UnitType.BASE) {
-                if (uc.canSpawn(dir, UnitType.SOLDIER)) uc.spawn(dir, UnitType.SOLDIER);
-                //if (in.unitController.canSpawn(dir, UnitType.WORKER)) in.unitController.spawn(dir, UnitType.WORKER);
+                //if (uc.canSpawn(dir, UnitType.SOLDIER)) uc.spawn(dir, UnitType.SOLDIER);
+                if(i>0){
+                    if (in.unitController.canSpawn(dir, UnitType.WORKER)) in.unitController.spawn(dir, UnitType.WORKER);
+                    --i;
+                }
             }
 
 			else if (in.unitController.getType() == UnitType.SOLDIER){

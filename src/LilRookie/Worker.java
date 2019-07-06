@@ -12,6 +12,8 @@ public class Worker {
     Boolean directionIsRandom;
     //Location of the closest resource
     private Location objectiveLocation;
+    //Location of the closest base or town
+    private Location objectiveBase;
     //RandomDirection
     Direction randomDir;
 
@@ -71,16 +73,87 @@ public class Worker {
                 //TODO
             }
         }
-        else if(currentAction == "GOTORESOURCE"){
+        if(currentAction == "GOTORESOURCE"){
+            //Move to desired resource
+            if (!in.unitController.canMove()) return;
+
+            Direction dir = in.pathfinder.getNextLocationTarget(objectiveLocation);
+            if (dir != null && in.unitController.canMove(dir)) {
+                in.unitController.move(dir);
+            }
+            //Check if desired resource has been reached
+            Location nextLocation =  in.staticVariables.myLocation.add(dir);
+            if(nextLocation.isEqual(objectiveLocation)){
+                currentAction = "GATHERRESOURCE";
+                //TODO: Use cangather()??
+                in.unitController.gather();
+            }
+            //Scout viewing zone
+            //TODO
+
+        }
+        if(currentAction == "GATHERRESOURCE"){
+
+            int health = in.staticVariables.unitInfo.getHealth();
+            in.unitController.gather();
+            //Si ja hem recol.lectat el que voliem del resource tornem a la town o base objectiu
+            float wood = in.staticVariables.unitInfo.getWood();
+            if(wood >= 60.0){ //60
+                objectiveBase = getClosestTownToResource();
+                currentAction = "GOTOTOWN";
+            }
+            float iron = in.staticVariables.unitInfo.getIron();
+            if( iron >= 20.0){ //20
+                objectiveBase = getClosestTownToResource();
+                currentAction = "GOTOTOWN";
+            }
+            float crystal = in.staticVariables.unitInfo.getCrystal();
+            if( crystal >= 6.0){ //6
+                objectiveBase = getClosestTownToResource();
+                currentAction = "GOTOTOWN";
+            }
             //Scout viewing zone
             //TODO
         }
-        else if(currentAction == "GOTOTOWN"){
+        if(currentAction == "GOTOTOWN"){
+            //TODO: check if destination is own
+            //Move to desired town or base
+            if (!in.unitController.canMove()) return;
+            Direction dir = in.pathfinder.getNextLocationTarget(objectiveBase);
+            //Sino avanco cap a lobjectiu
+            if (dir != null && in.unitController.canMove(dir)) {
+                in.unitController.move(dir);
+            }
+            //Si puc depositar deposito
+            Direction dirbase = in.unitController.getLocation().directionTo(objectiveBase);
+            if(in.unitController.canDeposit(dirbase)){
+                in.unitController.deposit(dirbase);
+                currentAction = "GOTORESOURCE";
+                //Move to desired resource
+                if (!in.unitController.canMove()) return;
+
+                dir = in.pathfinder.getNextLocationTarget(objectiveLocation);
+                if (dir != null && in.unitController.canMove(dir)) {
+                    in.unitController.move(dir);
+                }
+                /*
+                //Check if desired resource has been reached
+                Location nextLocation =  in.staticVariables.myLocation.add(dir);
+                if(nextLocation.isEqual(in.staticVariables.myLocation)){
+                    currentAction = "GATHERRESOURCE";
+                    //TODO: Use cangather()??
+                    in.unitController.gather();
+                }
+                 */
+            }
+
 
             //Scout viewing zone
             //TODO
         }
     }
+
+
 
     public Boolean scout(String mode){
         //TODO: actualitzar posicions del scout al mapa
@@ -109,5 +182,19 @@ public class Worker {
             }
         }
         return returnLocation;
+    }
+
+    //Returns closest town or base
+    public Location getClosestTownToResource(){
+        Location loc = in.staticVariables.allies.getInitialLocation();
+        TownInfo[] towns = in.unitController.getTowns(in.unitController.getTeam(), false);
+        for(TownInfo tI : towns){
+            int currentDistance = Math.abs(loc.distanceSquared(objectiveLocation));
+            int nextDistance = Math.abs(tI.getLocation().distanceSquared(objectiveLocation));
+            if( nextDistance < currentDistance ){
+                loc = tI.getLocation();
+            }
+        }
+        return loc;
     }
 }

@@ -10,6 +10,7 @@ public class StaticVariables {
     public int round;
     public Team opponent;
     public Team allies;
+    public UnitInfo unitInfo;
     public Direction[] dirs;
     public Location myLocation;
     public UnitType type;
@@ -27,6 +28,7 @@ public class StaticVariables {
         dirs = Direction.values();
         type = in.unitController.getType();
         enemytowns = in.unitController.getTowns(allies, true);
+
     }
 
     public void update() {
@@ -36,5 +38,6 @@ public class StaticVariables {
         allenemies = in.unitController.senseUnits(allies, true);
         units = in.unitController.senseUnits();
         myTowns = in.unitController.getTowns(allies, false);
+        unitInfo = in.unitController.getInfo();
     }
 }
