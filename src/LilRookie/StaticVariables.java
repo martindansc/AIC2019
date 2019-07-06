@@ -17,6 +17,8 @@ public class StaticVariables {
     public UnitInfo[] units;
     public UnitInfo[] enemies;
     public UnitInfo[] allenemies;
+    public int baseId;
+    public int myId;
     public TownInfo[] enemytowns;
     public TownInfo[] myTowns;
     public float wood;
@@ -30,6 +32,12 @@ public class StaticVariables {
         allies = in.unitController.getTeam();
         dirs = Direction.values();
         type = in.unitController.getType();
+
+        baseId = in.unitController.senseUnit(allies.getInitialLocation()).getID();
+        myId = in.unitController.getInfo().getID();
+
+        type = in.unitController.getType();
+        enemytowns = in.unitController.getTowns(allies, true);
         resources = Resource.values();
     }
 
