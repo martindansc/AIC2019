@@ -4,9 +4,10 @@ import aic2019.*;
 
 public class UnitPlayer {
 
-    private Injection in;
-
     public void run(UnitController uc) {
+
+        Injection in = new Injection(uc);
+
 
         while (true){
             in.staticVariables.update();
@@ -20,7 +21,8 @@ public class UnitPlayer {
 
 			/*If this unit is a base, try spawning a soldier at direction dir*/
 			if (uc.getType() == UnitType.BASE) {
-                if (uc.canSpawn(dir, UnitType.SOLDIER)) uc.spawn(dir, UnitType.SOLDIER);
+                //if (uc.canSpawn(dir, UnitType.SOLDIER)) uc.spawn(dir, UnitType.SOLDIER);
+                if (uc.canSpawn(dir, UnitType.WORKER)) uc.spawn(dir, UnitType.WORKER);
             }
 
 			else if (uc.getType() == UnitType.SOLDIER){

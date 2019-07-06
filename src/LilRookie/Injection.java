@@ -12,6 +12,7 @@ public class Injection {
     public final Move move;
     public final Pathfinder pathfinder;
     public final Soldier soldier;
+    public final Worker worker;
 
 
     Injection (UnitController uc) {
@@ -22,5 +23,6 @@ public class Injection {
         this.move = new Move(this);
         this.pathfinder = new Pathfinder(this);
         this.soldier = new Soldier(this);
+        this.worker = new Worker(this);
     }
 }
