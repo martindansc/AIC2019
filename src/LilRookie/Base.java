@@ -59,6 +59,8 @@ public class Base {
     }
 
     private int spawnAndGetIdIfPossible(Direction dir, UnitType ut) {
+        if (!in.market.canBuild(ut)) return -1;
+
         if (in.unitController.canSpawn(dir, ut)) {
             in.unitController.spawn(dir, ut);
 

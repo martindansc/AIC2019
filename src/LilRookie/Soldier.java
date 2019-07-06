@@ -20,10 +20,12 @@ public class Soldier {
                 closestTown = town;
             }
         }
+
         if (closestTown != null) {
             return closestTown.getLocation();
         } else {
             return in.staticVariables.myLocation;
         }
     }
+
 }

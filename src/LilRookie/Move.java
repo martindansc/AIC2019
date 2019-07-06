@@ -19,4 +19,11 @@ public class Move {
             in.unitController.move(dir);
         }
     }
+
+    public void sendResourcesMessage() {
+        for (ResourceInfo resource : in.staticVariables.resourcesSeen) {
+            in.messages.sendCreateAndSendToLocation(in.staticVariables.baseId, UnitType.WORKER, resource.getLocation().x, resource.getLocation().y);
+        }
+    }
+
 }

@@ -8,14 +8,11 @@ public class UnitPlayer {
 
         Injection in = new Injection(uc);
 
-        if(uc.getRound() < 2) {
-            in.messages.sendCreateAndSendToLocation(in.staticVariables.baseId, UnitType.WORKER, 4, 20);
-        }
-
         while (true){
             in.staticVariables.update();
             in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_COUNTER);
 
+            in.move.sendResourcesMessage();
 
 			/*If this unit is a base, try spawning a soldier at direction dir*/
 			if (uc.getType() == UnitType.BASE) {

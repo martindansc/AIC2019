@@ -12,6 +12,7 @@ public class StaticVariables {
     public Team allies;
     public Direction[] dirs;
     public Resource[] resources;
+    public ResourceInfo[] resourcesSeen;
     public Location myLocation;
     public UnitType type;
     public UnitInfo[] units;
@@ -52,5 +53,6 @@ public class StaticVariables {
         wood = in.unitController.getWood();
         iron = in.unitController.getIron();
         crystal = in.unitController.getCrystal();
+        resourcesSeen = in.unitController.senseResources();
     }
 }
