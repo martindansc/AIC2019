@@ -11,6 +11,9 @@ public class Move {
 
     public void myMove(Location target) {
         if (!in.unitController.canMove()) return;
+        if (catapultInRange(target)) return;
+
+        if (in.staticVariables.type.getAttackRangeSquared() >= in.staticVariables.myLocation.distanceSquared(target)) return;
 
         if (!doMicro()) {
             Direction dir = in.pathfinder.getNextLocationTarget(target);
@@ -22,17 +25,30 @@ public class Move {
         }
     }
 
+    public boolean catapultInRange(Location target) {
+        if (in.staticVariables.type != UnitType.CATAPULT) return false;
+        if (target.distanceSquared(in.staticVariables.myLocation) <= GameConstants.CATAPULT_ATTACK_RANGE_SQUARED) return true;
+        return false;
+    }
+
     public boolean doMicro() {
+
         MicroInfo[] microInfo = new MicroInfo[9];
         for (int i = 0; i < 9; i++) {
             microInfo[i] = new MicroInfo(in.staticVariables.myLocation.add(in.staticVariables.dirs[i]));
         }
 
+        boolean enemies = false;
         for (UnitInfo enemy : in.staticVariables.allenemies) {
-            for (int i = 0; i < 9; i++) {
-                microInfo[i].update(enemy);
+            if (in.staticVariables.type == UnitType.CATAPULT || !in.unitController.isObstructed(enemy.getLocation(), in.staticVariables.myLocation)) {
+                enemies = true;
+                for (int i = 0; i < 9; i++) {
+                    microInfo[i].update(enemy);
+                }
             }
         }
+
+        if (!enemies) return false;
 
         int bestIndex = -1;
 
@@ -63,6 +79,7 @@ public class Move {
         }
 
         void update(UnitInfo unit) {
+
             int distance = unit.getLocation().distanceSquared(loc);
             if (distance <= unit.getType().attackRangeSquared) ++numEnemies;
             if (distance < minDistToEnemy) minDistToEnemy = distance;

@@ -35,7 +35,13 @@ public class Attack {
             myAttack = GameConstants.TOWER_ATTACK;
         }
 
-        if (in.staticVariables.type == UnitType.MAGE) {
+
+        if (in.staticVariables.type == UnitType.CATAPULT) {
+            if (in.unitController.canAttack(town)) {
+                in.unitController.attack(town);
+                return true;
+            }
+        } else if (in.staticVariables.type == UnitType.MAGE) {
             Location[] locs = in.unitController.getVisibleLocations(5);
             int[] scores = new int[locs.length];
             for (int i = 0; i < locs.length; i++) {

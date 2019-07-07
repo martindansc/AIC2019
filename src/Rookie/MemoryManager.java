@@ -1,6 +1,7 @@
 package Rookie;
 
 import aic2019.UnitController;
+import aic2019.UnitType;
 
 public class MemoryManager {
 
@@ -88,6 +89,20 @@ public class MemoryManager {
 
     public int getTimesSendUnitLocation(int locX, int locY) {
         return uc.read(constants.ID_MAP_CLAIMS + locX * 200 + locY);
+    }
+
+    public void countUnits() {
+        if (in.staticVariables.type == UnitType.SOLDIER) {
+            in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_SOLDIER_COUNTER);
+        } else if (in.staticVariables.type == UnitType.ARCHER) {
+            in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_ARCHER_COUNTER);
+        } else if (in.staticVariables.type == UnitType.KNIGHT) {
+            in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_KNIGHT_COUNTER);
+        } else if (in.staticVariables.type == UnitType.CATAPULT) {
+            in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_CATAPULT_COUNTER);
+        } else if (in.staticVariables.type == UnitType.MAGE) {
+            in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_MAGE_COUNTER);
+        }
     }
 
 }

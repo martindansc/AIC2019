@@ -32,9 +32,17 @@ public class Base {
 
     private UnitType chooseBestUnitType(int[] message) {
 
+        int knights = in.memoryManager.readValue(in.constants.ID_ALLIES_KNIGHT_COUNTER);
+        int soldiers = in.memoryManager.readValue(in.constants.ID_ALLIES_SOLDIER_COUNTER);
+        int archers = in.memoryManager.readValue(in.constants.ID_ALLIES_ARCHER_COUNTER);
+        int catapults = in.memoryManager.readValue(in.constants.ID_ALLIES_CATAPULT_COUNTER);
+        int mages = in.memoryManager.readValue(in.constants.ID_ALLIES_MAGE_COUNTER);
+
         if(message[2] == 1) {
             return UnitType.WORKER;
         }
+
+        if (soldiers <= archers) return UnitType.SOLDIER;
 
         return UnitType.ARCHER;
     }

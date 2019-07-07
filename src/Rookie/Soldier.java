@@ -25,20 +25,7 @@ public class Soldier {
         if (closestTown != null) {
             return closestTown.getLocation();
         } else {
-            for (TownInfo town : in.staticVariables.myTowns) {
-                Location townLoc = town.getLocation();
-                int currentDistance = in.staticVariables.myLocation.distanceSquared(townLoc);
-                if (currentDistance < distance) {
-                    distance = currentDistance;
-                    closestTown = town;
-                }
-            }
-
-            if (closestTown != null) {
-                return closestTown.getLocation();
-            }
-
-            return in.staticVariables.myLocation;
+            return in.staticVariables.enemyBase;
         }
     }
 

@@ -23,11 +23,7 @@ public class UnitPlayer {
             } else if (in.staticVariables.type == UnitType.WORKER) {
                 in.worker.run();
             } else {
-			    if (in.staticVariables.type == UnitType.SOLDIER) {
-                    in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_SOLDIER_COUNTER);
-                } else if (in.staticVariables.type == UnitType.ARCHER) {
-                    in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_ARCHER_COUNTER);
-                }
+                in.memoryManager.countUnits();
                 in.move.myMove(target);
             }
 
