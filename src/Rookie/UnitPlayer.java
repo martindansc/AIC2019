@@ -2,6 +2,7 @@ package Rookie;
 
 import aic2019.Location;
 import aic2019.UnitController;
+import aic2019.UnitInfo;
 import aic2019.UnitType;
 
 public class UnitPlayer {
@@ -12,21 +13,22 @@ public class UnitPlayer {
 
         while (true){
             in.staticVariables.update();
-            in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_COUNTER);
 
-            in.move.sendResourcesMessage();
+            in.map.sendResourcesMessage();
+            Location target = in.soldier.getSoldierTarget();
+            in.attack.tryAttackBestTarget(target);
 
-			/*If this unit is a base, try spawning a soldier at direction dir*/
 			if (uc.getType() == UnitType.BASE) {
                 in.base.run();
-            }
-
-			else if (in.unitController.getType() == UnitType.SOLDIER){
-			    Location target = in.soldier.getSoldierTarget();
-			    in.move.myMove(target);
-			    in.attack.tryAttackBestTarget(target);
-            } else if (in.unitController.getType() == UnitType.WORKER) {
+            } else if (in.staticVariables.type == UnitType.WORKER) {
                 in.worker.run();
+            } else {
+			    if (in.staticVariables.type == UnitType.SOLDIER) {
+                    in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_SOLDIER_COUNTER);
+                } else if (in.staticVariables.type == UnitType.ARCHER) {
+                    in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_ARCHER_COUNTER);
+                }
+                in.move.myMove(target);
             }
 
             in.unitController.yield(); //End of turn
