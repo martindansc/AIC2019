@@ -1,6 +1,9 @@
-package LilRookie;
-import aic2019.*;
-import com.sun.org.apache.xpath.internal.operations.Bool;
+package Rookie;
+
+import aic2019.Direction;
+import aic2019.Location;
+import aic2019.ResourceInfo;
+import aic2019.TownInfo;
 
 public class Worker {
     private final Injection in;
@@ -37,12 +40,6 @@ public class Worker {
     }
 
     public void run(){
-        int[] message = in.memoryManager.getNewMessage(1);
-        if(message[0] != 0) {
-            this.fixObjectiveLocation(new Location(message[0], message[1]), true);
-            in.memoryManager.clearMessageMine(1);
-        }
-
         if(currentAction == "GOTORANDOM"){
             //Scout viewing zone
             Boolean resourceFound = scout("random");
