@@ -36,7 +36,7 @@ public class Base {
             return UnitType.WORKER;
         }
 
-        return UnitType.SOLDIER;
+        return UnitType.ARCHER;
     }
 
     private Direction getBestDirectionSpawn() {

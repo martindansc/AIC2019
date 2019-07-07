@@ -1,5 +1,7 @@
 package Rookie;
 
+import aic2019.*;
+
 public class Map {
 /*
 A tenir en compte en el mapa:
@@ -35,7 +37,13 @@ Estructures i unitats
     }
 
     public boolean canSendUnitToLocation(int locX, int locY) {
-        return (in.memoryManager.getTimesSendUnitLocation(locX, locY) < 2);
+        return (in.memoryManager.getTimesSendUnitLocation(locX, locY) < 1);
+    }
+
+    public void sendResourcesMessage() {
+        for (ResourceInfo resource : in.staticVariables.resourcesSeen) {
+            in.messages.sendCreateAndSendToLocation(in.staticVariables.baseId, UnitType.WORKER, resource.getLocation().x, resource.getLocation().y);
+        }
     }
 
 

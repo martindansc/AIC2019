@@ -6,7 +6,6 @@ public class StaticVariables {
 
     private final Injection in;
 
-
     public int round;
     public Team opponent;
     public Team allies;
@@ -14,6 +13,7 @@ public class StaticVariables {
     public Resource[] resources;
     public ResourceInfo[] resourcesSeen;
     public Location myLocation;
+    public Location[] visiblelocs;
     public UnitType type;
     public UnitInfo[] units;
     public UnitInfo[] enemies;
@@ -39,7 +39,6 @@ public class StaticVariables {
         myId = in.unitController.getInfo().getID();
 
         type = in.unitController.getType();
-        enemytowns = in.unitController.getTowns(allies, true);
         resources = Resource.values();
     }
 
@@ -56,5 +55,6 @@ public class StaticVariables {
         crystal = in.unitController.getCrystal();
         resourcesSeen = in.unitController.senseResources();
         unitInfo = in.unitController.getInfo();
+        visiblelocs = in.unitController.getVisibleLocations();
     }
 }
