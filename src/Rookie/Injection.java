@@ -12,6 +12,9 @@ public class Injection {
     public final Move move;
     public final Pathfinder pathfinder;
     public final Soldier soldier;
+    public final Archer archer;
+    public final Mage mage;
+    public final Catapult catapult;
     public final Worker worker;
     public final Base base;
     public final Messages messages;
@@ -27,6 +30,9 @@ public class Injection {
         this.move = new Move(this);
         this.pathfinder = new Pathfinder(this);
         this.soldier = new Soldier(this);
+        this.archer = new Archer (this);
+        this.mage = new Mage (this);
+        this.catapult = new Catapult(this);
         this.worker = new Worker(this);
         this.base = new Base(this);
         this.messages = new Messages(this);

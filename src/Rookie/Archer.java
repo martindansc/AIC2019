@@ -1,17 +1,20 @@
 package Rookie;
 
-import aic2019.*;
+import aic2019.Direction;
+import aic2019.Location;
+import aic2019.UnitInfo;
+import aic2019.UnitType;
 
-public class Soldier {
+public class Archer {
     private Injection in;
 
-    public Soldier(Injection in) {
+    public Archer(Injection in) {
         this.in = in;
     }
 
     public void run(Location target) {
         in.attack.genericTryAttack(target);
-        in.soldier.tryMove(target);
+        in.archer.tryMove(target);
         in.attack.genericTryAttack(target);
     }
 
@@ -80,6 +83,7 @@ public class Soldier {
         }
 
         void update(UnitInfo unit) {
+
             int distance = unit.getLocation().distanceSquared(loc);
             if (distance <= unit.getType().attackRangeSquared) ++numEnemies;
             if (distance < minDistToEnemy) minDistToEnemy = distance;

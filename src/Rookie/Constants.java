@@ -11,6 +11,8 @@ public class Constants {
     public int ID_ALLIES_SOLDIER_COUNTER = 1000;
     public int ID_ALLIES_ARCHER_COUNTER = 1003;
     public int ID_ALLIES_KNIGHT_COUNTER = 1006;
+    public int ID_ALLIES_CATAPULT_COUNTER = 1009;
+    public int ID_ALLIES_MAGE_COUNTER = 1009;
 
     public int ID_MAP_CLAIMS = 15000;
 }

@@ -2,21 +2,35 @@ package Rookie;
 
 import aic2019.*;
 
-public class Soldier {
+public class Catapult {
     private Injection in;
 
-    public Soldier(Injection in) {
+    public Catapult(Injection in) {
         this.in = in;
     }
 
     public void run(Location target) {
-        in.attack.genericTryAttack(target);
-        in.soldier.tryMove(target);
-        in.attack.genericTryAttack(target);
+        tryAttack(target);
+        in.catapult.tryMove(target);
+        tryAttack(target);
+    }
+
+    public boolean tryAttack(Location town) {
+        if (!in.unitController.canAttack()) return false;
+        if (in.staticVariables.allyBase.isEqual(town)) return false;
+
+        int myAttack = in.attack.getMyAttack();
+
+        if (in.unitController.canAttack(town)) {
+            in.unitController.attack(town);
+            return true;
+        }
+        return false;
     }
 
     public void tryMove(Location target) {
         if (!in.unitController.canMove()) return;
+        if (catapultInRange(target)) return;
         boolean isTargetBase = in.staticVariables.allyBase.isEqual(target);
         boolean isTargetObstructed = in.unitController.canSenseLocation(target) && in.unitController.isObstructed(target, in.staticVariables.myLocation);
 
@@ -30,6 +44,12 @@ public class Soldier {
                 }
             }
         }
+    }
+
+    public boolean catapultInRange(Location target) {
+        if (in.staticVariables.type != UnitType.CATAPULT) return false;
+        if (target.distanceSquared(in.staticVariables.myLocation) <= GameConstants.CATAPULT_ATTACK_RANGE_SQUARED) return true;
+        return false;
     }
 
     public boolean doMicro() {
@@ -80,6 +100,7 @@ public class Soldier {
         }
 
         void update(UnitInfo unit) {
+
             int distance = unit.getLocation().distanceSquared(loc);
             if (distance <= unit.getType().attackRangeSquared) ++numEnemies;
             if (distance < minDistToEnemy) minDistToEnemy = distance;

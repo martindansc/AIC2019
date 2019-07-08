@@ -2,17 +2,69 @@ package Rookie;
 
 import aic2019.*;
 
-public class Soldier {
+public class Mage {
     private Injection in;
 
-    public Soldier(Injection in) {
+    public Mage(Injection in) {
         this.in = in;
     }
 
     public void run(Location target) {
-        in.attack.genericTryAttack(target);
-        in.soldier.tryMove(target);
-        in.attack.genericTryAttack(target);
+        tryAttack(target);
+        in.mage.tryMove(target);
+        tryAttack(target);
+    }
+
+    public boolean tryAttack(Location town) {
+        if (!in.unitController.canAttack()) return false;
+        if (in.staticVariables.allyBase.isEqual(town)) return false;
+        UnitInfo[] enemies = in.staticVariables.allenemies;
+        if (enemies.length == 0 && town.isEqual(in.staticVariables.myLocation)) return false;
+
+        int myAttack = in.attack.getMyAttack();
+
+        Location[] locs = in.unitController.getVisibleLocations(5);
+        int[] scores = new int[locs.length];
+        for (int i = 0; i < locs.length; i++) {
+            int distance = locs[i].distanceSquared(in.staticVariables.myLocation);
+            if (distance > 2 && in.unitController.canAttack(locs[i])) {
+                for (Direction dir : in.staticVariables.dirs) {
+                    Location target = locs[i].add(dir);
+                    if (in.unitController.canSenseLocation(target)) {
+                        UnitInfo unit = in.unitController.senseUnit(target);
+                        TownInfo city = in.unitController.senseTown(target);
+                        if (unit != null) {
+                            if (unit.getTeam() == in.staticVariables.allies) {
+                                scores[i]--;
+                            } else {
+                                scores[i]++;
+                            }
+                        } else if (city != null){
+                            if (city.getOwner() == in.staticVariables.allies) {
+                                scores[i]--;
+                            } else {
+                                scores[i]++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        int index = -1;
+        int bestscore = 0;
+        for (int i = 0; i < scores.length; i++) {
+            if (scores[i] > bestscore) {
+                index = i;
+                bestscore = scores[i];
+            }
+        }
+
+        if (index != -1) {
+            in.unitController.attack(locs[index]);
+            return true;
+        }
+        return false;
     }
 
     public void tryMove(Location target) {
@@ -80,6 +132,7 @@ public class Soldier {
         }
 
         void update(UnitInfo unit) {
+
             int distance = unit.getLocation().distanceSquared(loc);
             if (distance <= unit.getType().attackRangeSquared) ++numEnemies;
             if (distance < minDistToEnemy) minDistToEnemy = distance;
