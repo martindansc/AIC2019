@@ -13,6 +13,7 @@ public class StaticVariables {
     public Resource[] resources;
     public ResourceInfo[] resourcesSeen;
     public Location myLocation;
+    public Location allyBase;
     public Location enemyBase;
     public Location[] visiblelocs;
     public UnitType type;
@@ -37,10 +38,10 @@ public class StaticVariables {
         type = in.unitController.getType();
 
         enemyBase = in.unitController.getTeam().getOpponent().getInitialLocation();
+        allyBase = in.unitController.getTeam().getInitialLocation();
         baseId = in.unitController.senseUnit(allies.getInitialLocation()).getID();
         myId = in.unitController.getInfo().getID();
 
-        type = in.unitController.getType();
         resources = Resource.values();
     }
 

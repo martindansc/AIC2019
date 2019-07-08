@@ -35,11 +35,12 @@ public class Worker {
     public void fixRandomDirection(){
         directionIsRandom = true;
         int randomNumber = (int)(Math.random()*8);
-        randomDir = Direction.values()[randomNumber];
+        randomDir = in.staticVariables.dirs[randomNumber];
         currentAction = "GOTORANDOM";
     }
 
     public void run(){
+
         int[] message = in.memoryManager.getNewMessage(1);
         if(message[0] != 0) {
             this.fixObjectiveLocation(new Location(message[0], message[1]), true);
@@ -87,23 +88,23 @@ public class Worker {
             if (!in.unitController.canMove()) return;
 
             Direction dir = in.pathfinder.getNextLocationTarget(objectiveLocation);
-            if (dir != null && in.unitController.canMove(dir)) {
+
+            // You can move to direction ZERO, but don't really want to
+            if (dir != null && in.unitController.canMove(dir) && dir != Direction.ZERO) {
                 in.unitController.move(dir);
+
+                //Check if desired resource has been reached, can't gather if can't move (CDs)
+                if(in.staticVariables.myLocation.isEqual(objectiveLocation)){
+                    currentAction = "GATHERRESOURCE";
+                }
             }
-            //Check if desired resource has been reached
-            Location nextLocation =  in.staticVariables.myLocation.add(dir);
-            if(nextLocation.isEqual(objectiveLocation)){
-                currentAction = "GATHERRESOURCE";
-                //TODO: Use cangather()??
-                in.unitController.gather();
-            }
+
             //Scout viewing zone
             //TODO
 
         }
         if(currentAction == "GATHERRESOURCE"){
 
-            int health = in.staticVariables.unitInfo.getHealth();
             in.unitController.gather();
             //Si ja hem recol.lectat el que voliem del resource tornem a la town o base objectiu
             float wood = in.staticVariables.unitInfo.getWood();
@@ -127,7 +128,15 @@ public class Worker {
         if(currentAction == "GOTOTOWN"){
             //Check if destination is own
             if(!objectiveBase.isEqual(in.staticVariables.allies.getInitialLocation())){
-                if(in.unitController.senseTown(objectiveBase).getOwner() != in.staticVariables.allies){
+                boolean foundAllyTown = false;
+                for (TownInfo closestTown : in.staticVariables.myTowns) {
+                    if (closestTown.getLocation().isEqual(objectiveBase)) {
+                        foundAllyTown = true;
+                        break;
+                    }
+                }
+
+                if (!foundAllyTown) {
                     objectiveBase = getClosestTownToLocation(in.unitController.getLocation());
                 }
             }
