@@ -37,6 +37,12 @@ public class Worker {
     }
 
     public void run(){
+        int[] message = in.memoryManager.getNewMessage(1);
+        if(message[0] != 0) {
+            this.fixObjectiveLocation(new Location(message[0], message[1]), true);
+            in.memoryManager.clearMessageMine(1);
+        }
+
         if(currentAction == "GOTORANDOM"){
             //Scout viewing zone
             Boolean resourceFound = scout("random");
