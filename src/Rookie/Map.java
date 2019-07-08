@@ -42,8 +42,15 @@ Estructures i unitats
 
     public void sendResourcesMessage() {
         for (ResourceInfo resource : in.staticVariables.resourcesSeen) {
-            in.messages.sendCreateAndSendToLocation(in.staticVariables.baseId, UnitType.WORKER, resource.getLocation().x, resource.getLocation().y);
+            Location loc = resource.getLocation();
+            in.memoryManager.addObjective(UnitType.WORKER, 1, in.constants.WORKERS_GET_WOOD, loc.x, loc.y, 0);
         }
     }
+
+
+    public UnitInfo getClosestAlliedUnitToLocation(UnitType unitType) {
+        return null;
+    }
+
 
 }

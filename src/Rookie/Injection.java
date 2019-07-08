@@ -20,7 +20,8 @@ public class Injection {
     public final Messages messages;
     public final Market market;
     public final Map map;
-
+    public final Helper helper;
+    public final Objectives objectives;
 
     Injection (UnitController uc) {
         this.unitController = uc;
@@ -38,5 +39,7 @@ public class Injection {
         this.messages = new Messages(this);
         this.market = new Market(this);
         this.map = new Map(this);
+        this.helper = new Helper(this);
+        this.objectives = new Objectives(this);
     }
 }

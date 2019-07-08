@@ -16,7 +16,7 @@ public class Base {
 
         Direction bestDir = this.getBestDirectionSpawn();
 
-        int[] message = in.memoryManager.getNewMessage(1);
+        int[] message = in.messages.readMessage();
 
         UnitType bestUnitType = this.chooseBestUnitType(message);
 
@@ -24,21 +24,18 @@ public class Base {
 
         if(id != -1 && message[0] != 0) {
             in.messages.sendToLocation(id, message[0], message[1]);
-            in.memoryManager.addTimeUnitLocation(message[0], message[1]);
-            in.memoryManager.clearMessageMine(1);
         }
 
     }
 
     private UnitType chooseBestUnitType(int[] message) {
-
         int knights = in.memoryManager.readValue(in.constants.ID_ALLIES_KNIGHT_COUNTER);
         int soldiers = in.memoryManager.readValue(in.constants.ID_ALLIES_SOLDIER_COUNTER);
         int archers = in.memoryManager.readValue(in.constants.ID_ALLIES_ARCHER_COUNTER);
         int catapults = in.memoryManager.readValue(in.constants.ID_ALLIES_CATAPULT_COUNTER);
         int mages = in.memoryManager.readValue(in.constants.ID_ALLIES_MAGE_COUNTER);
 
-        if(message[2] == 1) {
+        if(in.helper.intToUnitType(message[2]) == UnitType.WORKER) {
             return UnitType.WORKER;
         }
 

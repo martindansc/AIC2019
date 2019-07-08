@@ -1,8 +1,6 @@
 package Rookie;
 
-import aic2019.Location;
-import aic2019.UnitController;
-import aic2019.UnitType;
+import aic2019.*;
 
 public class UnitPlayer {
 
@@ -12,6 +10,7 @@ public class UnitPlayer {
 
         while (true){
             in.staticVariables.update();
+            in.messages.update();
             in.memoryManager.countUnits();
             in.map.sendResourcesMessage();
 
