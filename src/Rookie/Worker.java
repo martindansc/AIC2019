@@ -89,9 +89,11 @@ public class Worker {
 
             Direction dir = in.pathfinder.getNextLocationTarget(objectiveLocation);
 
-            // You can move to direction ZERO, but don't really want to
-            if (dir != null && in.unitController.canMove(dir) && dir != Direction.ZERO) {
-                in.unitController.move(dir);
+            if (dir != null && in.unitController.canMove(dir)) {
+                // You can move to direction ZERO, but don't really want to
+                if (dir != Direction.ZERO) {
+                    in.unitController.move(dir);
+                }
 
                 //Check if desired resource has been reached, can't gather if can't move (CDs)
                 if(in.staticVariables.myLocation.isEqual(objectiveLocation)){

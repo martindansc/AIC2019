@@ -80,7 +80,6 @@ public class Soldier {
         }
 
         void update(UnitInfo unit) {
-
             int distance = unit.getLocation().distanceSquared(loc);
             if (distance <= unit.getType().attackRangeSquared) ++numEnemies;
             if (distance < minDistToEnemy) minDistToEnemy = distance;
