@@ -19,7 +19,6 @@ public class Mage {
 
     public boolean tryAttack(Location town) {
         if (!in.unitController.canAttack()) return false;
-        if (in.staticVariables.allyBase.isEqual(town)) return false;
         if (!enemies && (!in.unitController.canSenseLocation(town) || (in.unitController.canSenseLocation(town) && in.unitController.isObstructed(town, in.staticVariables.myLocation)))) return false;
 
         int myAttack = in.attack.getMyAttack();

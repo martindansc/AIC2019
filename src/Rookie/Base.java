@@ -2,6 +2,7 @@ package Rookie;
 
 import aic2019.Direction;
 import aic2019.Location;
+import aic2019.UnitInfo;
 import aic2019.UnitType;
 
 public class Base {
@@ -13,6 +14,8 @@ public class Base {
     }
 
     public void run() {
+
+        tryAttack();
 
         Direction bestDir = this.getBestDirectionSpawn();
 
@@ -77,6 +80,45 @@ public class Base {
             return in.unitController.senseUnit(unitLocation).getID();
         }
         return -1;
+    }
+
+    private boolean tryAttack() {
+        if (!in.unitController.canAttack()) return false;
+
+        UnitInfo bestCatapult = null;
+        UnitInfo outerUnit = null;
+        int health = 10000;
+
+        for (UnitInfo enemy : in.staticVariables.allenemies) {
+            if (enemy.getType() == UnitType.CATAPULT) {
+                int enemyhealth = enemy.getHealth();
+                if (enemyhealth < health) {
+                    health = enemyhealth;
+                    bestCatapult = enemy;
+                }
+            }
+            if (enemy.getLocation().distanceSquared(in.staticVariables.myLocation) > 36) {
+                outerUnit = enemy;
+            }
+        }
+
+        if (bestCatapult != null) {
+            Location catapultLoc = bestCatapult.getLocation();
+            if (bestCatapult.getLocation().distanceSquared(in.staticVariables.myLocation) > 36) {
+                in.unitController.attack(catapultLoc.add(catapultLoc.directionTo(in.staticVariables.myLocation)));
+                return true;
+            }
+            in.unitController.attack(catapultLoc);
+            return true;
+        }
+
+        if (outerUnit != null) {
+            Location outerLoc = outerUnit.getLocation();
+            in.unitController.attack(outerLoc.add(outerLoc.directionTo(in.staticVariables.myLocation)));
+            return true;
+        }
+
+        return in.attack.genericTryAttack(in.staticVariables.allyBase);
     }
 
 }

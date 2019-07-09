@@ -17,7 +17,7 @@ public class Constants {
     public int MESSAGE_SIZE = 4;
     public int MAX_MESSAGES_INBOX = 10;
     public int OBJECTIVE_SIZE = 9;
-    public int MAX_OBJECTIVES = 40;
+    public int MAX_OBJECTIVES = 10;
 
 
     // OBJECTIVE CONSTANTS
