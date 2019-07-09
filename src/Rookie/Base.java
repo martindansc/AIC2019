@@ -39,7 +39,7 @@ public class Base {
             return UnitType.WORKER;
         }
 
-        if (soldiers < archers) return UnitType.SOLDIER;
+        if (soldiers < 3 * archers) return UnitType.SOLDIER;
 
         return UnitType.ARCHER;
     }

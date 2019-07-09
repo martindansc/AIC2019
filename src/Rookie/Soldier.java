@@ -90,8 +90,6 @@ public class Soldier {
         }
 
         boolean isBetter(MicroInfo m) {
-            if (numEnemies < m.numEnemies) return true;
-            if (numEnemies > m.numEnemies) return false;
             if (canAttack()) {
                 if (!m.canAttack()) return true;
                 return minDistToEnemy >= m.minDistToEnemy;

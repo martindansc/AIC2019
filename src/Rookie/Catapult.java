@@ -4,26 +4,30 @@ import aic2019.*;
 
 public class Catapult {
     private Injection in;
+    private int counter = 0;
 
     public Catapult(Injection in) {
         this.in = in;
     }
 
     public void run(Location target) {
-        tryAttack(target);
         in.catapult.tryMove(target);
         tryAttack(target);
     }
 
     public boolean tryAttack(Location town) {
+        counter++;
         if (!in.unitController.canAttack()) return false;
         if (in.staticVariables.allyBase.isEqual(town)) return false;
 
         int myAttack = in.attack.getMyAttack();
 
         if (in.unitController.canAttack(town)) {
-            in.unitController.attack(town);
-            return true;
+            if (counter > 6) {
+                counter = 0;
+                in.unitController.attack(town);
+                return true;
+            }
         }
         return false;
     }
