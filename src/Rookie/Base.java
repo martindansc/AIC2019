@@ -13,6 +13,8 @@ public class Base {
         this.in = in;
     }
 
+    int workers = 0; //DEBUG
+
     public void run() {
 
         tryAttack();
@@ -47,6 +49,14 @@ public class Base {
         if (soldiers < 2 * archers) return UnitType.SOLDIER;
 
         return UnitType.ARCHER;
+        /*
+        //DEBUG
+        if(workers<3){
+            workers++;
+            return UnitType.WORKER;
+        }
+        return UnitType.SOLDIER;
+        */
     }
 
     private Direction getBestDirectionSpawn() {

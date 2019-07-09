@@ -41,140 +41,196 @@ public class Worker {
 
     public void run(){
         this.selectObjective();
+        //TODO: si estic a sobre dun resource agafarlo si estic anant a home
 
         if(currentAction == "GOTORANDOM"){
-            //Scout viewing zone
-            Boolean resourceFound = scout("random");
-
-            if(!resourceFound){
-                //If worker wants to move to wall change direction
-                Location nextLocation =  in.staticVariables.myLocation.add(randomDir);
-                if(in.unitController.isOutOfMap(nextLocation)){
-                    int randomNumber = (int)(Math.random()*8);
-                    randomDir = Direction.values()[randomNumber];
-                }
-                //Move unit if possible
-                if (in.unitController.canMove()) {
-                    if(in.unitController.canMove(randomDir)){
-                        in.unitController.move(randomDir);
-                    }
-                    //If wanted possition is not accessible try the others
-                    else{
-                        Boolean hasMoved = false;
-                        int currentDirIndx = (int)(Math.random()*8);
-                        while(!hasMoved){
-                            Direction auxiliarRandomDir = Direction.values()[currentDirIndx];
-                            if(in.unitController.canMove(auxiliarRandomDir)){
-                                in.unitController.move(auxiliarRandomDir);
-                                hasMoved = true;
-                            }
-                            else{
-                                currentDirIndx = (currentDirIndx + 1)%8;
-                            }
-                        }
-                    }
-                }
-                //Scout viewing zone
-                //TODO
+            currentAction = goToRandom();
+            if(currentAction == "GOTORESOURCE"){
+                currentAction = goToResource();
             }
         }
         if(currentAction == "GOTORESOURCE"){
-            //Move to desired resource
-            if (!in.unitController.canMove()) return;
-
-            Direction dir = in.pathfinder.getNextLocationTarget(objectiveLocation);
-
-            if (dir != null && in.unitController.canMove(dir)) {
-                // You can move to direction ZERO, but don't really want to
-                if (dir != Direction.ZERO) {
-                    in.unitController.move(dir);
-                }
-
-                //Check if desired resource has been reached, can't gather if can't move (CDs)
-                if(in.staticVariables.myLocation.isEqual(objectiveLocation)){
-                    currentAction = "GATHERRESOURCE";
-                }
+            currentAction = goToResource();
+            if(currentAction == "GATHERRESOURCE"){
+                currentAction = gatherResource();
             }
-
-            //Scout viewing zone
-            //TODO
-
         }
         if(currentAction == "GATHERRESOURCE"){
-
-            in.unitController.gather();
-            //Si ja hem recol.lectat el que voliem del resource tornem a la town o base objectiu
-            float wood = in.staticVariables.unitInfo.getWood();
-            if(wood >= 60.0){ //60
-                objectiveBase = getClosestTownToLocation(objectiveLocation);
-                currentAction = "GOTOTOWN";
-            }
-            float iron = in.staticVariables.unitInfo.getIron();
-            if( iron >= 20.0){ //20
-                objectiveBase = getClosestTownToLocation(objectiveLocation);
-                currentAction = "GOTOTOWN";
-            }
-            float crystal = in.staticVariables.unitInfo.getCrystal();
-            if( crystal >= 6.0){ //6
-                objectiveBase = getClosestTownToLocation(objectiveLocation);
-                currentAction = "GOTOTOWN";
-            }
-            //Scout viewing zone
+            currentAction = gatherResource();
             //TODO
         }
         if(currentAction == "GOTOTOWN"){
-            //Check if destination is own
-            if(!objectiveBase.isEqual(in.staticVariables.allies.getInitialLocation())){
-                boolean foundAllyTown = false;
-                for (TownInfo closestTown : in.staticVariables.myTowns) {
-                    if (closestTown.getLocation().isEqual(objectiveBase)) {
-                        foundAllyTown = true;
-                        break;
-                    }
-                }
-
-                if (!foundAllyTown) {
-                    objectiveBase = getClosestTownToLocation(in.unitController.getLocation());
-                }
-            }
-
-            //Move to desired town or base
-            if (!in.unitController.canMove()) return;
-            Direction dir = in.pathfinder.getNextLocationTarget(objectiveBase);
-            //Sino avanco cap a lobjectiu
-            if (dir != null && in.unitController.canMove(dir)) {
-                in.unitController.move(dir);
-            }
-            //Si puc depositar deposito
-            Direction dirbase = in.unitController.getLocation().directionTo(objectiveBase);
-            if(in.unitController.canDeposit(dirbase)){
-                in.unitController.deposit(dirbase);
-                currentAction = "GOTORESOURCE";
-                //Move to desired resource
-                if (!in.unitController.canMove()) return;
-
-                dir = in.pathfinder.getNextLocationTarget(objectiveLocation);
-                if (dir != null && in.unitController.canMove(dir)) {
-                    in.unitController.move(dir);
-                }
-                /*
-                //Check if desired resource has been reached
-                Location nextLocation =  in.staticVariables.myLocation.add(dir);
-                if(nextLocation.isEqual(in.staticVariables.myLocation)){
-                    currentAction = "GATHERRESOURCE";
-                    //TODO: Use cangather()??
-                    in.unitController.gather();
-                }
-                 */
-            }
-
-
-            //Scout viewing zone
-            //TODO
+            currentAction = goToTown();
         }
     }
 
 
+    public String goToRandom(){
+        //Scout viewing zone
+        Boolean resourceFound = scout("random");
+
+        //If not resource found
+        if(!resourceFound){
+            moveRandom();
+            //Scout new viewing zone
+            //TODO
+            return "GOTORANDOM";
+        }
+
+        //If resource found
+        return "GOTORESOURCE";
+    }
+
+    public String goToResource(){
+        //Move to desired resource
+        if (in.unitController.canMove()) {
+            Direction dir = in.pathfinder.getNextLocationTarget(objectiveLocation);
+            if (dir != null && dir != Direction.ZERO) {
+                String nextMovementIsSafe = checkIfMovementIsSafe(in.staticVariables.myLocation, dir);
+                if(nextMovementIsSafe == "CANMOVE") {
+                    in.unitController.move(dir);
+                }
+                //TODO: tenir en compte catapultes i altres
+                //else if()
+            }
+            //Check if desired resource has been reached, can't gather if can't move (CDs)
+            if (in.staticVariables.myLocation.isEqual(objectiveLocation)) {
+                return "GATHERRESOURCE";
+            }
+        }
+        //Scout viewing zone
+        //TODO
+
+        return "GOTORESOURCE";
+    }
+
+    public String gatherResource(){
+
+        if(in.unitController.canGather()){
+            in.unitController.gather();
+        }
+        //Si ja hem recol.lectat el que voliem del resource tornem a la town o base objectiu
+        float wood = in.staticVariables.unitInfo.getWood();
+        if(wood >= 60.0){ //60
+            objectiveBase = getClosestTownToLocation(objectiveLocation);
+            return "GOTOTOWN";
+        }
+        float iron = in.staticVariables.unitInfo.getIron();
+        if( iron >= 20.0){ //20
+            objectiveBase = getClosestTownToLocation(objectiveLocation);
+            return "GOTOTOWN";
+        }
+        float crystal = in.staticVariables.unitInfo.getCrystal();
+        if( crystal >= 6.0){ //6
+            objectiveBase = getClosestTownToLocation(objectiveLocation);
+            return "GOTOTOWN";
+        }
+        //Scout viewing zone
+        //TODO
+        return "GATHERRESOURCE";
+    }
+
+    public String goToTown(){
+        //Ceck if destination is own and correct it
+        checkDestTownOwnAndCorrect();
+        //Move to desired town or base
+        if (!in.unitController.canMove()) return "GOTOTOWN";
+        Direction dir = in.pathfinder.getNextLocationTarget(objectiveBase);
+        if (dir != null && dir != Direction.ZERO) {
+            String nextMovementIsSafe = checkIfMovementIsSafe(in.staticVariables.myLocation, dir);
+            if(nextMovementIsSafe == "CANMOVE") {
+                in.unitController.move(dir);
+            }
+            //TODO: tenir en compte catapultes i altres
+            //else if()
+        }
+        //Desposit resource if possible
+        Boolean resourceDeposited = depositResource(dir);
+        //Scout viewing zone
+        //TODO
+        if(resourceDeposited) return "GOTORESOURCE";
+        return "GOTOTOWN";
+    }
+
+    public Boolean depositResource(Direction dir){
+        //Si puc depositar deposito
+        Direction dirbase = in.unitController.getLocation().directionTo(objectiveBase);
+        if(in.unitController.canDeposit(dirbase)){
+            in.unitController.deposit(dirbase);
+            return true;
+        }
+        else return false;
+    }
+
+    public void checkDestTownOwnAndCorrect(){
+        if(!objectiveBase.isEqual(in.staticVariables.allies.getInitialLocation())){
+            boolean foundAllyTown = false;
+            for (TownInfo closestTown : in.staticVariables.myTowns) {
+                if (closestTown.getLocation().isEqual(objectiveBase)) {
+                    foundAllyTown = true;
+                    break;
+                }
+            }
+            if (!foundAllyTown) {
+                objectiveBase = getClosestTownToLocation(in.unitController.getLocation());
+            }
+        }
+    }
+
+    public void moveRandom(){
+        if(in.unitController.canMove()) {
+            String nextMovementIsSafe = checkIfMovementIsSafe(in.staticVariables.myLocation, randomDir);
+
+            //If worker wants to move to wall change direction
+            if (nextMovementIsSafe == "WALL") {
+                int randomNumber = (int) (Math.random() * 8);
+                randomDir = Direction.values()[randomNumber];
+            }
+            //If there is a catapult attack on the going position dont move
+            //TODO
+            //If you see a enemy unit move in opposite direction
+            //TODO
+            //If it is safe to move, move
+            else if (nextMovementIsSafe == "CANMOVE") {
+                in.unitController.move(randomDir);
+            }
+            //If wanted possition is not accessible try the others
+            else if (nextMovementIsSafe == "SAFEBUTNOTMOVE") {
+                Boolean hasMoved = false;
+                int currentDirIndx = (int) (Math.random() * 8);
+                while (!hasMoved) {
+                    Direction auxiliarRandomDir = Direction.values()[currentDirIndx];
+                    if (checkIfMovementIsSafe(in.staticVariables.myLocation, auxiliarRandomDir) == "CANMOVE") {
+                        in.unitController.move(auxiliarRandomDir);
+                        hasMoved = true;
+                    } else {
+                        currentDirIndx = (currentDirIndx + 1) % 8;
+                    }
+                }
+            }
+        }
+    }
+
+    public String checkIfMovementIsSafe(Location loc, Direction dir){
+        Location nextLocation =  loc.add(dir);
+        //Check if next location is out of the map
+        if(in.unitController.isOutOfMap(nextLocation)){
+            return "WALL";
+        }
+        //check if next location is having a catapult attack next turn
+        else if(false){
+            //TODO
+        }
+        //check if next location is in range of attacking enemy unit
+        else if(false){
+            //TODO
+        }
+        //check if unit can move to that location
+        else if(in.unitController.canMove(dir)){
+            return "CANMOVE";
+        }
+        return "SAFEBUTNOTMOVE";
+    }
 
     public Boolean scout(String mode){
         //TODO: actualitzar posicions del scout al mapa

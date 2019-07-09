@@ -36,6 +36,8 @@ public class Worker {
         currentAction = "GOTORANDOM";
     }
 
+    
+
     public void run(){
         int[] message = in.memoryManager.getNewMessage(1);
         if(message[0] != 0) {
