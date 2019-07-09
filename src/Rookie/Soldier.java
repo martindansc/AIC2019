@@ -4,12 +4,14 @@ import aic2019.*;
 
 public class Soldier {
     private Injection in;
+    private Boolean microResult;
 
     public Soldier(Injection in) {
         this.in = in;
     }
 
     public void run(Location target) {
+        microResult = doMicro();
         in.attack.genericTryAttack(target);
         in.soldier.tryMove(target);
         in.attack.genericTryAttack(target);
@@ -22,7 +24,7 @@ public class Soldier {
 
         if (in.staticVariables.type.getAttackRangeSquared() >= in.staticVariables.myLocation.distanceSquared(target) && (!isTargetBase && !isTargetObstructed)) return;
 
-        if (!doMicro()) {
+        if (!microResult) {
             Direction dir = in.pathfinder.getNextLocationTarget(target);
             if (isTargetBase || isTargetObstructed || in.staticVariables.myLocation.add(dir).distanceSquared(target) >= in.staticVariables.type.getMinAttackRangeSquared()) {
                 if (dir != null && in.unitController.canMove(dir)) {

@@ -15,6 +15,7 @@ public class StaticVariables {
     public Location myLocation;
     public Location allyBase;
     public Location enemyBase;
+    public Location offsetReference;
     public Location[] visiblelocs;
     public UnitType type;
     public UnitInfo[] units;
@@ -40,6 +41,7 @@ public class StaticVariables {
 
         enemyBase = in.unitController.getTeam().getOpponent().getInitialLocation();
         allyBase = in.unitController.getTeam().getInitialLocation();
+        offsetReference = new Location(Math.abs(enemyBase.x - allyBase.x),Math.abs(enemyBase.y - allyBase.y));
         baseId = in.unitController.senseUnit(allies.getInitialLocation()).getID();
         myId = in.unitController.getInfo().getID();
 

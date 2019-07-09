@@ -1,6 +1,6 @@
 package Rookie;
 
-import aic2019.UnitType;
+import aic2019.*;
 
 public class Helper {
     private final Injection in;
@@ -24,5 +24,13 @@ public class Helper {
         }
 
         return UnitType.ARCHER;
+    }
+
+    public int LocationToInt(Location loc) {
+        return loc.x * 100 + loc.y;
+    }
+
+    public Location IntToLocation(int number) {
+        return new Location(number / 100, number % 100);
     }
 }
