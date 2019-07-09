@@ -184,27 +184,6 @@ public class MemoryManager {
         }
     }
 
-
-    // LOCATIONS
-    public int getNumberOfunitsClaimedLocation() {
-        return -1;
-    }
-
-
-    public void claimLocation(Location loc) {
-
-    }
-
-    public void addTimeUnitLocation(int locX, int locY) {
-        int times = uc.read(constants.ID_MAP_CLAIMS + locX * 200 + locY);
-        times++;
-        uc.write(constants.ID_MAP_CLAIMS + locX * 200 + locY, times);
-    }
-
-    public int getTimesSendUnitLocation(int locX, int locY) {
-        return uc.read(constants.ID_MAP_CLAIMS + locX * 200 + locY);
-    }
-
     public void countUnits() {
         if (in.staticVariables.type == UnitType.SOLDIER) {
             in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_SOLDIER_COUNTER);
@@ -217,6 +196,22 @@ public class MemoryManager {
         } else if (in.staticVariables.type == UnitType.MAGE) {
             in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_MAGE_COUNTER);
         }
+    }
+
+
+    // MAP FUNCTIONS
+    public void saveUnitToMap(Location loc, UnitType unit) {
+        int index = getIndexMap(loc);
+        in.unitController.write(index, in.helper.unitTypeToInt(unit));
+    }
+
+    public UnitType getUnitFromLocation(Location loc) {
+        int index = getIndexMap(loc);
+        return in.helper.intToUnitType(in.unitController.read(index));
+    }
+
+    public int getIndexMap(Location loc) {
+        return in.constants.ID_MAP_INFO + in.helper.LocationToInt(loc) * in.constants.INFO_PER_CELL;
     }
 
 }

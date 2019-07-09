@@ -10,17 +10,21 @@ public class Helper {
     }
 
     public int unitTypeToInt(UnitType ut) {
-        if(ut == UnitType.WORKER) {
+        if (ut == UnitType.WORKER) {
+            return 1;
+        } else if (ut == UnitType.TOWER) {
             return 1;
         }
 
-        return  2;
+        return 2;
     }
 
     public UnitType intToUnitType(int type) {
 
-        if(type == 1) {
+        if (type == 1) {
             return UnitType.WORKER;
+        } else if (type == 2) {
+            return UnitType.TOWER;
         }
 
         return UnitType.ARCHER;

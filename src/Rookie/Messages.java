@@ -52,8 +52,6 @@ public class Messages {
 
     public void sendCreateAndSendToLocation(int unitId, UnitType type, int locX, int locY) {
 
-        if(!in.map.canSendUnitToLocation(locX, locY)) return;
-
         int[] params = new int [in.constants.MESSAGE_SIZE];
 
         params[0] = locX;
@@ -68,11 +66,6 @@ public class Messages {
 
         in.memoryManager.sendMessageTo(unitId, params);
     }
-
-    public void sendCreateAndSendToLocation(int unitId, UnitType type, Location loc) {
-        this.sendCreateAndSendToLocation(unitId, type, loc.x, loc.y);
-    }
-
 
     public void sendToLocation(int unitId, int locX, int locY) {
 
