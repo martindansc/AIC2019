@@ -4,13 +4,15 @@ import aic2019.*;
 
 public class Mage {
     private Injection in;
+    private boolean enemies = false;
+    private Boolean microResult;
 
     public Mage(Injection in) {
         this.in = in;
     }
 
     public void run(Location target) {
-        tryAttack(target);
+        microResult = doMicro();
         in.mage.tryMove(target);
         tryAttack(target);
     }
@@ -18,8 +20,7 @@ public class Mage {
     public boolean tryAttack(Location town) {
         if (!in.unitController.canAttack()) return false;
         if (in.staticVariables.allyBase.isEqual(town)) return false;
-        UnitInfo[] enemies = in.staticVariables.allenemies;
-        if (enemies.length == 0 && town.isEqual(in.staticVariables.myLocation)) return false;
+        if (!enemies && (!in.unitController.canSenseLocation(town) || (in.unitController.canSenseLocation(town) && in.unitController.isObstructed(town, in.staticVariables.myLocation)))) return false;
 
         int myAttack = in.attack.getMyAttack();
 
@@ -74,7 +75,7 @@ public class Mage {
 
         if (in.staticVariables.type.getAttackRangeSquared() >= in.staticVariables.myLocation.distanceSquared(target) && (!isTargetBase && !isTargetObstructed)) return;
 
-        if (!doMicro()) {
+        if (!microResult) {
             Direction dir = in.pathfinder.getNextLocationTarget(target);
             if (isTargetBase || isTargetObstructed || in.staticVariables.myLocation.add(dir).distanceSquared(target) >= in.staticVariables.type.getMinAttackRangeSquared()) {
                 if (dir != null && in.unitController.canMove(dir)) {
@@ -91,12 +92,11 @@ public class Mage {
             microInfo[i] = new MicroInfo(in.staticVariables.myLocation.add(in.staticVariables.dirs[i]));
         }
 
-        boolean enemies = false;
-        for (UnitInfo enemy : in.staticVariables.allenemies) {
-            if (in.staticVariables.type == UnitType.CATAPULT || !in.unitController.isObstructed(enemy.getLocation(), in.staticVariables.myLocation)) {
+        for (int j = 0; j < in.staticVariables.allenemies.length; j++) {
+            if (!in.unitController.isObstructed(in.staticVariables.allenemies[j].getLocation(), in.staticVariables.myLocation)) {
                 enemies = true;
                 for (int i = 0; i < 9; i++) {
-                    microInfo[i].update(enemy);
+                    microInfo[i].update(in.staticVariables.allenemies[j]);
                 }
             }
         }

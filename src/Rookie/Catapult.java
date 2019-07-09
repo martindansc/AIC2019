@@ -63,17 +63,11 @@ public class Catapult {
             microInfo[i] = new MicroInfo(in.staticVariables.myLocation.add(in.staticVariables.dirs[i]));
         }
 
-        boolean enemies = false;
         for (UnitInfo enemy : in.staticVariables.allenemies) {
-            if (in.staticVariables.type == UnitType.CATAPULT || !in.unitController.isObstructed(enemy.getLocation(), in.staticVariables.myLocation)) {
-                enemies = true;
-                for (int i = 0; i < 9; i++) {
-                    microInfo[i].update(enemy);
-                }
+            for (int i = 0; i < 9; i++) {
+                microInfo[i].update(enemy);
             }
         }
-
-        if (!enemies) return false;
 
         int bestIndex = -1;
 

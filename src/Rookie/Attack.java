@@ -38,7 +38,7 @@ public class Attack {
         if (!in.unitController.canAttack()) return false;
         if (in.staticVariables.allyBase.isEqual(town)) return false;
         UnitInfo[] enemies = in.staticVariables.allenemies;
-        if (enemies.length == 0 && town.isEqual(in.staticVariables.myLocation)) return false;
+        if (enemies.length == 0 && !in.unitController.canSenseLocation(town)) return false;
 
         int myAttack = getMyAttack();
 

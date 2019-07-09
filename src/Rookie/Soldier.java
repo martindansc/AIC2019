@@ -41,7 +41,7 @@ public class Soldier {
 
         boolean enemies = false;
         for (UnitInfo enemy : in.staticVariables.allenemies) {
-            if (in.staticVariables.type == UnitType.CATAPULT || !in.unitController.isObstructed(enemy.getLocation(), in.staticVariables.myLocation)) {
+            if (!in.unitController.isObstructed(enemy.getLocation(), in.staticVariables.myLocation)) {
                 enemies = true;
                 for (int i = 0; i < 9; i++) {
                     microInfo[i].update(enemy);
@@ -81,7 +81,9 @@ public class Soldier {
 
         void update(UnitInfo unit) {
             int distance = unit.getLocation().distanceSquared(loc);
-            if (distance <= unit.getType().attackRangeSquared) ++numEnemies;
+            if (distance <= unit.getType().attackRangeSquared || (unit.getType() == UnitType.MAGE && distance < 14)) {
+                ++numEnemies;
+            }
             if (distance < minDistToEnemy) minDistToEnemy = distance;
         }
 
@@ -90,6 +92,7 @@ public class Soldier {
         }
 
         boolean isBetter(MicroInfo m) {
+            if (2 * in.staticVariables.allyUnits.length < numEnemies) return false;
             if (canAttack()) {
                 if (!m.canAttack()) return true;
                 return minDistToEnemy >= m.minDistToEnemy;
