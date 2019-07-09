@@ -36,17 +36,13 @@ Estructures i unitats
         this.in = in;
     }
 
-    public boolean canSendUnitToLocation(int locX, int locY) {
-        return (in.memoryManager.getTimesSendUnitLocation(locX, locY) < 1);
-    }
-
     public void sendResourcesMessage() {
         for (ResourceInfo resource : in.staticVariables.resourcesSeen) {
             Location loc = resource.getLocation();
-            in.memoryManager.addObjective(UnitType.WORKER, 1, in.constants.WORKERS_GET_WOOD, loc.x, loc.y, 0);
+            int[] objective = in.objectives.createResourceObjective(loc);
+            in.memoryManager.addObjective(UnitType.WORKER, objective);
         }
     }
-
 
     public UnitInfo getClosestAlliedUnitToLocation(UnitType unitType) {
         return null;

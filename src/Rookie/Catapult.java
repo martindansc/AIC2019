@@ -4,26 +4,30 @@ import aic2019.*;
 
 public class Catapult {
     private Injection in;
+    private int counter = 0;
 
     public Catapult(Injection in) {
         this.in = in;
     }
 
     public void run(Location target) {
-        tryAttack(target);
         in.catapult.tryMove(target);
         tryAttack(target);
     }
 
     public boolean tryAttack(Location town) {
+        counter++;
         if (!in.unitController.canAttack()) return false;
         if (in.staticVariables.allyBase.isEqual(town)) return false;
 
         int myAttack = in.attack.getMyAttack();
 
         if (in.unitController.canAttack(town)) {
-            in.unitController.attack(town);
-            return true;
+            if (counter > 6) {
+                counter = 0;
+                in.unitController.attack(town);
+                return true;
+            }
         }
         return false;
     }
@@ -59,17 +63,11 @@ public class Catapult {
             microInfo[i] = new MicroInfo(in.staticVariables.myLocation.add(in.staticVariables.dirs[i]));
         }
 
-        boolean enemies = false;
         for (UnitInfo enemy : in.staticVariables.allenemies) {
-            if (in.staticVariables.type == UnitType.CATAPULT || !in.unitController.isObstructed(enemy.getLocation(), in.staticVariables.myLocation)) {
-                enemies = true;
-                for (int i = 0; i < 9; i++) {
-                    microInfo[i].update(enemy);
-                }
+            for (int i = 0; i < 9; i++) {
+                microInfo[i].update(enemy);
             }
         }
-
-        if (!enemies) return false;
 
         int bestIndex = -1;
 

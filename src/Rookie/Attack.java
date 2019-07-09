@@ -36,9 +36,8 @@ public class Attack {
 
     public boolean genericTryAttack(Location town)  {
         if (!in.unitController.canAttack()) return false;
-        if (in.staticVariables.allyBase.isEqual(town)) return false;
         UnitInfo[] enemies = in.staticVariables.allenemies;
-        if (enemies.length == 0 && town.isEqual(in.staticVariables.myLocation)) return false;
+        if (enemies.length == 0 && !in.unitController.canSenseLocation(town)) return false;
 
         int myAttack = getMyAttack();
 
@@ -73,6 +72,7 @@ public class Attack {
             in.unitController.attack(bestLoc);
             return true;
         } else {
+            if (in.staticVariables.allyBase.isEqual(town)) return false;
             if (in.unitController.canAttack(town) && in.unitController.senseTown(town).getOwner() != in.staticVariables.allies) {
                 in.unitController.attack(town);
                 return true;

@@ -7,12 +7,14 @@ import aic2019.UnitType;
 
 public class Archer {
     private Injection in;
+    private Boolean microResult;
 
     public Archer(Injection in) {
         this.in = in;
     }
 
     public void run(Location target) {
+        microResult = doMicro();
         in.attack.genericTryAttack(target);
         in.archer.tryMove(target);
         in.attack.genericTryAttack(target);
@@ -25,7 +27,7 @@ public class Archer {
 
         if (in.staticVariables.type.getAttackRangeSquared() >= in.staticVariables.myLocation.distanceSquared(target) && (!isTargetBase && !isTargetObstructed)) return;
 
-        if (!doMicro()) {
+        if (!microResult) {
             Direction dir = in.pathfinder.getNextLocationTarget(target);
             if (isTargetBase || isTargetObstructed || in.staticVariables.myLocation.add(dir).distanceSquared(target) >= in.staticVariables.type.getMinAttackRangeSquared()) {
                 if (dir != null && in.unitController.canMove(dir)) {
@@ -44,7 +46,7 @@ public class Archer {
 
         boolean enemies = false;
         for (UnitInfo enemy : in.staticVariables.allenemies) {
-            if (in.staticVariables.type == UnitType.CATAPULT || !in.unitController.isObstructed(enemy.getLocation(), in.staticVariables.myLocation)) {
+            if (!in.unitController.isObstructed(enemy.getLocation(), in.staticVariables.myLocation)) {
                 enemies = true;
                 for (int i = 0; i < 9; i++) {
                     microInfo[i].update(enemy);
@@ -85,7 +87,9 @@ public class Archer {
         void update(UnitInfo unit) {
 
             int distance = unit.getLocation().distanceSquared(loc);
-            if (distance <= unit.getType().attackRangeSquared) ++numEnemies;
+            if (distance <= unit.getType().attackRangeSquared || (unit.getType() == UnitType.MAGE && distance < 14)) {
+                ++numEnemies;
+            }
             if (distance < minDistToEnemy) minDistToEnemy = distance;
         }
 
@@ -94,6 +98,7 @@ public class Archer {
         }
 
         boolean isBetter(MicroInfo m) {
+            if (2 * in.staticVariables.allyUnits.length < numEnemies) return false;
             if (numEnemies < m.numEnemies) return true;
             if (numEnemies > m.numEnemies) return false;
             if (canAttack()) {
