@@ -16,7 +16,7 @@ public class Messages {
     Messages(Injection in) {
         this.in = in;
         this.messages = new int[in.constants.MAX_MESSAGES_INBOX][in.constants.MESSAGE_SIZE];
-        this.hasMessage = new boolean[in.constants.MESSAGE_SIZE];
+        this.hasMessage = new boolean[in.constants.MAX_MESSAGES_INBOX];
     }
 
     public void update() {

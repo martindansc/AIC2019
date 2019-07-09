@@ -30,11 +30,11 @@ public class Helper {
         return UnitType.ARCHER;
     }
 
-    public int LocationToInt(Location loc) {
+    public int locationToInt(Location loc) {
         return loc.x * 100 + loc.y;
     }
 
-    public Location IntToLocation(int number) {
+    public Location intToLocation(int number) {
         return new Location(number / 100, number % 100);
     }
 }

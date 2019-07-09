@@ -15,9 +15,9 @@ public class Move {
         }
 
         TownInfo neutralTown = null;
-        int neutralDistance = 100000;
+        int neutralDistance = Integer.MAX_VALUE;
         TownInfo enemyTown = null;
-        int enemyDistance = 10000;
+        int enemyDistance = Integer.MAX_VALUE;
 
         for (TownInfo town : in.staticVariables.enemytowns) {
             Location townLoc = town.getLocation();

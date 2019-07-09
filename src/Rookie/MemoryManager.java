@@ -94,31 +94,66 @@ public class MemoryManager {
 
     // UNIT TYPE OBJECTIVE FUNCTIONS
 
+    // todo remove objectives
+
     private int getObjectiveId(int type, int num) {
         // types start at 1
         return in.constants.ID_OBJECTIVES + (type - 1) * UnitType.values().length * in.constants.MAX_OBJECTIVES +
                 num * in.constants.OBJECTIVE_SIZE;
     }
 
-    public void addObjective(UnitType unitType, int numberUnitsRequired, int objective, int param1, int param2, int param3) {
+    public int[] addObjective(UnitType unitType, int[] params) {
         int type = in.helper.unitTypeToInt(unitType);
+
+        int lastId = -1;
 
         for(int i = 0; i < in.constants.MAX_OBJECTIVES; i++) {
             int id = this.getObjectiveId(type, i);
             if(uc.read(id) == 0) {
-                uc.write(id, objective);
-                uc.write(id + 1, numberUnitsRequired);
-                uc.write(id + 2, param1);
-                uc.write(id + 3, param2);
-                uc.write(id + 4, param3);
+                uc.write(id, params[0]);
+                uc.write(id + 1, params[1]);
+                uc.write(id + 2, params[2]);
+                uc.write(id + 3, params[3]);
+                uc.write(id + 4, params[4]);
 
                 // reset counters
                 resetCounter(id + 6);
+
+                lastId = id;
 
                 break;
             }
         }
 
+        return this.getObjective(lastId, -1);
+
+    }
+
+    public int[] getObjective(int id, int objectiveType) {
+        int[] objective = new int[in.constants.OBJECTIVE_SIZE];
+
+        int readObjectiveType = uc.read(id);
+
+        if(uc.read(id) == 0 && (objectiveType == -1 || objectiveType == readObjectiveType)) {
+            objective[0] = readObjectiveType;
+            objective[1] = uc.read(id + 1);
+            objective[2] = uc.read(id + 2);
+            objective[3] = uc.read(id + 3);
+            objective[4] = uc.read(id + 4);
+            objective[5] = id;
+
+            // reset counters
+            objective[6] = this.readValue(id + 6);
+            objective[7] = this.readValueThisRound(id + 6);
+
+        }
+
+        return objective;
+    }
+
+    public int[] getObjective(Location loc) {
+        int id = this.getObjectiveIdInLocation(loc);
+        return getObjective(id,-1);
     }
 
     public int[][] getObjectives(UnitType unitType, int objectiveType) {
@@ -128,26 +163,7 @@ public class MemoryManager {
 
         for(int i = 0; i < in.constants.MAX_OBJECTIVES; i++) {
             int id = this.getObjectiveId(type, i);
-
-            int[] objective = new int[in.constants.OBJECTIVE_SIZE];
-
-            int readObjectiveType = uc.read(id);
-
-            if(uc.read(id) == 0 && (objectiveType == -1 || objectiveType == readObjectiveType)) {
-                objective[0] = readObjectiveType;
-                objective[1] = uc.read(id + 1);
-                objective[2] = uc.read(id + 2);
-                objective[3] = uc.read(id + 3);
-                objective[4] = uc.read(id + 4);
-                objective[5] = id;
-
-                // reset counters
-                objective[6] = this.readValue(id + 6);
-                objective[7] = this.readValueThisRound(id + 6);
-
-            }
-
-            objectives[i] = objective;
+            objectives[i] = this.getObjective(id, objectiveType);
         }
 
         return objectives;
@@ -184,6 +200,11 @@ public class MemoryManager {
         }
     }
 
+    public int getObjectiveIdInLocation(Location loc) {
+        int idObjectiveLocation = in.helper.locationToInt(loc);
+        return uc.read(in.constants.ID_LOCATION_OBJECTIVES + idObjectiveLocation);
+    }
+
     public void countUnits() {
         if (in.staticVariables.type == UnitType.SOLDIER) {
             in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_SOLDIER_COUNTER);
@@ -211,7 +232,7 @@ public class MemoryManager {
     }
 
     public int getIndexMap(Location loc) {
-        return in.constants.ID_MAP_INFO + in.helper.LocationToInt(loc) * in.constants.INFO_PER_CELL;
+        return in.constants.ID_MAP_INFO + in.helper.locationToInt(loc) * in.constants.INFO_PER_CELL;
     }
 
 }
