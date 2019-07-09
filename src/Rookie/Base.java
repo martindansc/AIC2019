@@ -34,7 +34,7 @@ public class Base {
     }
 
     private UnitType chooseBestUnitType(int[] message) {
-        /*int knights = in.memoryManager.readValue(in.constants.ID_ALLIES_KNIGHT_COUNTER);
+        int knights = in.memoryManager.readValue(in.constants.ID_ALLIES_KNIGHT_COUNTER);
         int soldiers = in.memoryManager.readValue(in.constants.ID_ALLIES_SOLDIER_COUNTER);
         int archers = in.memoryManager.readValue(in.constants.ID_ALLIES_ARCHER_COUNTER);
         int catapults = in.memoryManager.readValue(in.constants.ID_ALLIES_CATAPULT_COUNTER);
@@ -47,13 +47,14 @@ public class Base {
         if (soldiers < 2 * archers) return UnitType.SOLDIER;
 
         return UnitType.ARCHER;
-        */
+        /*
         //DEBUG
         if(workers<3){
             workers++;
             return UnitType.WORKER;
         }
         return UnitType.SOLDIER;
+        */
     }
 
     private Direction getBestDirectionSpawn() {
