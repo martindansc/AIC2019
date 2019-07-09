@@ -30,8 +30,12 @@ public class Helper {
         return UnitType.ARCHER;
     }
 
+    public int locationToInt(int locX, int locY) {
+        return (locX - in.staticVariables.allyBase.x) * 100 + (locY - in.staticVariables.allyBase.y);
+    }
+
     public int locationToInt(Location loc) {
-        return loc.x * 100 + loc.y;
+        return locationToInt(loc.x, loc.y);
     }
 
     public Location intToLocation(int number) {

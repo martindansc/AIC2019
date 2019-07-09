@@ -227,7 +227,7 @@ public class Worker {
 
         // do I currently have an objective set up?
         // if I don't have an objective, I can check for one in the objectives array and get the best
-        if(!directionIsRandom) {
+        if(directionIsRandom) {
             int closestObjective = Integer.MAX_VALUE;
             Location bestLocation = null;
 
@@ -237,7 +237,7 @@ public class Worker {
                 if(!in.objectives.isFull(objective)){
                     // for now, as heuristic we are going to get the distance to the resource
                     Location objectiveLocation = in.objectives.getLocationObjective(objective);
-                    int distance = this.objectiveLocation.distanceSquared(objectiveLocation);
+                    int distance = in.staticVariables.myLocation.distanceSquared(objectiveLocation);
                     if(distance < closestObjective) {
                         closestObjective = distance;
                         bestLocation = objectiveLocation;
@@ -246,7 +246,7 @@ public class Worker {
             }
 
             if(bestLocation != null){
-                this.fixObjectiveLocation(new Location(message[0], message[1]), true);
+                this.fixObjectiveLocation(bestLocation, true);
             }
 
         }

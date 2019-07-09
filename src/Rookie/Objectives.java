@@ -42,6 +42,7 @@ public class Objectives {
     }
 
     public void claimObjective(Location loc) {
+
         int idObjective = in.memoryManager.getObjectiveIdInLocation(loc);
         if(idObjective!= 0) {
             this.claimObjective(idObjective);
@@ -57,6 +58,8 @@ public class Objectives {
 
     public int[] createResourceObjective(Location loc) {
         int[] newObjective = new int[in.constants.OBJECTIVE_SIZE];
+        newObjective[0] = in.constants.WORKERS_GET_WOOD;
+        this.setLocationObjective(newObjective, loc);
 
         return newObjective;
     }

@@ -38,6 +38,8 @@ public class Base {
         int catapults = in.memoryManager.readValue(in.constants.ID_ALLIES_CATAPULT_COUNTER);
         int mages = in.memoryManager.readValue(in.constants.ID_ALLIES_MAGE_COUNTER);
 
+        //return UnitType.WORKER;
+
         if(in.helper.intToUnitType(message[2]) == UnitType.WORKER) {
             return UnitType.WORKER;
         }

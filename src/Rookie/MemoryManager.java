@@ -96,6 +96,10 @@ public class MemoryManager {
 
     // todo remove objectives
 
+    private int[] newEmptyObjective() {
+        return new int[in.constants.OBJECTIVE_SIZE];
+    }
+
     private int getObjectiveId(int type, int num) {
         // types start at 1
         return in.constants.ID_OBJECTIVES + (type - 1) * UnitType.values().length * in.constants.MAX_OBJECTIVES +
@@ -103,6 +107,13 @@ public class MemoryManager {
     }
 
     public int[] addObjective(UnitType unitType, int[] params) {
+
+        //todo: check that the objective doesn't exists, if it does maybe update it
+        int maybeId = this.getObjectiveIdInLocation(params[2], params[3]);
+        if(maybeId > 0) {
+            return this.getObjective(maybeId, -1);
+        }
+
         int type = in.helper.unitTypeToInt(unitType);
 
         int lastId = -1;
@@ -119,22 +130,27 @@ public class MemoryManager {
                 // reset counters
                 resetCounter(id + 6);
 
+                // add location objective
+                this.setObjectiveIdInLocation(params[2], params[3], id);
+
                 lastId = id;
 
                 break;
             }
         }
 
+        if(lastId == -1) return this.newEmptyObjective();
+
         return this.getObjective(lastId, -1);
 
     }
 
     public int[] getObjective(int id, int objectiveType) {
-        int[] objective = new int[in.constants.OBJECTIVE_SIZE];
+        int[] objective = this.newEmptyObjective();
 
         int readObjectiveType = uc.read(id);
 
-        if(uc.read(id) == 0 && (objectiveType == -1 || objectiveType == readObjectiveType)) {
+        if(uc.read(id) != 0 && (objectiveType == -1 || objectiveType == readObjectiveType)) {
             objective[0] = readObjectiveType;
             objective[1] = uc.read(id + 1);
             objective[2] = uc.read(id + 2);
@@ -170,11 +186,11 @@ public class MemoryManager {
     }
 
     public int[][] getObjectives(UnitType unitType) {
-        return getObjectives(unitType, -1);
+        return this.getObjectives(unitType, -1);
     }
 
     public int[][] getObjectives() {
-        return getObjectives(in.staticVariables.type, -1);
+        return this.getObjectives(in.staticVariables.type, -1);
     }
 
     public void removeObjective(int id) {
@@ -198,6 +214,16 @@ public class MemoryManager {
                 break;
             }
         }
+    }
+
+    public int getObjectiveIdInLocation(int locX, int locY) {
+        int idObjectiveLocation = in.helper.locationToInt(locX, locY);
+        return uc.read(in.constants.ID_LOCATION_OBJECTIVES + idObjectiveLocation);
+    }
+
+    private void setObjectiveIdInLocation(int locX, int locY, int id) {
+        int idObjectiveLocation = in.helper.locationToInt(locX, locY);
+        uc.write(in.constants.ID_LOCATION_OBJECTIVES  + idObjectiveLocation, id);
     }
 
     public int getObjectiveIdInLocation(Location loc) {
