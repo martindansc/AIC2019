@@ -261,4 +261,20 @@ public class MemoryManager {
         return in.constants.ID_MAP_INFO + in.helper.locationToInt(loc) * in.constants.INFO_PER_CELL;
     }
 
+    public void setLocationSafe(Location loc) {
+        int index = getIndexMap(loc);
+        in.unitController.write(index + 4, in.unitController.read(index) - 1);
+    }
+
+    public void setLocationDangerous(Location loc) {
+        int index = getIndexMap(loc);
+        in.unitController.write(index + 4, in.unitController.read(index) + 1);
+    }
+
+    public boolean isLocationSafe(Location loc) {
+        int index = getIndexMap(loc);
+        int enemies = in.unitController.read(index + 4);
+        return enemies == 0;
+    }
+
 }

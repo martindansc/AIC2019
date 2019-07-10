@@ -50,7 +50,7 @@ public class Objectives {
     }
 
     public boolean isFull(int[] objective) {
-        return objective[5] == 0 || this.getClaimedTimes(objective) < this.getNumberUnits(objective);
+        return objective[5] == 0 || this.getClaimedTimes(objective) >= this.getNumberUnits(objective);
     }
 
 
@@ -59,6 +59,7 @@ public class Objectives {
     public int[] createResourceObjective(Location loc) {
         int[] newObjective = new int[in.constants.OBJECTIVE_SIZE];
         newObjective[0] = in.constants.WORKERS_GET_WOOD;
+        newObjective[1] = 1;
         this.setLocationObjective(newObjective, loc);
 
         return newObjective;

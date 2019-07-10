@@ -13,10 +13,10 @@ public class Helper {
         if (ut == UnitType.WORKER) {
             return 1;
         } else if (ut == UnitType.TOWER) {
-            return 1;
+            return 2;
         }
 
-        return 2;
+        return 3;
     }
 
     public UnitType intToUnitType(int type) {
@@ -31,7 +31,7 @@ public class Helper {
     }
 
     public int locationToInt(int locX, int locY) {
-        return (locX - in.staticVariables.allyBase.x) * 100 + (locY - in.staticVariables.allyBase.y);
+        return (locX - in.staticVariables.allyBase.x + 50) * 100 + (locY - in.staticVariables.allyBase.y + 50);
     }
 
     public int locationToInt(Location loc) {
@@ -39,6 +39,6 @@ public class Helper {
     }
 
     public Location intToLocation(int number) {
-        return new Location(number / 100, number % 100);
+        return new Location((number / 100) + in.staticVariables.allyBase.x - 50, (number % 100) + in.staticVariables.allyBase.y - 50);
     }
 }

@@ -12,7 +12,7 @@ public class Constants {
     public int ID_ALLIES_MAGE_COUNTER = 19;
     public int ID_MESSAGING_BOX = 100; // 40000 positions
     public int ID_OBJECTIVES = 50000; // 7600 positions: 10 unit types * 40 objectives * (6 values + 3 of the counter)
-    public int ID_LOCATION_OBJECTIVES = 60000; // ocupes 10000 positions
+    public int ID_LOCATION_OBJECTIVES = 60000; // 10000 positions
     public int ID_MAP_INFO = 70000; // 50000 positions
 
     public int MESSAGE_SIZE = 4;

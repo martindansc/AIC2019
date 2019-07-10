@@ -8,6 +8,7 @@ import aic2019.UnitType;
 public class Archer {
     private Injection in;
     private Boolean microResult;
+    private Direction microDir;
 
     public Archer(Injection in) {
         this.in = in;
@@ -16,25 +17,33 @@ public class Archer {
     public void run(Location target) {
         microResult = doMicro();
         in.attack.genericTryAttack(target);
-        in.archer.tryMove(target);
+        if (in.archer.tryMove(target)) {
+            in.staticVariables.myLocation = in.unitController.getLocation();
+            in.staticVariables.allenemies = in.unitController.senseUnits(in.staticVariables.allies, true);
+        }
         in.attack.genericTryAttack(target);
     }
 
-    public void tryMove(Location target) {
-        if (!in.unitController.canMove()) return;
+    public boolean tryMove(Location target) {
+        if (!in.unitController.canMove()) return false;
         boolean isTargetBase = in.staticVariables.allyBase.isEqual(target);
         boolean isTargetObstructed = in.unitController.canSenseLocation(target) && in.unitController.isObstructed(target, in.staticVariables.myLocation);
 
-        if (in.staticVariables.type.getAttackRangeSquared() >= in.staticVariables.myLocation.distanceSquared(target) && (!isTargetBase && !isTargetObstructed)) return;
+        if (in.staticVariables.type.getAttackRangeSquared() >= in.staticVariables.myLocation.distanceSquared(target) && (!isTargetBase && !isTargetObstructed)) return false;
 
         if (!microResult) {
             Direction dir = in.pathfinder.getNextLocationTarget(target);
             if (isTargetBase || isTargetObstructed || in.staticVariables.myLocation.add(dir).distanceSquared(target) >= in.staticVariables.type.getMinAttackRangeSquared()) {
                 if (dir != null && in.unitController.canMove(dir)) {
                     in.unitController.move(dir);
+                    return true;
                 }
             }
+        } else {
+            in.unitController.move(microDir);
         }
+
+        return false;
     }
 
     public boolean doMicro() {
@@ -65,7 +74,7 @@ public class Archer {
 
         if (bestIndex != -1) {
             if (in.staticVariables.allenemies.length > 0) {
-                in.unitController.move(in.staticVariables.dirs[bestIndex]);
+                microDir = (in.staticVariables.dirs[bestIndex]);
                 return true;
             }
         }
