@@ -64,4 +64,13 @@ public class Objectives {
 
         return newObjective;
     }
+
+    public int[] createTowerObjective(Location loc) {
+        int[] newObjective = new int[in.constants.OBJECTIVE_SIZE];
+        newObjective[0] = in.constants.ENEMY_TOWER;
+        newObjective[1] = 1;
+        this.setLocationObjective(newObjective, loc);
+
+        return newObjective;
+    }
 }

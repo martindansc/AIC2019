@@ -263,18 +263,67 @@ public class MemoryManager {
 
     public void setLocationSafe(Location loc) {
         int index = getIndexMap(loc);
-        in.unitController.write(index + 4, in.unitController.read(index) - 1);
+        in.unitController.write(index + 4, in.unitController.read(index + 4) - 1);
     }
 
     public void setLocationDangerous(Location loc) {
         int index = getIndexMap(loc);
-        in.unitController.write(index + 4, in.unitController.read(index) + 1);
+        in.unitController.write(index + 4, in.unitController.read(index + 4) + 1);
     }
 
     public boolean isLocationSafe(Location loc) {
         int index = getIndexMap(loc);
         int enemies = in.unitController.read(index + 4);
         return enemies == 0;
+    }
+
+    public void markTower(Location loc) {
+        if (getUnitFromLocation(loc) == UnitType.TOWER) return;
+        int[] objective = in.objectives.createTowerObjective(loc);
+        in.memoryManager.addObjective(UnitType.CATAPULT, objective);
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 6; j++) {
+                int suma = i * i + j * j;
+                if (suma < 33 && suma > 19) {
+                    setLocationDangerous(new Location (loc.x + i, loc.y + j));
+                    setLocationDangerous(new Location (loc.x - i, loc.y + j));
+                    setLocationDangerous(new Location (loc.x + i, loc.y - j));
+                    setLocationDangerous(new Location (loc.x - i, loc.y - j));
+                }
+            }
+        }
+        saveUnitToMap(loc, UnitType.TOWER);
+    }
+
+    public void unmarkTower(Location loc) {
+        if (getUnitFromLocation(loc) != UnitType.TOWER) return;
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 6; j++) {
+                int suma = i * i + j * j;
+                if (suma < 33 && suma > 19) {
+                    setLocationSafe(new Location (loc.x + i, loc.y + j));
+                    setLocationSafe(new Location (loc.x - i, loc.y + j));
+                    setLocationSafe(new Location (loc.x + i, loc.y - j));
+                    setLocationSafe(new Location (loc.x - i, loc.y - j));
+                }
+            }
+        }
+        saveUnitToMap(loc, null);
+    }
+
+    public void markEnemyBase() {
+        Location loc = in.staticVariables.enemyBase;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                int suma = i * i + j * j;
+                if (suma < 51 && suma > 33) {
+                    setLocationSafe(new Location (loc.x + i, loc.y + j));
+                    setLocationSafe(new Location (loc.x - i, loc.y + j));
+                    setLocationSafe(new Location (loc.x + i, loc.y - j));
+                    setLocationSafe(new Location (loc.x - i, loc.y - j));
+                }
+            }
+        }
     }
 
 }

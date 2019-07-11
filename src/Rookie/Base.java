@@ -44,7 +44,8 @@ public class Base {
             return UnitType.WORKER;
         }
 
-        if (soldiers < 2 * archers) return UnitType.SOLDIER;
+        if (soldiers <= 2 * archers) return UnitType.SOLDIER;
+        if (catapults < 1) return UnitType.CATAPULT;
 
         return UnitType.ARCHER;
 

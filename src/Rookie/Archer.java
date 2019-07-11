@@ -35,8 +35,10 @@ public class Archer {
             Direction dir = in.pathfinder.getNextLocationTarget(target);
             if (isTargetBase || isTargetObstructed || in.staticVariables.myLocation.add(dir).distanceSquared(target) >= in.staticVariables.type.getMinAttackRangeSquared()) {
                 if (dir != null && in.unitController.canMove(dir)) {
-                    in.unitController.move(dir);
-                    return true;
+                    if (in.memoryManager.isLocationSafe(in.staticVariables.myLocation.add(dir))) {
+                        in.unitController.move(dir);
+                        return true;
+                    }
                 }
             }
         } else {
@@ -107,6 +109,7 @@ public class Archer {
         }
 
         boolean isBetter(MicroInfo m) {
+            if (!in.memoryManager.isLocationSafe(m.loc)) return false;
             if (2 * in.staticVariables.allyUnits.length < numEnemies) return false;
             if (numEnemies < m.numEnemies) return true;
             if (numEnemies > m.numEnemies) return false;

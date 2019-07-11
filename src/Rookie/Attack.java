@@ -50,6 +50,9 @@ public class Attack {
 
         for (UnitInfo unit : enemies) {
             Location target = unit.getLocation();
+            if (unit.getType() == UnitType.TOWER) {
+                in.memoryManager.markTower(target);
+            }
             if (in.unitController.canAttack(target)) {
                 int health = unit.getHealth();
                 if (bestTargetHealth > health) {

@@ -7,6 +7,7 @@ public class UnitPlayer {
     public void run(UnitController uc) {
 
         Injection in = new Injection(uc);
+        in.memoryManager.markEnemyBase();
 
         while (true){
             in.staticVariables.update();

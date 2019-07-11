@@ -27,5 +27,6 @@ public class Constants {
     public int WORKERS_GET_IRON = 2;
     public int WORKERS_GET_CRYSTAL = 3;
     public int WORKERS_DEPOSIT_POSITION = 4;
+    public int ENEMY_TOWER = 5;
 
 }
