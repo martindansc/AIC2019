@@ -91,9 +91,11 @@ public class Base {
 
         UnitInfo bestCatapult = null;
         UnitInfo outerUnit = null;
+        UnitInfo innerUnit = null;
         int health = 10000;
 
         for (UnitInfo enemy : in.staticVariables.allenemies) {
+            int distance = enemy.getLocation().distanceSquared(in.staticVariables.myLocation);
             if (enemy.getType() == UnitType.CATAPULT) {
                 int enemyhealth = enemy.getHealth();
                 if (enemyhealth < health) {
@@ -101,8 +103,10 @@ public class Base {
                     bestCatapult = enemy;
                 }
             }
-            if (enemy.getLocation().distanceSquared(in.staticVariables.myLocation) > 36) {
+            if (distance > 36) {
                 outerUnit = enemy;
+            } else if (distance < 3) {
+                innerUnit = enemy;
             }
         }
 
@@ -122,7 +126,18 @@ public class Base {
             return true;
         }
 
-        return in.attack.genericTryAttack(in.staticVariables.allyBase);
+        boolean attacked = in.attack.genericTryAttack(in.staticVariables.allyBase);
+
+        if (innerUnit != null) {
+            Location innerLoc = innerUnit.getLocation();
+            Location target = innerLoc.add(in.staticVariables.myLocation.directionTo(innerLoc));
+            if (in.unitController.canAttack(target)) {
+                in.unitController.attack(target);
+            }
+            return true;
+        }
+
+        return attacked;
     }
 
 }
