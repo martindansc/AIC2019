@@ -138,7 +138,7 @@ public class Base {
             return true;
         }
 
-        boolean attacked = in.attack.genericTryAttack(in.staticVariables.allyBase);
+        boolean attacked = in.attack.genericTryAttack();
 
         if (innerUnit != null) {
             Location innerLoc = innerUnit.getLocation();

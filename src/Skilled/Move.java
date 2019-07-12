@@ -15,10 +15,28 @@ public class Move {
             return in.staticVariables.allyBase;
         }
 
+        TownInfo allyTown = null;
+        int allyDistance = Integer.MAX_VALUE;
         TownInfo neutralTown = null;
         int neutralDistance = Integer.MAX_VALUE;
         TownInfo enemyTown = null;
         int enemyDistance = Integer.MAX_VALUE;
+
+        for (TownInfo town : in.staticVariables.myTowns) {
+            int maxLoyalty = town.getMaxLoyalty();
+            int loyalty = town.getLoyalty();
+            if ((loyalty/maxLoyalty) < 0.2) {
+                int distance = in.staticVariables.myLocation.distanceSquared(town.getLocation());
+                if (distance < allyDistance) {
+                    allyTown = town;
+                    allyDistance = distance;
+                }
+            }
+        }
+
+        if (allyTown != null) {
+            return allyTown.getLocation();
+        }
 
         for (TownInfo town : in.staticVariables.enemytowns) {
             Location townLoc = town.getLocation();

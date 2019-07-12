@@ -16,20 +16,19 @@ public class Archer {
 
     public void run(Location target) {
         microResult = doMicro();
-        in.attack.genericTryAttack(target);
+        in.attack.genericTryAttack();
         if (in.archer.tryMove(target)) {
             in.staticVariables.myLocation = in.unitController.getLocation();
             in.staticVariables.allenemies = in.unitController.senseUnits(in.staticVariables.allies, true);
         }
-        in.attack.genericTryAttack(target);
+        in.attack.genericTryAttack();
+        in.attack.genericTryAttackTown(target);
     }
 
     public boolean tryMove(Location target) {
         if (!in.unitController.canMove()) return false;
         boolean isTargetBase = in.staticVariables.allyBase.isEqual(target);
         boolean isTargetObstructed = in.unitController.canSenseLocation(target) && in.unitController.isObstructed(target, in.staticVariables.myLocation);
-
-        if (in.staticVariables.type.getAttackRangeSquared() >= in.staticVariables.myLocation.distanceSquared(target) && (!isTargetBase && !isTargetObstructed)) return false;
 
         if (!microResult) {
             Direction dir = in.pathfinder.getNextLocationTarget(target);
@@ -112,7 +111,6 @@ public class Archer {
 
         boolean isBetter(MicroInfo m) {
             if (!in.memoryManager.isLocationSafe(m.loc)) return true;
-            if (2 * in.staticVariables.allyUnits.length < numEnemies) return false;
             if (numEnemies < m.numEnemies) return true;
             if (numEnemies > m.numEnemies) return false;
             if (canAttack()) {

@@ -90,8 +90,6 @@ public class Mage {
         boolean isTargetBase = in.staticVariables.allyBase.isEqual(target);
         boolean isTargetObstructed = in.unitController.canSenseLocation(target) && in.unitController.isObstructed(target, in.staticVariables.myLocation);
 
-        if (in.staticVariables.type.getAttackRangeSquared() >= in.staticVariables.myLocation.distanceSquared(target) && (!isTargetBase && !isTargetObstructed)) return false;
-
         if (!microResult) {
             Direction dir = in.pathfinder.getNextLocationTarget(target);
             if (dir != null) {
