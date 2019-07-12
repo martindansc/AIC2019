@@ -168,7 +168,7 @@ public class Mage {
         }
 
         boolean isBetter(MicroInfo m) {
-            if (!in.memoryManager.isLocationSafe(m.loc)) return false;
+            if (!in.memoryManager.isLocationSafe(m.loc)) return true;
             if (numEnemies < m.numEnemies) return true;
             if (numEnemies > m.numEnemies) return false;
             if (canAttack()) {

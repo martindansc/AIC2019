@@ -46,7 +46,7 @@ public class Worker {
         unitMoved = false;
         this.selectObjective();
 
-        //Si estic a sobre dun resource agafarlo
+        //Si estic a sobre d'un resource agafar-lo
         if(in.unitController.canGather()){
             in.unitController.gather();
         }
@@ -234,7 +234,7 @@ public class Worker {
     }
 
     public String checkIfMovementIsSafe(Location loc, Direction dir){
-        Location nextLocation =  loc.add(dir);
+        Location nextLocation = loc.add(dir);
         //Check if next location is out of the map
         if(in.unitController.isOutOfMap(nextLocation)){
             return "WALL";
@@ -244,8 +244,8 @@ public class Worker {
             //TODO
         }
         //check if next location is in range of attacking enemy unit
-        else if(false){
-            //TODO
+        else if(!in.memoryManager.isLocationSafe(nextLocation)){
+            return "TOWER/BASE";
         }
         //check if unit can move to that location
         else if(in.unitController.canMove(dir)){

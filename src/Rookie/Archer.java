@@ -109,7 +109,7 @@ public class Archer {
         }
 
         boolean isBetter(MicroInfo m) {
-            if (!in.memoryManager.isLocationSafe(m.loc)) return false;
+            if (!in.memoryManager.isLocationSafe(m.loc)) return true;
             if (2 * in.staticVariables.allyUnits.length < numEnemies) return false;
             if (numEnemies < m.numEnemies) return true;
             if (numEnemies > m.numEnemies) return false;
