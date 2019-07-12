@@ -44,7 +44,8 @@ public class MemoryManager {
     public int readValue(int key) {
         this.roundClearCounter(key);
         int realId = key + (uc.getRound() - 1)%in.constants.COUNTERS_SPACE;
-        return uc.read(realId);
+        int realIdThisRound = key + (uc.getRound())%in.constants.COUNTERS_SPACE;
+        return Math.max(uc.read(realId), uc.read(realIdThisRound));
     }
 
     public int readValueThisRound(int key) {
@@ -109,6 +110,8 @@ public class MemoryManager {
     }
 
     public int[] addObjective(UnitType unitType, int[] params) {
+
+        if(in.unitController.getEnergyLeft() < 6500) return this.newEmptyObjective();
 
         //todo: check that the objective doesn't exists, if it does maybe update it
         int maybeId = this.getObjectiveIdInLocation(params[2], params[3]);

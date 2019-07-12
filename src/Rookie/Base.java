@@ -38,18 +38,28 @@ public class Base {
         int archers = in.memoryManager.readValue(in.constants.ID_ALLIES_ARCHER_COUNTER);
         int catapults = in.memoryManager.readValue(in.constants.ID_ALLIES_CATAPULT_COUNTER);
         int mages = in.memoryManager.readValue(in.constants.ID_ALLIES_MAGE_COUNTER);
+        int workers = in.memoryManager.readValue(in.constants.ID_ALLIES_WORKERS_COUNTER);
 
-        if (archers < 1) return UnitType.ARCHER;
-        if (catapults < 1) return UnitType.CATAPULT;
-
-        int[][] objectives = in.memoryManager.getObjectives(UnitType.WORKER);
-        for (int[] objective: objectives) {
-            if(!in.objectives.isFull(objective)){
-               return UnitType.WORKER;
+        if (catapults < 1) {
+            int[][] objectives = in.memoryManager.getObjectives(UnitType.CATAPULT);
+            for (int[] objective: objectives) {
+                if(!in.objectives.isFull(objective)){
+                    return UnitType.CATAPULT;
+                }
             }
         }
 
-        return UnitType.SOLDIER;
+        if(workers < 6) {
+            int[][] objectives = in.memoryManager.getObjectives(UnitType.WORKER);
+            for (int[] objective: objectives) {
+                if(!in.objectives.isFull(objective)){
+                    return UnitType.WORKER;
+                }
+            }
+        }
+
+        if (soldiers <= 2*archers) return UnitType.SOLDIER;
+        return UnitType.ARCHER;
 
     }
 

@@ -10,24 +10,18 @@ public class Helper {
     }
 
     public int unitTypeToInt(UnitType ut) {
-        if (ut == UnitType.WORKER) {
-            return 1;
-        } else if (ut == UnitType.TOWER) {
-            return 2;
+        UnitType[] values = UnitType.values();
+        for(int i = 0; i < values.length; i++){
+            if(ut == values[i]) return i + 1;
         }
 
-        return 3;
+        return -1;
     }
 
     public UnitType intToUnitType(int type) {
-
-        if (type == 1) {
-            return UnitType.WORKER;
-        } else if (type == 2) {
-            return UnitType.TOWER;
-        }
-
-        return UnitType.ARCHER;
+        if(type <= 0) return null;
+        UnitType[] values = UnitType.values();
+        return values[type - 1];
     }
 
     public int locationToInt(int locX, int locY) {
@@ -53,6 +47,8 @@ public class Helper {
             in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_CATAPULT_COUNTER);
         } else if (in.staticVariables.type == UnitType.MAGE) {
             in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_MAGE_COUNTER);
+        } else if (in.staticVariables.type == UnitType.WORKER) {
+            in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_WORKERS_COUNTER);
         }
     }
 }

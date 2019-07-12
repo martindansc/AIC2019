@@ -13,7 +13,6 @@ public class UnitPlayer {
             in.staticVariables.update();
             in.messages.update();
             in.helper.countUnits();
-            in.map.sendResourcesMessage();
 
             Location target = in.move.getTarget();
 
@@ -30,6 +29,8 @@ public class UnitPlayer {
             } else if (in.staticVariables.type == UnitType.CATAPULT) {
                 in.catapult.run(target);
             }
+
+            in.map.sendResourcesMessage();
 
             in.unitController.yield(); //End of turn
         }
