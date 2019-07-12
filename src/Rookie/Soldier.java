@@ -105,7 +105,7 @@ public class Soldier {
         }
 
         boolean isBetter(MicroInfo m) {
-            if (!in.memoryManager.isLocationSafe(m.loc)) return false;
+            if (!in.memoryManager.isLocationSafe(m.loc)) return true;
             if (2 * in.staticVariables.allyUnits.length < numEnemies) return false;
             if (canAttack()) {
                 if (!m.canAttack()) return true;
