@@ -51,8 +51,12 @@ public class Worker {
             in.unitController.gather();
         }
 
+        //Scout viewing zone
+        //TODO: millorar scout
+        Boolean resourceFound = scout("random");
+
         if(currentAction == "GOTORANDOM"){
-            goToRandom();
+            goToRandom(resourceFound);
         }
         else if(currentAction == "GOTORESOURCE"){
             goToResource();
@@ -65,27 +69,26 @@ public class Worker {
         }
 
         //Si estic a sobre dun resource agafarlo
-        if(unitMoved && in.unitController.canGather()){
-            in.unitController.gather();
+        if(unitMoved) {
+            if (in.unitController.canGather()) {
+                in.unitController.gather();
+
+            }
+            //TODO: scout new viewing zone
         }
     }
 
 
-    public void goToRandom(){
-        //Scout viewing zone
-        Boolean resourceFound = scout("random");
-
+    public void goToRandom(Boolean resourceFound){
         //If not resource found
-        if(!resourceFound){
+        if(!resourceFound) {
             moveRandom();
-            //Scout new viewing zone
-            //TODO
-            return;
         }
-
         //If resource found
-        currentAction = "GOTORESOURCE";
-        goToResource();
+        else{
+            currentAction = "GOTORESOURCE";
+            goToResource();
+        }
         return;
     }
 
@@ -109,13 +112,11 @@ public class Worker {
                 return;
             }
         }
-        //Scout viewing zone
-        //TODO
         return;
     }
 
     public void gatherResource(){
-
+        //Gather if possible
         if(in.unitController.canGather()){
             in.unitController.gather();
         }
@@ -141,8 +142,6 @@ public class Worker {
             goToTown();
             return;
         }
-        //Scout viewing zone
-        //TODO
         return;
     }
 
@@ -163,8 +162,7 @@ public class Worker {
         }
         //Desposit resource if possible
         Boolean resourceDeposited = depositResource(dir);
-        //Scout viewing zone
-        //TODO
+
         if(resourceDeposited){
             currentAction =  "GOTORESOURCE";
             return;
