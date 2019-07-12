@@ -6,6 +6,7 @@ public class Mage {
     private Injection in;
     private boolean enemies = false;
     private Boolean microResult;
+    private Boolean closeEnemy = false;
     private Direction microDir;
 
     public Mage(Injection in) {
@@ -14,6 +15,7 @@ public class Mage {
 
     public void run(Location target) {
         microResult = doMicro();
+        tryAttack(target);
         in.mage.tryMove(target);
         if (in.mage.tryMove(target)) {
             in.staticVariables.myLocation = in.unitController.getLocation();
@@ -25,48 +27,44 @@ public class Mage {
     public boolean tryAttack(Location town) {
         if (!in.unitController.canAttack()) return false;
         if (!enemies && (!in.unitController.canSenseLocation(town) || (in.unitController.canSenseLocation(town) && in.unitController.isObstructed(town, in.staticVariables.myLocation)))) return false;
+        if (!closeEnemy) {
+            if (in.unitController.canAttack(town) && in.unitController.senseTown(town) != null) {
+                in.unitController.attack(town);
+                return true;
+            }
+            return false;
+        }
 
         int myAttack = in.attack.getMyAttack();
 
         Location[] locs = in.unitController.getVisibleLocations(5);
-        int[] scores = new int[locs.length];
+        Location bestLocation = null;
+        int bestLocationScore = 0;
         for (int i = 0; i < locs.length; i++) {
             int distance = locs[i].distanceSquared(in.staticVariables.myLocation);
             if (distance > 2 && in.unitController.canAttack(locs[i])) {
-                for (Direction dir : in.staticVariables.dirs) {
-                    Location target = locs[i].add(dir);
-                    if (in.unitController.canSenseLocation(target)) {
-                        UnitInfo unit = in.unitController.senseUnit(target);
-                        TownInfo city = in.unitController.senseTown(target);
+                int currentScore = 0;
+                for (int j = -1; j < 2; j++) {
+                    for (int k = -1; k < 2; k++) {
+                        UnitInfo unit = in.unitController.senseUnit(new Location (locs[i].x + j, locs[i].y + k));
                         if (unit != null) {
-                            if (unit.getTeam() == in.staticVariables.allies) {
-                                scores[i]--;
+                            if (unit.getTeam() != in.staticVariables.allies) {
+                                currentScore++;
                             } else {
-                                scores[i]++;
-                            }
-                        } else if (city != null){
-                            if (city.getOwner() == in.staticVariables.allies) {
-                                scores[i]--;
-                            } else {
-                                scores[i]++;
+                                currentScore--;
                             }
                         }
                     }
                 }
+                if (currentScore > bestLocationScore) {
+                    bestLocationScore = currentScore;
+                    bestLocation = locs[i];
+                }
             }
         }
 
-        int index = -1;
-        int bestscore = 0;
-        for (int i = 0; i < scores.length; i++) {
-            if (scores[i] > bestscore) {
-                index = i;
-                bestscore = scores[i];
-            }
-        }
-
-        if (index != -1) {
-            in.unitController.attack(locs[index]);
+        if (bestLocation != null) {
+            in.unitController.attack(bestLocation);
             return true;
         }
         return false;
@@ -108,6 +106,9 @@ public class Mage {
                 enemies = true;
                 for (int i = 0; i < 9; i++) {
                     microInfo[i].update(in.staticVariables.allenemies[j]);
+                    if (microInfo[i].minDistToEnemy < 6) {
+                        closeEnemy = true;
+                    }
                 }
             }
         }
@@ -143,10 +144,10 @@ public class Mage {
         }
 
         void update(UnitInfo unit) {
-
             int distance = unit.getLocation().distanceSquared(loc);
             if (distance <= unit.getType().attackRangeSquared) ++numEnemies;
             if (distance < minDistToEnemy) minDistToEnemy = distance;
+
         }
 
         boolean canAttack() {

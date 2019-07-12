@@ -38,7 +38,7 @@ public class Market {
                 return true;
             }
         } else if (freeiron >= 0 && freewood < 0) {
-            if (-freewood > freecrystal * crystalwood + freeiron * 1/woodiron) return false;
+            if (-freewood > freecrystal * crystalwood + freeiron * 1 / woodiron) return false;
             else {
                 in.unitController.trade(Resource.CRYSTAL, Resource.WOOD, freecrystal);
                 in.unitController.trade(Resource.IRON, Resource.WOOD, freeiron);
