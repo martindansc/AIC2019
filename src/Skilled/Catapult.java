@@ -15,7 +15,7 @@ public class Catapult {
         this.in = in;
     }
 
-    public void run(Location target) {
+    public void run() {
         selectObjective();
         in.catapult.tryMove(objectiveLocation);
         tryAttack();
@@ -36,6 +36,7 @@ public class Catapult {
         }
 
         if (!in.unitController.canAttack()) return false;
+        if (objectiveLocation == null) return false;
         if (in.staticVariables.allyBase.isEqual(objectiveLocation)) return false;
 
         if (in.unitController.canAttack(objectiveLocation)) {
@@ -56,10 +57,8 @@ public class Catapult {
 
         if (!doMicro()) {
             Direction dir = in.pathfinder.getNextLocationTarget(target);
-            if (in.staticVariables.myLocation.add(dir).distanceSquared(target) >= in.staticVariables.type.getMinAttackRangeSquared()) {
-                if (dir != null && in.unitController.canMove(dir)) {
-                    in.unitController.move(dir);
-                }
+            if (dir != null && in.unitController.canMove(dir)) {
+                in.unitController.move(dir);
             }
         }
     }
