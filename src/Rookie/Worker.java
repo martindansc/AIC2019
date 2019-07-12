@@ -259,7 +259,7 @@ public class Worker {
         if(mode == "random"){
             ResourceInfo[] resourcesSeen = in.unitController.senseResources();
             Location returnLocation = getClosestResource(resourcesSeen);
-            if(returnLocation != new Location(100000, 100000)){
+            if(!returnLocation.isEqual(new Location(100000, 100000))){
                 currentAction = "GOTORESOURCE";
                 objectiveLocation = returnLocation;
                 return true;
