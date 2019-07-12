@@ -21,14 +21,18 @@ public class MemoryManager {
     // SIMPLE COUNTERS FUNCTION
 
     public void resetCounter(int key) {
-        uc.write(key, 0);
-        uc.write(key, 1);
-        uc.write(key, 2);
+        for(int i = 0; i < in.constants.COUNTERS_SPACE; i++) {
+            uc.write(key + i, 0);
+        }
     }
 
+    public void roundClearCounter(int key) {
+        uc.write(key + (uc.getRound() + 1)%in.constants.COUNTERS_SPACE, 0);
+    }
 
     public void increaseValue(int key, int ammount) {
-        int realId = key + uc.getRound()%3;
+        this.roundClearCounter(key);
+        int realId = key + uc.getRound()%in.constants.COUNTERS_SPACE;
         int value = uc.read(realId);
         uc.write(realId, value + ammount);
     }
@@ -38,13 +42,13 @@ public class MemoryManager {
     }
 
     public int readValue(int key) {
-        uc.write(key + (uc.getRound() + 1)%3, 0);
-        int realId = key + (uc.getRound() - 1)%3;
+        this.roundClearCounter(key);
+        int realId = key + (uc.getRound() - 1)%in.constants.COUNTERS_SPACE;
         return uc.read(realId);
     }
 
     public int readValueThisRound(int key) {
-        int realId = key + (uc.getRound())%3;
+        int realId = key + (uc.getRound())%in.constants.COUNTERS_SPACE;
         return uc.read(realId);
     }
 
@@ -93,8 +97,6 @@ public class MemoryManager {
 
 
     // UNIT TYPE OBJECTIVE FUNCTIONS
-
-    // todo remove objectives
 
     private int[] newEmptyObjective() {
         return new int[in.constants.OBJECTIVE_SIZE];
@@ -194,6 +196,9 @@ public class MemoryManager {
     }
 
     public void removeObjective(int id) {
+        // remove location
+        this.removeObjectiveIdInLocation(uc.read(id + 2), uc.read(id + 3));
+
         uc.write(id, 0);
         uc.write(id + 1, 0);
         uc.write(id + 2, 0);
@@ -204,16 +209,14 @@ public class MemoryManager {
         resetCounter(id + 6);
     }
 
-    public void removeObjective(UnitType unitType, int objective, Location loc) {
-        int type = in.helper.unitTypeToInt(unitType);
+    public void removeObjective(Location loc) {
+        int idObjectiveLocation = in.helper.locationToInt(loc.x, loc.y);
+        removeObjective(idObjectiveLocation);
+    }
 
-        for(int i = 0; i < in.constants.MAX_OBJECTIVES; i++) {
-            int id = this.getObjectiveId(type, i);
-            if(uc.read(id + 2) == loc.x && uc.read(id + 3) == loc.y && objective == uc.read(id)) {
-                this.removeObjective(id);
-                break;
-            }
-        }
+    public boolean existsObjectiveInLocation(int locX, int locY) {
+        int idObjectiveLocation = in.helper.locationToInt(locX, locY);
+        return 0 < uc.read(in.constants.ID_LOCATION_OBJECTIVES + idObjectiveLocation);
     }
 
     public int getObjectiveIdInLocation(int locX, int locY) {
@@ -226,23 +229,14 @@ public class MemoryManager {
         uc.write(in.constants.ID_LOCATION_OBJECTIVES  + idObjectiveLocation, id);
     }
 
+    private void removeObjectiveIdInLocation(int locX, int locY) {
+        int idObjectiveLocation = in.helper.locationToInt(locX, locY);
+        uc.write(in.constants.ID_LOCATION_OBJECTIVES  + idObjectiveLocation, 0);
+    }
+
     public int getObjectiveIdInLocation(Location loc) {
         int idObjectiveLocation = in.helper.locationToInt(loc);
         return uc.read(in.constants.ID_LOCATION_OBJECTIVES + idObjectiveLocation);
-    }
-
-    public void countUnits() {
-        if (in.staticVariables.type == UnitType.SOLDIER) {
-            in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_SOLDIER_COUNTER);
-        } else if (in.staticVariables.type == UnitType.ARCHER) {
-            in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_ARCHER_COUNTER);
-        } else if (in.staticVariables.type == UnitType.KNIGHT) {
-            in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_KNIGHT_COUNTER);
-        } else if (in.staticVariables.type == UnitType.CATAPULT) {
-            in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_CATAPULT_COUNTER);
-        } else if (in.staticVariables.type == UnitType.MAGE) {
-            in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_MAGE_COUNTER);
-        }
     }
 
 
@@ -275,55 +269,6 @@ public class MemoryManager {
         int index = getIndexMap(loc);
         int enemies = in.unitController.read(index + 4);
         return enemies == 0;
-    }
-
-    public void markTower(Location loc) {
-        if (getUnitFromLocation(loc) == UnitType.TOWER) return;
-        int[] objective = in.objectives.createTowerObjective(loc);
-        in.memoryManager.addObjective(UnitType.CATAPULT, objective);
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 6; j++) {
-                int suma = i * i + j * j;
-                if (suma < 33 && suma > 19) {
-                    setLocationDangerous(new Location (loc.x + i, loc.y + j));
-                    setLocationDangerous(new Location (loc.x - i, loc.y + j));
-                    setLocationDangerous(new Location (loc.x + i, loc.y - j));
-                    setLocationDangerous(new Location (loc.x - i, loc.y - j));
-                }
-            }
-        }
-        saveUnitToMap(loc, UnitType.TOWER);
-    }
-
-    public void unmarkTower(Location loc) {
-        if (getUnitFromLocation(loc) != UnitType.TOWER) return;
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 6; j++) {
-                int suma = i * i + j * j;
-                if (suma < 33 && suma > 19) {
-                    setLocationSafe(new Location (loc.x + i, loc.y + j));
-                    setLocationSafe(new Location (loc.x - i, loc.y + j));
-                    setLocationSafe(new Location (loc.x + i, loc.y - j));
-                    setLocationSafe(new Location (loc.x - i, loc.y - j));
-                }
-            }
-        }
-        saveUnitToMap(loc, null);
-    }
-
-    public void markEnemyBase() {
-        Location loc = in.staticVariables.enemyBase;
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                int suma = i * i + j * j;
-                if (suma < 51 && suma > 33) {
-                    setLocationSafe(new Location (loc.x + i, loc.y + j));
-                    setLocationSafe(new Location (loc.x - i, loc.y + j));
-                    setLocationSafe(new Location (loc.x + i, loc.y - j));
-                    setLocationSafe(new Location (loc.x - i, loc.y - j));
-                }
-            }
-        }
     }
 
 }

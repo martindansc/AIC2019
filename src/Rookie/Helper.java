@@ -41,4 +41,18 @@ public class Helper {
     public Location intToLocation(int number) {
         return new Location((number / 100) + in.staticVariables.allyBase.x - 50, (number % 100) + in.staticVariables.allyBase.y - 50);
     }
+
+    public void countUnits() {
+        if (in.staticVariables.type == UnitType.SOLDIER) {
+            in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_SOLDIER_COUNTER);
+        } else if (in.staticVariables.type == UnitType.ARCHER) {
+            in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_ARCHER_COUNTER);
+        } else if (in.staticVariables.type == UnitType.KNIGHT) {
+            in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_KNIGHT_COUNTER);
+        } else if (in.staticVariables.type == UnitType.CATAPULT) {
+            in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_CATAPULT_COUNTER);
+        } else if (in.staticVariables.type == UnitType.MAGE) {
+            in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_MAGE_COUNTER);
+        }
+    }
 }

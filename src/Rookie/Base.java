@@ -23,12 +23,13 @@ public class Base {
 
         UnitType bestUnitType = this.chooseBestUnitType(message);
 
-        int id = spawnAndGetIdIfPossible(bestDir, bestUnitType);
+        if(bestUnitType != UnitType.BASE) {
+            int id = spawnAndGetIdIfPossible(bestDir, bestUnitType);
 
-        if(id != -1 && message[0] != 0) {
-            in.messages.sendToLocation(id, message[0], message[1]);
+            if(id != -1 && message[0] != 0) {
+                in.messages.sendToLocation(id, message[0], message[1]);
+            }
         }
-
     }
 
     private UnitType chooseBestUnitType(int[] message) {
@@ -38,16 +39,17 @@ public class Base {
         int catapults = in.memoryManager.readValue(in.constants.ID_ALLIES_CATAPULT_COUNTER);
         int mages = in.memoryManager.readValue(in.constants.ID_ALLIES_MAGE_COUNTER);
 
-        //return UnitType.WORKER;
-
-        if(in.helper.intToUnitType(message[2]) == UnitType.WORKER) {
-            return UnitType.WORKER;
-        }
-
-        if (soldiers <= 2 * archers) return UnitType.SOLDIER;
+        if (archers < 1) return UnitType.ARCHER;
         if (catapults < 1) return UnitType.CATAPULT;
 
-        return UnitType.ARCHER;
+        int[][] objectives = in.memoryManager.getObjectives(UnitType.WORKER);
+        for (int[] objective: objectives) {
+            if(!in.objectives.isFull(objective)){
+               return UnitType.WORKER;
+            }
+        }
+
+        return UnitType.SOLDIER;
 
     }
 

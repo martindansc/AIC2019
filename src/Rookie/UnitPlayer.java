@@ -7,12 +7,12 @@ public class UnitPlayer {
     public void run(UnitController uc) {
 
         Injection in = new Injection(uc);
-        in.memoryManager.markEnemyBase();
+        if(in.staticVariables.type == UnitType.BASE) in.map.markEnemyBase();
 
         while (true){
             in.staticVariables.update();
             in.messages.update();
-            in.memoryManager.countUnits();
+            in.helper.countUnits();
             in.map.sendResourcesMessage();
 
             Location target = in.move.getTarget();

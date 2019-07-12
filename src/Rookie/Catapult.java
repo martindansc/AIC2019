@@ -14,7 +14,7 @@ public class Catapult {
 
     public void run(Location target) {
         selectObjective();
-        in.catapult.tryMove(target);
+        in.catapult.tryMove(objectiveLocation);
         tryAttack();
     }
 
@@ -26,8 +26,9 @@ public class Catapult {
             if (delay == 5) {
                 counter = 0;
                 delay = 0;
-                in.memoryManager.unmarkTower(objectiveLocation);
+                in.map.unmarkTower(objectiveLocation);
                 in.memoryManager.removeObjective(in.memoryManager.getObjectiveIdInLocation(objectiveLocation));
+                objectiveLocation = null;
             }
         }
 
@@ -45,16 +46,14 @@ public class Catapult {
     }
 
     public void tryMove(Location target) {
-        if (!in.unitController.canMove()) return;
-        if (catapultInRange(target)) return;
-        boolean isTargetBase = in.staticVariables.allyBase.isEqual(target);
-        boolean isTargetObstructed = in.unitController.canSenseLocation(target) && in.unitController.isObstructed(target, in.staticVariables.myLocation);
-
-        if (in.staticVariables.type.getAttackRangeSquared() >= in.staticVariables.myLocation.distanceSquared(target) && (!isTargetBase && !isTargetObstructed)) return;
+        if(target != null) {
+            if (!in.unitController.canMove()) return;
+            if (catapultInRange(target)) return;
+        }
 
         if (!doMicro()) {
             Direction dir = in.pathfinder.getNextLocationTarget(target);
-            if (isTargetBase || isTargetObstructed || in.staticVariables.myLocation.add(dir).distanceSquared(target) >= in.staticVariables.type.getMinAttackRangeSquared()) {
+            if (in.staticVariables.myLocation.add(dir).distanceSquared(target) >= in.staticVariables.type.getMinAttackRangeSquared()) {
                 if (dir != null && in.unitController.canMove(dir)) {
                     in.unitController.move(dir);
                 }
@@ -63,9 +62,7 @@ public class Catapult {
     }
 
     public boolean catapultInRange(Location target) {
-        if (in.staticVariables.type != UnitType.CATAPULT) return false;
-        if (target.distanceSquared(in.staticVariables.myLocation) <= GameConstants.CATAPULT_ATTACK_RANGE_SQUARED) return true;
-        return false;
+        return target.distanceSquared(in.staticVariables.myLocation) <= GameConstants.CATAPULT_ATTACK_RANGE_SQUARED;
     }
 
     public boolean doMicro() {

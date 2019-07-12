@@ -44,7 +44,7 @@ public class Objectives {
     public void claimObjective(Location loc) {
 
         int idObjective = in.memoryManager.getObjectiveIdInLocation(loc);
-        if(idObjective!= 0) {
+        if(idObjective != 0) {
             this.claimObjective(idObjective);
         }
     }
