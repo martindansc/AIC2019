@@ -53,6 +53,10 @@ public class Objectives {
         return objective[5] == 0 || this.getClaimedTimes(objective) >= this.getNumberUnits(objective);
     }
 
+    public int getRound(int[] objective) {
+        return objective[9];
+    }
+
 
     // CREATE FUNCTIONS
 
@@ -70,6 +74,7 @@ public class Objectives {
         newObjective[0] = in.constants.ENEMY_TOWER;
         newObjective[1] = 1;
         this.setLocationObjective(newObjective, loc);
+        newObjective[9] = in.staticVariables.round;
 
         return newObjective;
     }

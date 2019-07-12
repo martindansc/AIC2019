@@ -40,10 +40,16 @@ public class Base {
         int mages = in.memoryManager.readValue(in.constants.ID_ALLIES_MAGE_COUNTER);
         int workers = in.memoryManager.readValue(in.constants.ID_ALLIES_WORKERS_COUNTER);
 
-        if (catapults < 1) {
+        if(in.messages.hasMessage()) {
+            int[] newMessage = in.messages.readMessage();
+            return in.helper.intToUnitType(newMessage[1]);
+        }
+
+        if (catapults < 2) {
             int[][] objectives = in.memoryManager.getObjectives(UnitType.CATAPULT);
             for (int[] objective: objectives) {
-                if(!in.objectives.isFull(objective)){
+                if(!in.objectives.isFull(objective) &&
+                        in.staticVariables.round - in.objectives.getRound(objective) > 20) {
                     return UnitType.CATAPULT;
                 }
             }

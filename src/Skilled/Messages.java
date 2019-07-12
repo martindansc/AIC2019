@@ -44,26 +44,25 @@ public class Messages {
     public int[] readMessage() {
         if(this.hasMessage()) {
             int[] message = messages[messageCounter];
-            hasMessage[messageCounter] = false;
-            messageCounter = (messageCounter + 1) % hasMessage.length;
             return message;
         }
         return this.emptyMessage();
     }
 
-    public void sendCreateAndSendToLocation(int unitId, UnitType type, int locX, int locY) {
+    public void nextMessage() {
+        hasMessage[messageCounter] = false;
+        messageCounter = (messageCounter + 1) % hasMessage.length;
+    }
+
+    public void sendCreateAndSendToLocation(int unitId, int quantity, UnitType type, int locX, int locY) {
 
         int[] params = new int [in.constants.MESSAGE_SIZE];
 
-        params[0] = locX;
-        params[1] = locY;
+        params[2] = locX;
+        params[3] = locY;
 
-        if(UnitType.WORKER.equals(type)) {
-            params[2] = 1;
-        }
-        else {
-            params[2] = 2;
-        }
+        params[0] = in.helper.unitTypeToInt(type);
+        params[1] = quantity;
 
         in.memoryManager.sendMessageTo(unitId, params);
     }
@@ -72,8 +71,8 @@ public class Messages {
 
         int[] params = new int [in.constants.MESSAGE_SIZE];
 
-        params[0] = locX;
-        params[1] = locY;
+        params[2] = locX;
+        params[3] = locY;
 
         in.memoryManager.sendMessageTo(unitId, params);
     }

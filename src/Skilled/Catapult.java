@@ -10,6 +10,7 @@ public class Catapult {
     private int counter = 0;
     private int delay = 0;
     private Location objectiveLocation;
+    private Location[] nextsObjectivesLocations = new Location[2];
 
     public Catapult(Injection in) {
         this.in = in;
@@ -139,34 +140,58 @@ public class Catapult {
 
     public void selectObjective() {
         // do I currently have an objective set up?
-        // if I don't have an objective, I can check for one in the objectives array and get the best
         if(objectiveLocation == null) {
-            int closestObjective = Integer.MAX_VALUE;
-            Location bestLocation = null;
+            for(int i = 0; i < nextsObjectivesLocations.length; i++) {
+                if(nextsObjectivesLocations[i] != null) {
+                    objectiveLocation = nextsObjectivesLocations[i];
+                    nextsObjectivesLocations[i] = null;
+                    break;
+                }
+            }
+        }
 
-            int[][] objectives = in.memoryManager.getObjectives();
+        // if I don't have an objective, I can check for one in the objectives array and get the best
+        // can we add a new objective?
+        int closestObjective = Integer.MAX_VALUE;
+        Location bestLocation = null;
 
-            for (int[] objective: objectives) {
-                if(!in.objectives.isFull(objective)){
-                    // for now, as heuristic we are going to get the distance to the resource
-                    Location objectiveLocation = in.objectives.getLocationObjective(objective);
-                    int distance = in.staticVariables.myLocation.distanceSquared(objectiveLocation);
-                    if(distance < closestObjective) {
-                        closestObjective = distance;
-                        bestLocation = objectiveLocation;
+        int[][] objectives = in.memoryManager.getObjectives();
+
+        for (int[] objective: objectives) {
+            if(!in.objectives.isFull(objective)){
+                // for now, as heuristic we are going to get the distance to the resource
+                Location objectiveLocation = in.objectives.getLocationObjective(objective);
+                int distance = in.staticVariables.myLocation.distanceSquared(objectiveLocation);
+                if(distance < closestObjective) {
+                    closestObjective = distance;
+                    bestLocation = objectiveLocation;
+                }
+            }
+        }
+
+        if(bestLocation != null){
+            if(objectiveLocation == null) {
+                this.fixObjectiveLocation(bestLocation);
+            }
+            else {
+                for(int i = 0; i < nextsObjectivesLocations.length; i++) {
+                    if(nextsObjectivesLocations[i] == null) {
+                        nextsObjectivesLocations[i] = bestLocation;
+                        break;
                     }
                 }
             }
-
-            if(bestLocation != null){
-                this.fixObjectiveLocation(bestLocation);
-            }
-
         }
 
         // claim objective
         if(objectiveLocation != null) {
             in.objectives.claimObjective(this.objectiveLocation);
+
+            for(int i = 0; i < nextsObjectivesLocations.length; i++) {
+                if(nextsObjectivesLocations[i] != null) {
+                    in.objectives.claimObjective(nextsObjectivesLocations[i]);
+                }
+            }
         }
     }
 

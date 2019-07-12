@@ -39,7 +39,7 @@ Estructures i unitats
         this.in = in;
     }
 
-    public void sendResourcesMessage() {
+    public void sendResourcesObjective() {
         for (ResourceInfo resource : in.staticVariables.resourcesSeen) {
             Location loc = resource.getLocation();
             int[] objective = in.objectives.createResourceObjective(loc);

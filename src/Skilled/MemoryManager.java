@@ -244,7 +244,6 @@ public class MemoryManager {
         return uc.read(in.constants.ID_LOCATION_OBJECTIVES + idObjectiveLocation);
     }
 
-
     // MAP FUNCTIONS
     public void saveUnitToMap(Location loc, UnitType unit) {
         int index = getIndexMap(loc);

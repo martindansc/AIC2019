@@ -30,7 +30,7 @@ public class UnitPlayer {
                 in.catapult.run(target);
             }
 
-            in.map.sendResourcesMessage();
+            in.map.sendResourcesObjective();
 
             in.unitController.yield(); //End of turn
         }
