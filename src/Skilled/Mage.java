@@ -94,11 +94,13 @@ public class Mage {
 
         if (!microResult) {
             Direction dir = in.pathfinder.getNextLocationTarget(target);
-            if (isTargetBase || isTargetObstructed || in.staticVariables.myLocation.add(dir).distanceSquared(target) >= in.staticVariables.type.getMinAttackRangeSquared()) {
-                if (dir != null && in.unitController.canMove(dir)) {
-                    if (in.memoryManager.isLocationSafe(in.staticVariables.myLocation.add(dir))) {
-                        in.unitController.move(dir);
-                        return true;
+            if (dir != null) {
+                if (isTargetBase || isTargetObstructed || in.staticVariables.myLocation.add(dir).distanceSquared(target) >= in.staticVariables.type.getMinAttackRangeSquared()) {
+                    if (in.unitController.canMove(dir)) {
+                        if (in.memoryManager.isLocationSafe(in.staticVariables.myLocation.add(dir))) {
+                            in.unitController.move(dir);
+                            return true;
+                        }
                     }
                 }
             }

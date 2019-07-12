@@ -29,7 +29,7 @@ public class UnitPlayer {
             } else if (in.staticVariables.type == UnitType.MAGE) {
                 in.mage.run(target);
             } else if (in.staticVariables.type == UnitType.CATAPULT) {
-                in.catapult.run(target);
+                in.catapult.run();
             }
 
             in.map.sendResourcesObjective();
