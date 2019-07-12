@@ -29,8 +29,21 @@ public class Mage {
         if (!enemies && (!in.unitController.canSenseLocation(town) || (in.unitController.canSenseLocation(town) && in.unitController.isObstructed(town, in.staticVariables.myLocation)))) return false;
         if (!closeEnemy) {
             if (in.unitController.canAttack(town) && in.unitController.senseTown(town) != null) {
-                in.unitController.attack(town);
-                return true;
+                int allyUnits = 0;
+                for (int i = -1; i < 2; i++) {
+                    for (int j = -1; j < 2; j++) {
+                        UnitInfo unit = in.unitController.senseUnit(new Location(town.x + i, town.y + j));
+                        if (unit != null) {
+                            if (unit.getTeam() == in.staticVariables.allies) {
+                                allyUnits++;
+                            }
+                        }
+                    }
+                }
+                if (allyUnits == 0) {
+                    in.unitController.attack(town);
+                    return true;
+                }
             }
             return false;
         }
