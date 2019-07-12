@@ -118,6 +118,7 @@ public class Catapult {
         }
 
         boolean isBetter(MicroInfo m) {
+            if (!in.memoryManager.isLocationSafe(m.loc)) return true;
             if (numEnemies < m.numEnemies) return true;
             if (numEnemies > m.numEnemies) return false;
             if (canAttack()) {
