@@ -19,10 +19,13 @@ public class Worker {
     private Location objectiveBase;
     //RandomDirection
     Direction randomDir;
+    //True if unit moved in this turn
+    Boolean unitMoved;
 
     public Worker(Injection in) {
         this.in = in;
         fixRandomDirection();
+        unitMoved = false;
     }
 
     public void fixObjectiveLocation(Location loc, Boolean resourceObjective){
@@ -40,32 +43,35 @@ public class Worker {
     }
 
     public void run(){
+        unitMoved = false;
         this.selectObjective();
-        //TODO: si estic a sobre dun resource agafarlo si estic anant a home
+
+        //Si estic a sobre dun resource agafarlo
+        if(in.unitController.canGather()){
+            in.unitController.gather();
+        }
 
         if(currentAction == "GOTORANDOM"){
-            currentAction = goToRandom();
-            if(currentAction == "GOTORESOURCE"){
-                currentAction = goToResource();
-            }
+            goToRandom();
         }
-        if(currentAction == "GOTORESOURCE"){
-            currentAction = goToResource();
-            if(currentAction == "GATHERRESOURCE"){
-                currentAction = gatherResource();
-            }
+        else if(currentAction == "GOTORESOURCE"){
+            goToResource();
         }
-        if(currentAction == "GATHERRESOURCE"){
-            currentAction = gatherResource();
-            //TODO
+        else if(currentAction == "GATHERRESOURCE"){
+            gatherResource();
         }
-        if(currentAction == "GOTOTOWN"){
-            currentAction = goToTown();
+        else if(currentAction == "GOTOTOWN"){
+            goToTown();
+        }
+
+        //Si estic a sobre dun resource agafarlo
+        if(unitMoved && in.unitController.canGather()){
+            in.unitController.gather();
         }
     }
 
 
-    public String goToRandom(){
+    public void goToRandom(){
         //Scout viewing zone
         Boolean resourceFound = scout("random");
 
@@ -74,14 +80,16 @@ public class Worker {
             moveRandom();
             //Scout new viewing zone
             //TODO
-            return "GOTORANDOM";
+            return;
         }
 
         //If resource found
-        return "GOTORESOURCE";
+        currentAction = "GOTORESOURCE";
+        goToResource();
+        return;
     }
 
-    public String goToResource(){
+    public void goToResource(){
         //Move to desired resource
         if (in.unitController.canMove()) {
             Direction dir = in.pathfinder.getNextLocationTarget(objectiveLocation);
@@ -89,22 +97,24 @@ public class Worker {
                 String nextMovementIsSafe = checkIfMovementIsSafe(in.staticVariables.myLocation, dir);
                 if(nextMovementIsSafe == "CANMOVE") {
                     in.unitController.move(dir);
+                    unitMoved = true;
                 }
                 //TODO: tenir en compte catapultes i altres
                 //else if()
             }
-            //Check if desired resource has been reached, can't gather if can't move (CDs)
+            //Check if desired resource has been reached
             if (in.staticVariables.myLocation.isEqual(objectiveLocation)) {
-                return "GATHERRESOURCE";
+                currentAction = "GATHERRESOURCE";
+                gatherResource();
+                return;
             }
         }
         //Scout viewing zone
         //TODO
-
-        return "GOTORESOURCE";
+        return;
     }
 
-    public String gatherResource(){
+    public void gatherResource(){
 
         if(in.unitController.canGather()){
             in.unitController.gather();
@@ -113,33 +123,40 @@ public class Worker {
         float wood = in.staticVariables.unitInfo.getWood();
         if(wood >= 60.0){ //60
             objectiveBase = getClosestTownToLocation(objectiveLocation);
-            return "GOTOTOWN";
+            currentAction =  "GOTOTOWN";
+            goToTown();
+            return;
         }
         float iron = in.staticVariables.unitInfo.getIron();
         if( iron >= 20.0){ //20
             objectiveBase = getClosestTownToLocation(objectiveLocation);
-            return "GOTOTOWN";
+            currentAction =  "GOTOTOWN";
+            goToTown();
+            return;
         }
         float crystal = in.staticVariables.unitInfo.getCrystal();
         if( crystal >= 6.0){ //6
             objectiveBase = getClosestTownToLocation(objectiveLocation);
-            return "GOTOTOWN";
+            currentAction = "GOTOTOWN";
+            goToTown();
+            return;
         }
         //Scout viewing zone
         //TODO
-        return "GATHERRESOURCE";
+        return;
     }
 
-    public String goToTown(){
+    public void goToTown(){
         //Ceck if destination is own and correct it
         checkDestTownOwnAndCorrect();
         //Move to desired town or base
-        if (!in.unitController.canMove()) return "GOTOTOWN";
+        if (!in.unitController.canMove()) return;
         Direction dir = in.pathfinder.getNextLocationTarget(objectiveBase);
         if (dir != null && dir != Direction.ZERO) {
             String nextMovementIsSafe = checkIfMovementIsSafe(in.staticVariables.myLocation, dir);
             if(nextMovementIsSafe == "CANMOVE") {
                 in.unitController.move(dir);
+                unitMoved = true;
             }
             //TODO: tenir en compte catapultes i altres
             //else if()
@@ -148,8 +165,11 @@ public class Worker {
         Boolean resourceDeposited = depositResource(dir);
         //Scout viewing zone
         //TODO
-        if(resourceDeposited) return "GOTORESOURCE";
-        return "GOTOTOWN";
+        if(resourceDeposited){
+            currentAction =  "GOTORESOURCE";
+            return;
+        }
+        return;
     }
 
     public Boolean depositResource(Direction dir){
@@ -193,6 +213,7 @@ public class Worker {
             //If it is safe to move, move
             else if (nextMovementIsSafe == "CANMOVE") {
                 in.unitController.move(randomDir);
+                unitMoved = true;
             }
             //If wanted possition is not accessible try the others
             else if (nextMovementIsSafe == "SAFEBUTNOTMOVE") {
@@ -202,6 +223,7 @@ public class Worker {
                     Direction auxiliarRandomDir = Direction.values()[currentDirIndx];
                     if (checkIfMovementIsSafe(in.staticVariables.myLocation, auxiliarRandomDir) == "CANMOVE") {
                         in.unitController.move(auxiliarRandomDir);
+                        unitMoved = true;
                         hasMoved = true;
                     } else {
                         currentDirIndx = (currentDirIndx + 1) % 8;
