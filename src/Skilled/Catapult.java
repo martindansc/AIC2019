@@ -58,7 +58,9 @@ public class Catapult {
         if (!doMicro()) {
             Direction dir = in.pathfinder.getNextLocationTarget(target);
             if (dir != null && in.unitController.canMove(dir)) {
-                in.unitController.move(dir);
+                if (in.memoryManager.isLocationSafe(in.staticVariables.myLocation.add(dir))) {
+                    in.unitController.move(dir);
+                }
             }
         }
     }
