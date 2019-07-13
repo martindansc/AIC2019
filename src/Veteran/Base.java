@@ -1,4 +1,4 @@
-package Skilled;
+package Veteran;
 
 import aic2019.Direction;
 import aic2019.Location;

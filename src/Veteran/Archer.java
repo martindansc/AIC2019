@@ -1,95 +1,28 @@
-package Skilled;
+package Veteran;
 
 import aic2019.Direction;
 import aic2019.Location;
 import aic2019.UnitInfo;
+import aic2019.UnitType;
 
-public class Mage {
+public class Archer {
     private Injection in;
-    private boolean enemies = false;
     private Boolean microResult;
     private Direction microDir;
 
-    public Mage(Injection in) {
+    public Archer(Injection in) {
         this.in = in;
     }
 
     public void run(Location target) {
         microResult = doMicro();
-        tryAttack(target);
-        in.mage.tryMove(target);
-        if (in.mage.tryMove(target)) {
+        in.attack.genericTryAttack();
+        if (in.archer.tryMove(target)) {
             in.staticVariables.myLocation = in.unitController.getLocation();
             in.staticVariables.allenemies = in.unitController.senseUnits(in.staticVariables.allies, true);
         }
-        tryAttack(target);
-    }
-
-    public boolean tryAttack(Location town) {
-        if (!in.unitController.canAttack()) return false;
-        if (!enemies && (!in.unitController.canSenseLocation(town) || (in.unitController.canSenseLocation(town) && in.unitController.isObstructed(town, in.staticVariables.myLocation)))) return false;
-        int closeDistance = 10000;
-        for (UnitInfo enemy: in.staticVariables.allenemies) {
-            int currentDistance = in.staticVariables.myLocation.distanceSquared(enemy.getLocation());
-            if (currentDistance < closeDistance) {
-                closeDistance = currentDistance;
-            }
-        }
-
-        if (closeDistance > 13) {
-            if (in.unitController.canAttack(town) && in.unitController.senseTown(town) != null && in.unitController.senseTown(town).getOwner() != in.staticVariables.allies) {
-                int allyUnits = 0;
-                for (int i = -1; i < 2; i++) {
-                    for (int j = -1; j < 2; j++) {
-                        UnitInfo unit = in.unitController.senseUnit(new Location(town.x + i, town.y + j));
-                        if (unit != null) {
-                            if (unit.getTeam() == in.staticVariables.allies) {
-                                allyUnits++;
-                            }
-                        }
-                    }
-                }
-                if (allyUnits == 0) {
-                    in.unitController.attack(town);
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        int myAttack = in.attack.getMyAttack();
-
-        Location[] locs = in.unitController.getVisibleLocations(5);
-        Location bestLocation = null;
-        int bestLocationScore = 0;
-        for (int i = 0; i < locs.length; i++) {
-            int distance = locs[i].distanceSquared(in.staticVariables.myLocation);
-            if (distance > 2 && in.unitController.canAttack(locs[i])) {
-                int currentScore = 0;
-                for (int j = -1; j < 2; j++) {
-                    for (int k = -1; k < 2; k++) {
-                        UnitInfo unit = in.unitController.senseUnit(new Location (locs[i].x + j, locs[i].y + k));
-                        if (unit != null) {
-                            if (unit.getTeam() != in.staticVariables.allies) {
-                                currentScore++;
-                            } else {
-                                currentScore--;
-                            }
-                        }
-                    }
-                }
-                if (currentScore > bestLocationScore) {
-                    bestLocationScore = currentScore;
-                    bestLocation = locs[i];
-                }
-            }
-        }
-
-        if (bestLocation != null) {
-            in.unitController.attack(bestLocation);
-            return true;
-        }
-        return false;
+        in.attack.genericTryAttack();
+        in.attack.genericTryAttackTown(target);
     }
 
     public boolean tryMove(Location target) {
@@ -98,7 +31,7 @@ public class Mage {
         boolean isTargetObstructed = in.unitController.canSenseLocation(target) && in.unitController.isObstructed(target, in.staticVariables.myLocation);
 
         if (!microResult) {
-            Direction dir = in.pathfinder.getNextLocationTarget(target);
+            Direction dir = in.pathfinder.getNextLocationTarget(target, loc -> in.memoryManager.isLocationSafe(loc));
             if (dir != null) {
                 if (isTargetBase || isTargetObstructed || in.staticVariables.myLocation.add(dir).distanceSquared(target) >= in.staticVariables.type.getMinAttackRangeSquared()) {
                     if (in.unitController.canMove(dir)) {
@@ -123,11 +56,12 @@ public class Mage {
             microInfo[i] = new MicroInfo(in.staticVariables.myLocation.add(in.staticVariables.dirs[i]));
         }
 
-        for (int j = 0; j < in.staticVariables.allenemies.length; j++) {
-            if (!in.unitController.isObstructed(in.staticVariables.allenemies[j].getLocation(), in.staticVariables.myLocation)) {
+        boolean enemies = false;
+        for (UnitInfo enemy : in.staticVariables.allenemies) {
+            if (!in.unitController.isObstructed(enemy.getLocation(), in.staticVariables.myLocation)) {
                 enemies = true;
                 for (int i = 0; i < 9; i++) {
-                    microInfo[i].update(in.staticVariables.allenemies[j]);
+                    microInfo[i].update(enemy);
                 }
             }
         }
@@ -168,9 +102,10 @@ public class Mage {
                 return;
             }
             int distance = unit.getLocation().distanceSquared(loc);
-            if (distance <= unit.getType().attackRangeSquared) ++numEnemies;
+            if (distance <= unit.getType().attackRangeSquared || (unit.getType() == UnitType.MAGE && distance < 14)) {
+                ++numEnemies;
+            }
             if (distance < minDistToEnemy) minDistToEnemy = distance;
-
         }
 
         boolean canAttack() {

@@ -1,23 +1,23 @@
-package Skilled;
+package Veteran;
 
 import aic2019.Direction;
 import aic2019.Location;
 import aic2019.UnitInfo;
 import aic2019.UnitType;
 
-public class Archer {
+public class Soldier {
     private Injection in;
     private Boolean microResult;
     private Direction microDir;
 
-    public Archer(Injection in) {
+    public Soldier(Injection in) {
         this.in = in;
     }
 
     public void run(Location target) {
         microResult = doMicro();
         in.attack.genericTryAttack();
-        if (in.archer.tryMove(target)) {
+        if (in.soldier.tryMove(target)) {
             in.staticVariables.myLocation = in.unitController.getLocation();
             in.staticVariables.allenemies = in.unitController.senseUnits(in.staticVariables.allies, true);
         }
@@ -58,7 +58,8 @@ public class Archer {
 
         boolean enemies = false;
         for (UnitInfo enemy : in.staticVariables.allenemies) {
-            if (!in.unitController.isObstructed(enemy.getLocation(), in.staticVariables.myLocation)) {
+            Location enemyLoc = enemy.getLocation();
+            if (!in.unitController.isObstructed(enemyLoc, in.staticVariables.myLocation) && !in.helper.isObstructedWater(enemyLoc, in.staticVariables.myLocation)) {
                 enemies = true;
                 for (int i = 0; i < 9; i++) {
                     microInfo[i].update(enemy);
@@ -114,8 +115,7 @@ public class Archer {
 
         boolean isBetter(MicroInfo m) {
             if (!in.memoryManager.isLocationSafe(m.loc)) return true;
-            if (numEnemies < m.numEnemies) return true;
-            if (numEnemies > m.numEnemies) return false;
+            if (2 * in.staticVariables.allyUnits.length < numEnemies) return false;
             if (canAttack()) {
                 if (!m.canAttack()) return true;
                 return minDistToEnemy >= m.minDistToEnemy;
