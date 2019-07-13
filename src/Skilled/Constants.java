@@ -31,4 +31,7 @@ public class Constants {
     public int WORKERS_DEPOSIT_POSITION = 4;
     public int ENEMY_TOWER = 5;
 
+    // UNITS
+    public int CATAPULTS_CONSIDER_COSE_DISTANCE = 300;
+
 }

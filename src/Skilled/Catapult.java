@@ -10,6 +10,7 @@ public class Catapult {
     private int counter = 0;
     private int delay = 0;
     private Location objectiveLocation;
+    private boolean claimObjective = false;
 
     public Catapult(Injection in) {
         this.in = in;
@@ -144,7 +145,9 @@ public class Catapult {
         // if I don't have an objective, I can check for one in the objectives array and get the best
         // can we add a new objective?
         int closestObjective = Integer.MAX_VALUE;
+        int closestOccupedObjective = Integer.MAX_VALUE;
         Location bestLocation = null;
+        Location bestOccupedLocation = null;
 
         int[][] objectives = in.memoryManager.getObjectives();
 
@@ -152,26 +155,45 @@ public class Catapult {
             Location newObjectiveLocation = in.objectives.getLocationObjective(objective);
             int distance = in.staticVariables.myLocation.distanceSquared(newObjectiveLocation);
 
-            if(!in.objectives.isFull(objective)){
-                // for now, as heuristic we are going to get the distance to the resource
+            if(in.unitController.canAttack(newObjectiveLocation) && !in.unitController.canAttack(objectiveLocation)) {
+                this.fixObjectiveLocation(newObjectiveLocation);
+                claimObjective = true;
+            }
 
+            if(!in.objectives.isFull(objective) || in.objectives.getLastClaimedId(objective) == in.staticVariables.myId){
+                // for now, as heuristic we are going to get the distance to the resource
                 if(distance < closestObjective) {
                     closestObjective = distance;
                     bestLocation = newObjectiveLocation;
                 }
+
+            } else {
+                if(distance < closestOccupedObjective) {
+                    closestOccupedObjective = distance;
+                    bestOccupedLocation = newObjectiveLocation;
+                }
             }
 
-            if(distance < 400) {
+            if(distance < in.constants.CATAPULTS_CONSIDER_COSE_DISTANCE ||
+                    in.staticVariables.myLocation.distanceSquared(newObjectiveLocation) < in.constants.CATAPULTS_CONSIDER_COSE_DISTANCE) {
                 in.objectives.claimObjective(newObjectiveLocation);
             }
         }
 
-        if(bestLocation != null && objectiveLocation == null){
+        if(bestLocation != null && (objectiveLocation == null || !claimObjective)){
             this.fixObjectiveLocation(bestLocation);
+            claimObjective = true;
+        }
+
+        // just to do something in case we have nothing to do but there is still an objective...
+        // we won't claim it thought
+        if(objectiveLocation == null){
+            this.fixObjectiveLocation(bestOccupedLocation);
+            claimObjective = false;
         }
 
         // claim objective
-        if(objectiveLocation != null) {
+        if(objectiveLocation != null && claimObjective) {
             in.objectives.claimObjective(this.objectiveLocation);
         }
     }

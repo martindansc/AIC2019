@@ -30,22 +30,18 @@ public class Objectives {
         return Math.max(objective[6], objective[7]);
     }
 
-    public void claimObjective(int idObjective) {
-        in.memoryManager.increaseValueByOne(idObjective + 6);
-    }
 
     public void claimObjective(int[] objective) {
         if(objective[5] == 0) {
             in.unitController.println("Error, objective must be added before claimed");
         }
-        this.claimObjective(objective[5]);
+        in.memoryManager.claimObjective(objective[5]);
     }
 
     public void claimObjective(Location loc) {
-
         int idObjective = in.memoryManager.getObjectiveIdInLocation(loc);
         if(idObjective != 0) {
-            this.claimObjective(idObjective);
+            in.memoryManager.claimObjective(idObjective);
         }
     }
 
@@ -57,6 +53,15 @@ public class Objectives {
         return objective[9];
     }
 
+    public int getLastClaimedId(int[] objective) {
+        return objective[10];
+    }
+
+    private void addCommonVariables(int[] objective) {
+        objective[9] = in.staticVariables.round;
+        objective[10] = in.staticVariables.myId;
+    }
+
 
     // CREATE FUNCTIONS
 
@@ -65,6 +70,7 @@ public class Objectives {
         newObjective[0] = in.constants.WORKERS_GET_WOOD;
         newObjective[1] = 1;
         this.setLocationObjective(newObjective, loc);
+        this.addCommonVariables(newObjective);
 
         return newObjective;
     }
@@ -74,7 +80,7 @@ public class Objectives {
         newObjective[0] = in.constants.ENEMY_TOWER;
         newObjective[1] = 1;
         this.setLocationObjective(newObjective, loc);
-        newObjective[9] = in.staticVariables.round;
+        this.addCommonVariables(newObjective);
 
         return newObjective;
     }

@@ -45,7 +45,7 @@ public class Base {
             return in.helper.intToUnitType(newMessage[1]);
         }
 
-        if (catapults < 1) {
+        if (catapults < 2) {
             int[][] objectives = in.memoryManager.getObjectives(UnitType.CATAPULT);
             for (int[] objective: objectives) {
                 if(!in.objectives.isFull(objective) &&

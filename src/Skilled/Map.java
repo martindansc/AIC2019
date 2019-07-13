@@ -54,6 +54,7 @@ Estructures i unitats
 
     public void markTower(Location loc) {
         if (in.memoryManager.getUnitFromLocation(loc) == UnitType.TOWER) return;
+        in.memoryManager.saveUnitToMap(loc, UnitType.TOWER);
         int[] objective = in.objectives.createTowerObjective(loc);
         in.memoryManager.addObjective(UnitType.CATAPULT, objective);
         for (int i = 0; i < 6; i++) {
@@ -67,7 +68,7 @@ Estructures i unitats
                 }
             }
         }
-        in.memoryManager.saveUnitToMap(loc, UnitType.TOWER);
+
     }
 
     public void unmarkTower(Location loc) {

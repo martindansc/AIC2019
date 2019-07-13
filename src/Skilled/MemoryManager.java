@@ -138,6 +138,9 @@ public class MemoryManager {
                 // add location objective
                 this.setObjectiveIdInLocation(params[2], params[3], id);
 
+                uc.write(id + 9, params[9]);
+                uc.write(id + 10, params[10]);
+
                 lastId = id;
 
                 break;
@@ -166,6 +169,9 @@ public class MemoryManager {
             // reset counters
             objective[6] = this.readValue(id + 6);
             objective[7] = this.readValueThisRound(id + 6);
+
+            objective[9] = uc.read(id + 9);
+            objective[10] = uc.read(id + 10);
 
         }
 
@@ -202,14 +208,9 @@ public class MemoryManager {
         // remove location
         this.removeObjectiveIdInLocation(uc.read(id + 2), uc.read(id + 3));
 
-        uc.write(id, 0);
-        uc.write(id + 1, 0);
-        uc.write(id + 2, 0);
-        uc.write(id + 3, 0);
-        uc.write(id + 4, 0);
-
-        // reset counters
-        resetCounter(id + 6);
+        for(int i = 0; i < in.constants.OBJECTIVE_SIZE; i++) {
+            uc.write(id + i, 0);
+        }
     }
 
     public void removeObjective(Location loc) {
@@ -242,6 +243,11 @@ public class MemoryManager {
         return uc.read(in.constants.ID_LOCATION_OBJECTIVES + idObjectiveLocation);
     }
 
+    public void claimObjective(int idObjective) {
+        uc.write(idObjective + 10, in.staticVariables.myId);
+        this.increaseValueByOne(idObjective + 6);
+    }
+
     // MAP FUNCTIONS
     public void saveUnitToMap(Location loc, UnitType unit) {
         int index = getIndexMap(loc);
@@ -270,7 +276,7 @@ public class MemoryManager {
     public boolean isLocationSafe(Location loc) {
         int index = getIndexMap(loc);
         int enemies = in.unitController.read(index + 4);
-        return enemies == 0;
+        return enemies <= 0;
     }
 
 }
