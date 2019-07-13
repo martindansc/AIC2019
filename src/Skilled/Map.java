@@ -41,6 +41,7 @@ Estructures i unitats
 
     public void sendResourcesObjective() {
         for (ResourceInfo resource : in.staticVariables.resourcesSeen) {
+            if(in.unitController.getEnergyLeft() < 4000) return;
             Location loc = resource.getLocation();
             int[] objective = in.objectives.createResourceObjective(loc);
             in.memoryManager.addObjective(UnitType.WORKER, objective);

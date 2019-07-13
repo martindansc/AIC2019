@@ -18,7 +18,7 @@ public class UnitPlayer {
 
             Location target = in.move.getTarget();
 
-			if (uc.getType() == UnitType.BASE) {
+			if (in.staticVariables.type == UnitType.BASE) {
                 in.base.run();
             } else if (in.staticVariables.type == UnitType.WORKER) {
                 in.worker.run();

@@ -113,8 +113,6 @@ public class MemoryManager {
 
     public int[] addObjective(UnitType unitType, int[] params) {
 
-        if(in.unitController.getEnergyLeft() < 6500) return this.newEmptyObjective();
-
         //todo: check that the objective doesn't exists, if it does maybe update it
         int maybeId = this.getObjectiveIdInLocation(params[2], params[3]);
         if(maybeId > 0) {

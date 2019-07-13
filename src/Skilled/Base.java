@@ -45,11 +45,12 @@ public class Base {
             return in.helper.intToUnitType(newMessage[1]);
         }
 
-        if (catapults < 2) {
+        if (catapults < 1) {
             int[][] objectives = in.memoryManager.getObjectives(UnitType.CATAPULT);
             for (int[] objective: objectives) {
                 if(!in.objectives.isFull(objective) &&
-                        in.staticVariables.round - in.objectives.getRound(objective) > 20) {
+                        (in.staticVariables.round - in.objectives.getRound(objective) > 5 ||
+                        catapults < 1)) {
                     return UnitType.CATAPULT;
                 }
             }
