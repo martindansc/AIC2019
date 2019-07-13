@@ -55,19 +55,17 @@ public class Worker {
         microResult = doMicro();
         if (microResult) {
             in.unitController.move(microDir);
-        }
-
-        if(currentAction == "GOTORANDOM"){
-            goToRandom();
-        }
-        else if(currentAction == "GOTORESOURCE"){
-            goToResource();
-        }
-        else if(currentAction == "GATHERRESOURCE"){
-            gatherResource();
-        }
-        else if(currentAction == "GOTOTOWN"){
-            goToTown();
+            currentAction = "GOTORESOURCE";
+        } else {
+            if (currentAction == "GOTORANDOM") {
+                goToRandom();
+            } else if (currentAction == "GOTORESOURCE") {
+                goToResource();
+            } else if (currentAction == "GATHERRESOURCE") {
+                gatherResource();
+            } else if (currentAction == "GOTOTOWN") {
+                goToTown();
+            }
         }
 
         //Si estic a sobre dun resource agafarlo
@@ -252,11 +250,7 @@ public class Worker {
         //check if next location is in range of attacking base/tower
         else if(!in.memoryManager.isLocationSafe(nextLocation)){
             return "TOWER/BASE";
-        //check if next location is in range of enemy unit
-        } else if(in.staticVariables.allenemies.length != 0){
-            return "TOWER/BASE";
-        }
-        //check if unit can move to that location
+        } //check if unit can move to that location
         else if(in.unitController.canMove(dir)){
             return "CANMOVE";
         }
