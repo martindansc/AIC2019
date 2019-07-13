@@ -99,7 +99,7 @@ public class Worker {
         //Move to desired resource
         if (in.unitController.canMove()) {
             Direction dir = in.pathfinder.getNextLocationTarget(objectiveLocation,
-                    (Location loc) -> this.checkIfMovementIsSafe(loc).equals("CANMOVE"));
+                    (Location loc) -> in.memoryManager.isLocationSafe(loc));
             if (dir != null && dir != Direction.ZERO) {
                 String nextMovementIsSafe = checkIfMovementIsSafe(in.staticVariables.myLocation, dir);
                 if(nextMovementIsSafe == "CANMOVE") {
@@ -158,7 +158,7 @@ public class Worker {
         checkDestTownOwnAndCorrect();
         //Move to desired town or base
         if (!in.unitController.canMove()) return;
-        Direction dir = in.pathfinder.getNextLocationTarget(objectiveBase);
+        Direction dir = in.pathfinder.getNextLocationTarget(objectiveBase, loc-> in.memoryManager.isLocationSafe(loc));
         if (dir != null && dir != Direction.ZERO) {
             String nextMovementIsSafe = checkIfMovementIsSafe(in.staticVariables.myLocation, dir);
             if(nextMovementIsSafe == "CANMOVE") {
