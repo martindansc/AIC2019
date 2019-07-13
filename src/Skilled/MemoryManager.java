@@ -213,6 +213,10 @@ public class MemoryManager {
         }
     }
 
+    public void updateObjective(int id, int round) {
+        uc.write(id + 9, round);
+    }
+
     public void removeObjective(Location loc) {
         int idObjectiveLocation = in.helper.locationToInt(loc.x, loc.y);
         removeObjective(idObjectiveLocation);

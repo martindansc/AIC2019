@@ -62,6 +62,14 @@ public class Objectives {
         objective[10] = in.staticVariables.myId;
     }
 
+    public void updateObjectiveRound(int idObjective) {
+        in.memoryManager.updateObjective(idObjective, in.staticVariables.round);
+    }
+
+    public void updateObjectiveRound(int[] objective) {
+        in.memoryManager.updateObjective(objective[5], in.staticVariables.round);
+    }
+
 
     // CREATE FUNCTIONS
 
@@ -83,5 +91,9 @@ public class Objectives {
         this.addCommonVariables(newObjective);
 
         return newObjective;
+    }
+
+    public int getObjectiveId(int[] objective) {
+        return objective[5];
     }
 }
