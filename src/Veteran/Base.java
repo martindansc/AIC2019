@@ -1,4 +1,4 @@
-package Skilled;
+package Veteran;
 
 import aic2019.Direction;
 import aic2019.Location;
@@ -8,8 +8,6 @@ import aic2019.UnitType;
 public class Base {
 
     private final Injection in;
-
-    private int[] nextObjectiveSpawn = null;
 
     Base(Injection in) {
         this.in = in;
@@ -63,10 +61,8 @@ public class Base {
             int[][] objectives = in.memoryManager.getObjectives(UnitType.CATAPULT);
             for (int[] objective: objectives) {
                 if(!in.objectives.isFull(objective) &&
-                        (in.staticVariables.round - in.objectives.getRound(objective) > 15 ||
+                        (in.staticVariables.round - in.objectives.getRound(objective) > 5 ||
                         catapults < 1)) {
-
-                    nextObjectiveSpawn = objective;
                     return UnitType.CATAPULT;
                 }
             }
@@ -76,7 +72,6 @@ public class Base {
             int[][] objectives = in.memoryManager.getObjectives(UnitType.WORKER);
             for (int[] objective: objectives) {
                 if(!in.objectives.isFull(objective)){
-                    nextObjectiveSpawn = objective;
                     return UnitType.WORKER;
                 }
             }
@@ -117,9 +112,6 @@ public class Base {
 
         if (in.unitController.canSpawn(dir, ut)) {
             in.unitController.spawn(dir, ut);
-
-            if(nextObjectiveSpawn != null) in.objectives.updateObjectiveRound(nextObjectiveSpawn);
-            nextObjectiveSpawn = null;
 
             Location unitLocation = in.staticVariables.myLocation.add(dir);
             return in.unitController.senseUnit(unitLocation).getID();

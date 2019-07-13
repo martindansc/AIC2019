@@ -58,7 +58,8 @@ public class Soldier {
 
         boolean enemies = false;
         for (UnitInfo enemy : in.staticVariables.allenemies) {
-            if (!in.unitController.isObstructed(enemy.getLocation(), in.staticVariables.myLocation)) {
+            Location enemyLoc = enemy.getLocation();
+            if (!in.unitController.isObstructed(enemyLoc, in.staticVariables.myLocation) && !in.helper.isObstructedWater(enemyLoc, in.staticVariables.myLocation)) {
                 enemies = true;
                 for (int i = 0; i < 9; i++) {
                     microInfo[i].update(enemy);
@@ -97,6 +98,10 @@ public class Soldier {
         }
 
         void update(UnitInfo unit) {
+            if (!in.memoryManager.isLocationSafe(loc)) {
+                numEnemies += 100;
+                return;
+            }
             int distance = unit.getLocation().distanceSquared(loc);
             if (distance <= unit.getType().attackRangeSquared || (unit.getType() == UnitType.MAGE && distance < 14)) {
                 ++numEnemies;

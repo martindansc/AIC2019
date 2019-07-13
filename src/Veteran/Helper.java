@@ -1,6 +1,9 @@
-package Skilled;
+package Veteran;
 
-import aic2019.*;
+import aic2019.Location;
+import aic2019.Terrain;
+import aic2019.TownInfo;
+import aic2019.UnitType;
 
 public class Helper {
     private final Injection in;
