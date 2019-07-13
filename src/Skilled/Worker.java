@@ -1,9 +1,6 @@
 package Skilled;
 
-import aic2019.Direction;
-import aic2019.Location;
-import aic2019.ResourceInfo;
-import aic2019.TownInfo;
+import aic2019.*;
 
 public class Worker {
     private final Injection in;
@@ -21,6 +18,10 @@ public class Worker {
     Direction randomDir;
     //True if unit moved in this turn
     Boolean unitMoved;
+    //Best micro direction
+    Direction microDir;
+    //Is micro needed?
+    Boolean microResult;
 
     public Worker(Injection in) {
         this.in = in;
@@ -49,6 +50,11 @@ public class Worker {
         //Si estic a sobre dun resource agafarlo
         if(in.unitController.canGather()){
             in.unitController.gather();
+        }
+
+        microResult = doMicro();
+        if (microResult) {
+            in.unitController.move(microDir);
         }
 
         if(currentAction == "GOTORANDOM"){
@@ -243,8 +249,11 @@ public class Worker {
         else if(false){
             //TODO
         }
-        //check if next location is in range of attacking enemy unit
+        //check if next location is in range of attacking base/tower
         else if(!in.memoryManager.isLocationSafe(nextLocation)){
+            return "TOWER/BASE";
+        //check if next location is in range of enemy unit
+        } else if(in.staticVariables.allenemies.length != 0){
             return "TOWER/BASE";
         }
         //check if unit can move to that location
@@ -321,5 +330,69 @@ public class Worker {
             in.objectives.claimObjective(this.objectiveLocation);
         }
     }
+
+    public boolean doMicro() {
+
+        MicroInfo[] microInfo = new MicroInfo[9];
+        for (int i = 0; i < 9; i++) {
+            microInfo[i] = new MicroInfo(in.staticVariables.myLocation.add(in.staticVariables.dirs[i]));
+        }
+
+        boolean enemies = false;
+        for (UnitInfo enemy : in.staticVariables.allenemies) {
+            if (!in.unitController.isObstructed(enemy.getLocation(), in.staticVariables.myLocation)) {
+                enemies = true;
+                for (int i = 0; i < 9; i++) {
+                    microInfo[i].update(enemy);
+                }
+            }
+        }
+
+        if (!enemies) return false;
+
+        int bestIndex = -1;
+
+        for (int i = 8; i >= 0; i--) {
+            if (!in.unitController.canMove(in.staticVariables.dirs[i])) continue;
+            if (bestIndex < 0 || !microInfo[bestIndex].isBetter(microInfo[i])) bestIndex = i;
+        }
+
+        if (bestIndex != -1) {
+            if (in.staticVariables.allenemies.length > 0) {
+                microDir = (in.staticVariables.dirs[bestIndex]);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    class MicroInfo {
+        int numEnemies;
+        int minDistToEnemy;
+        Location loc;
+
+        public MicroInfo(Location loc) {
+            this.loc = loc;
+            numEnemies = 0;
+            minDistToEnemy =  100000;
+        }
+
+        void update(UnitInfo unit) {
+            if (unit.getType() != UnitType.WORKER) {
+                int distance = unit.getLocation().distanceSquared(loc);
+                if (distance <= unit.getType().attackRangeSquared) ++numEnemies;
+                if (distance < minDistToEnemy) minDistToEnemy = distance;
+            }
+        }
+
+        boolean isBetter(MicroInfo m) {
+            if (!in.memoryManager.isLocationSafe(m.loc)) return true;
+            if (numEnemies < m.numEnemies) return true;
+            if (numEnemies > m.numEnemies) return false;
+            return minDistToEnemy >= m.minDistToEnemy;
+        }
+    }
+
 
 }

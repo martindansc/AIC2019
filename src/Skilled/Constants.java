@@ -3,7 +3,6 @@ package Skilled;
 public class Constants {
 
     // MEMORY CONSTANTS
-
     public int ID_ALLIES_COUNTER = 1; // each counter uses 7 positions
     public int ID_ALLIES_SOLDIER_COUNTER = 8;
     public int ID_ALLIES_ARCHER_COUNTER = 15;
@@ -23,6 +22,11 @@ public class Constants {
     public int INFO_PER_CELL = 5;
     public int COUNTERS_SPACE = 7;
 
+    //HEURISTIC CONSTANTS
+    public int HEU_SOLDIER = 10;
+    public int HEU_KNIGHT = 14;
+    public int HEU_ARCHER = 6;
+    public int HEU_MAGE = 12;
 
     // OBJECTIVE CONSTANTS
     public int WORKERS_GET_WOOD = 1;

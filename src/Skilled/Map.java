@@ -68,7 +68,6 @@ Estructures i unitats
                 }
             }
         }
-
     }
 
     public void unmarkTower(Location loc) {

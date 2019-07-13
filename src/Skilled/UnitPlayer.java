@@ -24,6 +24,8 @@ public class UnitPlayer {
                 in.worker.run();
             } else if (in.staticVariables.type == UnitType.SOLDIER) {
                 in.soldier.run(target);
+            } else if (in.staticVariables.type == UnitType.KNIGHT) {
+                in.knight.run(target);
             } else if (in.staticVariables.type == UnitType.ARCHER) {
                 in.archer.run(target);
             } else if (in.staticVariables.type == UnitType.MAGE) {
