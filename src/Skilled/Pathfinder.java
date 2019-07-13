@@ -3,6 +3,9 @@ package Skilled;
 import aic2019.Direction;
 import aic2019.Location;
 
+import java.lang.reflect.Method;
+import java.util.function.Function;
+
 public class Pathfinder {
 
     private Injection in;
@@ -17,8 +20,9 @@ public class Pathfinder {
     Location lastObstacleFound = null; //latest obstacle I've found in my way
     int minDistToEnemy = INF; //minimum distance I've been to the enemy while going around an obstacle
     Location prevTarget = null; //previous target
+    int stuckCounter = 0;
 
-    Direction getNextLocationTarget(Location target){
+    Direction getNextLocationTarget(Location target, Function<Location, Boolean> conditions) {
         //No target? ==> bye!
         if (target == null) return null;
 
@@ -44,7 +48,7 @@ public class Pathfinder {
         //I rotate clockwise or counterclockwise (depends on 'rotateRight'). If I try to go out of the map I change the orientation
         //Note that we have to try at most 16 times since we can switch orientation in the middle of the loop. (It can be done more efficiently)
         for (int i = 0; i < 16; ++i){
-            if (in.unitController.canMove(dir)){
+            if (in.unitController.canMove(dir) && conditions.apply(myLoc.add(dir))){
                 return dir;
             }
             Location newLoc = myLoc.add(dir);
@@ -55,14 +59,20 @@ public class Pathfinder {
             else dir = dir.rotateLeft();
         }
 
-        if (in.unitController.canMove(dir)) return dir;
+        if (in.unitController.canMove(dir) && conditions.apply(myLoc.add(dir))) return dir;
 
         return null;
+    }
+
+    Direction getNextLocationTarget(Location target) {
+        return getNextLocationTarget(target, ((Location location) -> true));
     }
 
     void resetPathfinding(){
         lastObstacleFound = null;
         minDistToEnemy = INF;
+        stuckCounter = 0;
     }
+
 
 }

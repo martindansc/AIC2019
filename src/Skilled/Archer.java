@@ -31,7 +31,7 @@ public class Archer {
         boolean isTargetObstructed = in.unitController.canSenseLocation(target) && in.unitController.isObstructed(target, in.staticVariables.myLocation);
 
         if (!microResult) {
-            Direction dir = in.pathfinder.getNextLocationTarget(target);
+            Direction dir = in.pathfinder.getNextLocationTarget(target, loc -> in.memoryManager.isLocationSafe(loc));
             if (dir != null) {
                 if (isTargetBase || isTargetObstructed || in.staticVariables.myLocation.add(dir).distanceSquared(target) >= in.staticVariables.type.getMinAttackRangeSquared()) {
                     if (in.unitController.canMove(dir)) {

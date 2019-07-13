@@ -96,7 +96,8 @@ public class Worker {
     public void goToResource(){
         //Move to desired resource
         if (in.unitController.canMove()) {
-            Direction dir = in.pathfinder.getNextLocationTarget(objectiveLocation);
+            Direction dir = in.pathfinder.getNextLocationTarget(objectiveLocation,
+                    (Location loc) -> in.memoryManager.isLocationSafe(loc));
             if (dir != null && dir != Direction.ZERO) {
                 String nextMovementIsSafe = checkIfMovementIsSafe(in.staticVariables.myLocation, dir);
                 if(nextMovementIsSafe == "CANMOVE") {
@@ -155,7 +156,7 @@ public class Worker {
         checkDestTownOwnAndCorrect();
         //Move to desired town or base
         if (!in.unitController.canMove()) return;
-        Direction dir = in.pathfinder.getNextLocationTarget(objectiveBase);
+        Direction dir = in.pathfinder.getNextLocationTarget(objectiveBase, loc-> in.memoryManager.isLocationSafe(loc));
         if (dir != null && dir != Direction.ZERO) {
             String nextMovementIsSafe = checkIfMovementIsSafe(in.staticVariables.myLocation, dir);
             if(nextMovementIsSafe == "CANMOVE") {
@@ -237,8 +238,8 @@ public class Worker {
         }
     }
 
-    public String checkIfMovementIsSafe(Location loc, Direction dir){
-        Location nextLocation = loc.add(dir);
+    public String checkIfMovementIsSafe(Location nextLocation){
+        Direction dir = in.staticVariables.myLocation.directionTo(nextLocation);
         //Check if next location is out of the map
         if(in.unitController.isOutOfMap(nextLocation)){
             return "WALL";
@@ -256,6 +257,12 @@ public class Worker {
         }
         return "SAFEBUTNOTMOVE";
     }
+
+    public String checkIfMovementIsSafe(Location loc, Direction dir){
+        Location nextLocation = loc.add(dir);
+        return checkIfMovementIsSafe(nextLocation);
+    }
+
 
     public Boolean scout(String mode){
         //TODO: actualitzar posicions del scout al mapa
