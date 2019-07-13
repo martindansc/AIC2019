@@ -15,6 +15,8 @@ public class Base {
 
     public void run() {
 
+        addCocoonUnits();
+
         tryAttack();
 
         Direction bestDir = this.getBestDirectionSpawn();
@@ -28,6 +30,16 @@ public class Base {
 
             if(id != -1 && message[0] != 0) {
                 in.messages.sendToLocation(id, message[0], message[1]);
+            }
+        }
+    }
+
+    private void addCocoonUnits() {
+        Location[] spawnLocations = in.unitController.getVisibleLocations(2);
+        for (Location spawnLocation: spawnLocations) {
+            UnitInfo unit = in.unitController.senseUnit(spawnLocation);
+            if(unit != null && unit.isBeingConstructed()) {
+                in.helper.countUnit(unit.getType());
             }
         }
     }

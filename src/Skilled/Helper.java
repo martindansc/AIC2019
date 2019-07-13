@@ -1,9 +1,6 @@
 package Skilled;
 
-import aic2019.Location;
-import aic2019.Terrain;
-import aic2019.TownInfo;
-import aic2019.UnitType;
+import aic2019.*;
 
 public class Helper {
     private final Injection in;
@@ -39,20 +36,24 @@ public class Helper {
         return new Location((number / 100) + in.staticVariables.allyBase.x - 50, (number % 100) + in.staticVariables.allyBase.y - 50);
     }
 
-    public void countUnits() {
-        if (in.staticVariables.type == UnitType.SOLDIER) {
+    public void countUnit(UnitType ut) {
+        if (ut == UnitType.SOLDIER) {
             in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_SOLDIER_COUNTER);
-        } else if (in.staticVariables.type == UnitType.ARCHER) {
+        } else if (ut == UnitType.ARCHER) {
             in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_ARCHER_COUNTER);
-        } else if (in.staticVariables.type == UnitType.KNIGHT) {
+        } else if (ut == UnitType.KNIGHT) {
             in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_KNIGHT_COUNTER);
-        } else if (in.staticVariables.type == UnitType.CATAPULT) {
+        } else if (ut == UnitType.CATAPULT) {
             in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_CATAPULT_COUNTER);
-        } else if (in.staticVariables.type == UnitType.MAGE) {
+        } else if (ut == UnitType.MAGE) {
             in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_MAGE_COUNTER);
-        } else if (in.staticVariables.type == UnitType.WORKER) {
+        } else if (ut == UnitType.WORKER) {
             in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_WORKERS_COUNTER);
         }
+    }
+
+    public void countUnits() {
+        this.countUnit(in.staticVariables.type);
     }
 
     public boolean isObstructedWater(Location loc1, Location loc2) {

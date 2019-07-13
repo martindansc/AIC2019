@@ -43,6 +43,8 @@ Estructures i unitats
         for (ResourceInfo resource : in.staticVariables.resourcesSeen) {
             if(in.unitController.getEnergyLeft() < 4000) return;
             Location loc = resource.getLocation();
+            //if(in.helper.getClosestTownToLocation(loc).distanceSquared(loc) < in.constants.WORKERS_CONSIDER_ClOSE_DISTANCE)
+                //return;
             int[] objective = in.objectives.createResourceObjective(loc);
             in.memoryManager.addObjective(UnitType.WORKER, objective);
         }
