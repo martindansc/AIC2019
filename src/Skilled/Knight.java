@@ -1,23 +1,20 @@
 package Skilled;
 
-import aic2019.Direction;
-import aic2019.Location;
-import aic2019.UnitInfo;
-import aic2019.UnitType;
+import aic2019.*;
 
-public class Archer {
+public class Knight {
     private Injection in;
     private Boolean microResult;
     private Direction microDir;
 
-    public Archer(Injection in) {
+    public Knight(Injection in) {
         this.in = in;
     }
 
     public void run(Location target) {
         microResult = doMicro();
         in.attack.genericTryAttack();
-        if (in.archer.tryMove(target)) {
+        if (in.knight.tryMove(target)) {
             in.staticVariables.myLocation = in.unitController.getLocation();
             in.staticVariables.allenemies = in.unitController.senseUnits(in.staticVariables.allies, true);
         }
@@ -97,7 +94,6 @@ public class Archer {
         }
 
         void update(UnitInfo unit) {
-
             int distance = unit.getLocation().distanceSquared(loc);
             if (distance <= unit.getType().attackRangeSquared || (unit.getType() == UnitType.MAGE && distance < 14)) {
                 ++numEnemies;
@@ -111,8 +107,7 @@ public class Archer {
 
         boolean isBetter(MicroInfo m) {
             if (!in.memoryManager.isLocationSafe(m.loc)) return true;
-            if (numEnemies < m.numEnemies) return true;
-            if (numEnemies > m.numEnemies) return false;
+            if (2 * in.staticVariables.allyUnits.length < numEnemies) return false;
             if (canAttack()) {
                 if (!m.canAttack()) return true;
                 return minDistToEnemy >= m.minDistToEnemy;

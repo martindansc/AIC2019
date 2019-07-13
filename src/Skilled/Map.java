@@ -92,10 +92,10 @@ Estructures i unitats
             for (int j = 0; j < 8; j++) {
                 int suma = i * i + j * j;
                 if (suma < 51 && suma > 33) {
-                    in.memoryManager.setLocationSafe(new Location (loc.x + i, loc.y + j));
-                    in.memoryManager.setLocationSafe(new Location (loc.x - i, loc.y + j));
-                    in.memoryManager.setLocationSafe(new Location (loc.x + i, loc.y - j));
-                    in.memoryManager.setLocationSafe(new Location (loc.x - i, loc.y - j));
+                    in.memoryManager.setLocationDangerous(new Location (loc.x + i, loc.y + j));
+                    in.memoryManager.setLocationDangerous(new Location (loc.x - i, loc.y + j));
+                    in.memoryManager.setLocationDangerous(new Location (loc.x + i, loc.y - j));
+                    in.memoryManager.setLocationDangerous(new Location (loc.x - i, loc.y - j));
                 }
             }
         }
