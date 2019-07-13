@@ -12,6 +12,7 @@ public class Injection {
     public final Move move;
     public final Pathfinder pathfinder;
     public final Soldier soldier;
+    public final Knight knight;
     public final Archer archer;
     public final Mage mage;
     public final Catapult catapult;
@@ -31,6 +32,7 @@ public class Injection {
         this.move = new Move(this);
         this.pathfinder = new Pathfinder(this);
         this.soldier = new Soldier(this);
+        this.knight = new Knight(this);
         this.archer = new Archer (this);
         this.mage = new Mage (this);
         this.catapult = new Catapult(this);
