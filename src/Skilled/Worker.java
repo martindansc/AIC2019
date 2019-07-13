@@ -121,22 +121,22 @@ public class Worker {
         }
         //Si ja hem recol.lectat el que voliem del resource tornem a la town o base objectiu
         float wood = in.staticVariables.unitInfo.getWood();
-        if(wood >= 60.0){ //60
-            objectiveBase = getClosestTownToLocation(objectiveLocation);
+        if(wood >= in.constants.WORKERS_GATHER_WOOD){ //60
+            objectiveBase = in.helper.getClosestTownToLocation(objectiveLocation);
             currentAction =  "GOTOTOWN";
             goToTown();
             return;
         }
         float iron = in.staticVariables.unitInfo.getIron();
-        if( iron >= 20.0){ //20
-            objectiveBase = getClosestTownToLocation(objectiveLocation);
+        if( iron >= in.constants.WORKERS_GATHER_IRON){ //20
+            objectiveBase = in.helper.getClosestTownToLocation(objectiveLocation);
             currentAction =  "GOTOTOWN";
             goToTown();
             return;
         }
         float crystal = in.staticVariables.unitInfo.getCrystal();
-        if( crystal >= 6.0){ //6
-            objectiveBase = getClosestTownToLocation(objectiveLocation);
+        if( crystal >= in.constants.WORKERS_GATHER_MINERAL){ //6
+            objectiveBase = in.helper.getClosestTownToLocation(objectiveLocation);
             currentAction = "GOTOTOWN";
             goToTown();
             return;
@@ -192,7 +192,7 @@ public class Worker {
                 }
             }
             if (!foundAllyTown) {
-                objectiveBase = getClosestTownToLocation(in.unitController.getLocation());
+                objectiveBase = in.helper.getClosestTownToLocation(in.unitController.getLocation());
             }
         }
     }
@@ -281,19 +281,6 @@ public class Worker {
             }
         }
         return returnLocation;
-    }
-
-    //Returns closest town or base
-    public Location getClosestTownToLocation(Location location){
-        Location loc = in.staticVariables.allies.getInitialLocation();
-        for(TownInfo tI : in.staticVariables.myTowns){
-            int currentDistance = Math.abs(loc.distanceSquared(location));
-            int nextDistance = Math.abs(tI.getLocation().distanceSquared(location));
-            if( nextDistance < currentDistance ){
-                loc = tI.getLocation();
-            }
-        }
-        return loc;
     }
 
     public void selectObjective() {

@@ -2,6 +2,7 @@ package Skilled;
 
 import aic2019.Location;
 import aic2019.Terrain;
+import aic2019.TownInfo;
 import aic2019.UnitType;
 
 public class Helper {
@@ -107,7 +108,7 @@ public class Helper {
                 int slope_error_new = m_new - (loc1.x - loc2.x);
 
                 for (int x = loc2.x, y = loc1.y; x <= loc1.x; x++) {
-                    if (in.unitController.senseTerrain(new Location (x, y)) == Terrain.MOUNTAIN) {
+                    if (in.unitController.senseTerrain(new Location (x, y)) == Terrain.WATER) {
                         return true;
                     }
                     slope_error_new += m_new;
@@ -137,4 +138,18 @@ public class Helper {
 
         return false;
     }
+
+    //Returns closest town or base
+    public Location getClosestTownToLocation(Location location){
+        Location loc = in.staticVariables.allies.getInitialLocation();
+        for(TownInfo tI : in.staticVariables.myTowns){
+            int currentDistance = Math.abs(loc.distanceSquared(location));
+            int nextDistance = Math.abs(tI.getLocation().distanceSquared(location));
+            if( nextDistance < currentDistance ){
+                loc = tI.getLocation();
+            }
+        }
+        return loc;
+    }
+
 }
