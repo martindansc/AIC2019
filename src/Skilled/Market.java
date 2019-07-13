@@ -1,5 +1,6 @@
 package Skilled;
 
+import aic2019.GameConstants;
 import aic2019.Resource;
 import aic2019.UnitType;
 
@@ -37,12 +38,8 @@ public class Market {
         if (freewood >= 0 && freeiron >= 0 && freecrystal >= 0) return true;
         if (freewood < 0 && freeiron < 0 && freecrystal < 0) return false;
 
-        float crystalwood = in.unitController.tradeOutput(Resource.CRYSTAL, Resource.WOOD, 1);
-        float crystaliron = in.unitController.tradeOutput(Resource.CRYSTAL, Resource.IRON, 1);
-        float woodiron = in.unitController.tradeOutput(Resource.WOOD, Resource.IRON, 1);
-
         if (freewood < 0) {
-            if (-freewood > freecrystal * crystalwood + freeiron * 1/woodiron) return false;
+            if (-freewood > freecrystal * in.staticVariables.crystalwood + freeiron * 1/in.staticVariables.woodiron) return false;
             if (freeiron < 0) {
                 in.unitController.trade(Resource.CRYSTAL, Resource.WOOD, freecrystal);
                 return false;
@@ -56,7 +53,7 @@ public class Market {
                 }
             }
         } else if (freeiron < 0) {
-            if (-freeiron > freecrystal * crystaliron + freewood * woodiron) return false;
+            if (-freeiron > freecrystal * in.staticVariables.crystaliron + freewood * in.staticVariables.woodiron) return false;
             if (freecrystal < 0) {
                 in.unitController.trade(Resource.WOOD, Resource.IRON, freewood);
                 return false;
@@ -67,7 +64,7 @@ public class Market {
                 }
             }
         } else {
-            if (-freecrystal > freeiron * 1/crystaliron + freewood * 1/crystalwood) return false;
+            if (-freecrystal > freeiron * 1/in.staticVariables.crystaliron + freewood * 1/in.staticVariables.crystalwood) return false;
             else {
                 in.unitController.trade(maxFree, Resource.CRYSTAL, maxFreeFloat);
                 if (in.unitController.getCrystal() > crystalNeeded) {
@@ -78,4 +75,31 @@ public class Market {
 
         return false;
     }
+
+    public UnitType heuristic() {
+        int knights = in.memoryManager.readValue(in.constants.ID_ALLIES_KNIGHT_COUNTER);
+        int soldiers = in.memoryManager.readValue(in.constants.ID_ALLIES_SOLDIER_COUNTER);
+        int archers = in.memoryManager.readValue(in.constants.ID_ALLIES_ARCHER_COUNTER);
+        int mages = in.memoryManager.readValue(in.constants.ID_ALLIES_MAGE_COUNTER);
+        int total = knights + soldiers + archers + mages;
+
+        float soldierResources = GameConstants.SOLDIER_WOOD_COST + GameConstants.SOLDIER_IRON_COST * 1/in.staticVariables.woodiron;
+        float knightResources = GameConstants.KNIGHT_WOOD_COST + GameConstants.KNIGHT_IRON_COST * 1/in.staticVariables.woodiron;
+        float archerResources = GameConstants.ARCHER_WOOD_COST + GameConstants.ARCHER_IRON_COST * 1/in.staticVariables.woodiron;
+        float mageResources = GameConstants.MAGE_WOOD_COST + GameConstants.MAGE_IRON_COST * 1/in.staticVariables.woodiron + GameConstants.MAGE_CRYSTAL_COST * in.staticVariables.crystalwood;
+
+        float soldierScore = total/(soldiers * soldiers + 1) * in.constants.HEU_SOLDIER / soldierResources;
+        float knightScore = total/(knights * knights + 1) * in.constants.HEU_KNIGHT / knightResources;
+        float archerScore = total/(archers * archers + 1) * in.constants.HEU_ARCHER / archerResources;
+        float mageScore = total/(mages * mages + 1) * in.constants.HEU_MAGE / mageResources;
+
+        UnitType bestType;
+        if (soldierScore >= knightScore && soldierScore >= archerScore && soldierScore > mageScore) bestType = UnitType.SOLDIER;
+        else if (knightScore >= archerScore && knightScore > mageScore) bestType = UnitType.KNIGHT;
+        else if (archerScore > mageScore) bestType = UnitType.ARCHER;
+        else bestType = UnitType.MAGE;
+
+        return bestType;
+    }
+
 }

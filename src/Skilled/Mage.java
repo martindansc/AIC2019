@@ -8,7 +8,6 @@ public class Mage {
     private Injection in;
     private boolean enemies = false;
     private Boolean microResult;
-    private Boolean closeEnemy = false;
     private Direction microDir;
 
     public Mage(Injection in) {
@@ -29,8 +28,16 @@ public class Mage {
     public boolean tryAttack(Location town) {
         if (!in.unitController.canAttack()) return false;
         if (!enemies && (!in.unitController.canSenseLocation(town) || (in.unitController.canSenseLocation(town) && in.unitController.isObstructed(town, in.staticVariables.myLocation)))) return false;
-        if (!closeEnemy) {
-            if (in.unitController.canAttack(town) && in.unitController.senseTown(town) != null) {
+        int closeDistance = 10000;
+        for (UnitInfo enemy: in.staticVariables.allenemies) {
+            int currentDistance = in.staticVariables.myLocation.distanceSquared(enemy.getLocation());
+            if (currentDistance < closeDistance) {
+                closeDistance = currentDistance;
+            }
+        }
+
+        if (closeDistance > 13) {
+            if (in.unitController.canAttack(town) && in.unitController.senseTown(town) != null && in.unitController.senseTown(town).getOwner() != in.staticVariables.allies) {
                 int allyUnits = 0;
                 for (int i = -1; i < 2; i++) {
                     for (int j = -1; j < 2; j++) {
@@ -121,9 +128,6 @@ public class Mage {
                 enemies = true;
                 for (int i = 0; i < 9; i++) {
                     microInfo[i].update(in.staticVariables.allenemies[j]);
-                    if (microInfo[i].minDistToEnemy < 6) {
-                        closeEnemy = true;
-                    }
                 }
             }
         }

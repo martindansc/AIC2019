@@ -1,9 +1,6 @@
 package Skilled;
 
-import aic2019.Direction;
-import aic2019.GameConstants;
-import aic2019.Location;
-import aic2019.UnitInfo;
+import aic2019.*;
 
 public class Catapult {
     private Injection in;
@@ -112,10 +109,11 @@ public class Catapult {
         }
 
         void update(UnitInfo unit) {
-
-            int distance = unit.getLocation().distanceSquared(loc);
-            if (distance <= unit.getType().attackRangeSquared) ++numEnemies;
-            if (distance < minDistToEnemy) minDistToEnemy = distance;
+            if (unit.getType() != UnitType.WORKER) {
+                int distance = unit.getLocation().distanceSquared(loc);
+                if (distance <= unit.getType().attackRangeSquared) ++numEnemies;
+                if (distance < minDistToEnemy) minDistToEnemy = distance;
+            }
         }
 
         boolean canAttack() {
