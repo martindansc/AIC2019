@@ -18,6 +18,8 @@ public class Base {
 
         addCocoonUnits();
 
+        in.macro.updateTownObjectives();
+
         tryAttack();
 
         Direction bestDir = this.getBestDirectionSpawn();
@@ -62,23 +64,23 @@ public class Base {
             int[][] objectives = in.memoryManager.getObjectives(UnitType.CATAPULT);
             for (int[] objective: objectives) {
                 if(!in.objectives.isFull(objective) &&
-                        (in.staticVariables.round - in.objectives.getRound(objective) > 5 ||
-                        catapults < 1)) {
+                        (in.staticVariables.round - in.objectives.getRound(objective) > 10 ||
+                        catapults < 1) && in.objectives.isSafe(objective)) {
                     return UnitType.CATAPULT;
                 }
             }
         }
 
-        if(countWork < 4) {
+        if(countWork < 6) {
             int[][] objectives = in.memoryManager.getObjectives(UnitType.WORKER);
             for (int[] objective: objectives) {
-                if(!in.objectives.isFull(objective)){
+                if(!in.objectives.isFull(objective) && in.objectives.isSafe(objective)){
                     return UnitType.WORKER;
                 }
             }
         }
 
-  //      return in.market.heuristic();
+        //return in.market.heuristic();
 
         if (soldiers <= 2 * (archers)) return UnitType.SOLDIER;
         return UnitType.ARCHER;

@@ -89,4 +89,15 @@ public class Macro {
             return in.staticVariables.enemyBase;
         }
     }
+
+    public void updateTownObjectives() {
+        if(in.staticVariables.round == 1) {
+            for (TownInfo town: in.staticVariables.allenemytowns) {
+                if (town.getOwner() == in.staticVariables.opponent) {
+
+                }
+            }
+        }
+
+    }
 }

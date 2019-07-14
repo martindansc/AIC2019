@@ -128,14 +128,38 @@ public class MemoryManager {
         uc.write(id + 10, params[10]);
     }
 
-    public int[] addObjective(UnitType unitType, int[] params) {
+    public void updateObjective(int id, int[] params) {
+        uc.write(id, params[0]);
+        uc.write(id + 1, params[1]);
+        uc.write(id + 2, params[2]);
+        uc.write(id + 3, params[3]);
+        uc.write(id + 4, params[4]);
 
-        if(uc.getEnergyLeft() < 2000) return this.newEmptyObjective();
+        uc.write(id + 9, params[9]);
+        uc.write(id + 10, params[10]);
+    }
+
+    public void updateObjective(int[] params) {
+        int maybeId = this.getObjectiveIdInLocation(params[2], params[3]);
+        if(maybeId > 0) {
+            this.updateObjective(maybeId, params);
+        }
+    }
+
+    public void addObjective(UnitType unitType, int[] params) {
+
+        if(uc.getEnergyLeft() < 2000) return;
 
         //todo: check that the objective doesn't exists, if it does maybe update it
         int maybeId = this.getObjectiveIdInLocation(params[2], params[3]);
         if(maybeId > 0) {
-            return this.getObjective(maybeId, -1);
+            this.updateObjective(maybeId, params);
+            return;
+        }
+
+        if(params[5] != 0) {
+            this.updateObjective(params[5], params);
+            return;
         }
 
         int worstObjective = 0;
@@ -164,12 +188,7 @@ public class MemoryManager {
         if(lastId == -1 && worstObjective != 0 && params[11] < worstObjective) {
             this.removeObjectiveIdInLocation(uc.read(worstObjective + 2), uc.read(worstObjective + 3));
             this.insertObjective(worstObjective, params);
-            lastId = worstObjective;
         }
-
-        if(lastId == -1) return this.newEmptyObjective();
-
-        return this.getObjective(lastId, -1);
 
     }
 
@@ -274,6 +293,7 @@ public class MemoryManager {
 
     public void claimObjective(int idObjective) {
         uc.write(idObjective + 10, in.staticVariables.myId);
+        uc.write(idObjective + 9, in.staticVariables.round);
         this.increaseValueByOne(idObjective + 6);
     }
 

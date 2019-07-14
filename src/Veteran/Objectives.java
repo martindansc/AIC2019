@@ -1,6 +1,6 @@
 package Veteran;
 
-import aic2019.Location;
+import aic2019.*;
 
 public class Objectives {
     private final Injection in;
@@ -49,6 +49,10 @@ public class Objectives {
         return objective[5] == 0 || this.getClaimedTimes(objective) >= this.getNumberUnits(objective);
     }
 
+    public boolean isSafe(int[] objective) {
+        return objective[9] + 200 < in.staticVariables.round || objective[10] == 0;
+    }
+
     public int getRound(int[] objective) {
         return objective[9];
     }
@@ -59,7 +63,6 @@ public class Objectives {
 
     private void addCommonVariables(int[] objective) {
         objective[9] = in.staticVariables.round;
-        objective[10] = in.staticVariables.myId;
     }
 
 
@@ -71,6 +74,7 @@ public class Objectives {
         newObjective[1] = 1;
         this.setLocationObjective(newObjective, loc);
         this.addCommonVariables(newObjective);
+        newObjective[11] = in.helper.getClosestTownToLocation(loc).distanceSquared(loc);
 
         return newObjective;
     }
@@ -80,6 +84,16 @@ public class Objectives {
         newObjective[0] = in.constants.ENEMY_TOWER;
         newObjective[1] = 1;
         this.setLocationObjective(newObjective, loc);
+        this.addCommonVariables(newObjective);
+
+        return newObjective;
+    }
+
+    public int[] createTownObjective(TownInfo town) {
+        int[] newObjective = new int[in.constants.OBJECTIVE_SIZE];
+        newObjective[0] = in.constants.TOWN;
+        newObjective[1] = 20;
+        this.setLocationObjective(newObjective, town.getLocation());
         this.addCommonVariables(newObjective);
 
         return newObjective;

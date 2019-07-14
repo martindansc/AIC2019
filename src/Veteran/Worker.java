@@ -32,6 +32,7 @@ public class Worker {
     public void fixObjectiveLocation(Location loc, Boolean resourceObjective){
         directionIsRandom = false;
         objectiveLocation = loc;
+        objectiveBase = in.helper.getClosestTownToLocation(objectiveLocation);
         if(resourceObjective) currentAction = "GOTORESOURCE";
         else currentAction = "GOTOTOWN";
     }
@@ -54,19 +55,20 @@ public class Worker {
 
         microResult = doMicro();
         if (microResult) {
-            in.unitController.move(microDir);
-            currentAction = "GOTORESOURCE";
-        } else {
-            if (currentAction == "GOTORANDOM") {
-                goToRandom();
-            } else if (currentAction == "GOTORESOURCE") {
-                goToResource();
-            } else if (currentAction == "GATHERRESOURCE") {
-                gatherResource();
-            } else if (currentAction == "GOTOTOWN") {
-                goToTown();
-            }
+            objectiveLocation = null;
+            currentAction = "GOTOTOWN";
         }
+
+        if (currentAction == "GOTORANDOM") {
+            goToRandom();
+        } else if (currentAction == "GOTORESOURCE") {
+            goToResource();
+        } else if (currentAction == "GATHERRESOURCE") {
+            gatherResource();
+        } else if (currentAction == "GOTOTOWN") {
+            goToTown();
+        }
+
 
         //Si estic a sobre dun resource agafarlo
         if(unitMoved && in.unitController.canGather()){
@@ -302,14 +304,14 @@ public class Worker {
 
         // do I currently have an objective set up?
         // if I don't have an objective, I can check for one in the objectives array and get the best
-        if(directionIsRandom) {
+        if(directionIsRandom || objectiveLocation == null) {
             int closestObjective = Integer.MAX_VALUE;
             Location bestLocation = null;
 
             int[][] objectives = in.memoryManager.getObjectives();
 
             for (int[] objective: objectives) {
-                if(!in.objectives.isFull(objective)){
+                if(!in.objectives.isFull(objective) && in.objectives.isSafe(objective)){
                     // for now, as heuristic we are going to get the distance to the resource
                     Location objectiveLocation = in.objectives.getLocationObjective(objective);
                     int distance = in.staticVariables.myLocation.distanceSquared(objectiveLocation);
