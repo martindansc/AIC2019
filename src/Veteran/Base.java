@@ -8,6 +8,7 @@ import aic2019.UnitType;
 public class Base {
 
     private final Injection in;
+    private int countWork = 0;
 
     Base(Injection in) {
         this.in = in;
@@ -68,7 +69,7 @@ public class Base {
             }
         }
 
-        if(workers < 4) {
+        if(countWork < 4) {
             int[][] objectives = in.memoryManager.getObjectives(UnitType.WORKER);
             for (int[] objective: objectives) {
                 if(!in.objectives.isFull(objective)){
@@ -111,8 +112,10 @@ public class Base {
         if (!in.market.canBuild(ut)) return -1;
 
         if (in.unitController.canSpawn(dir, ut)) {
+            if (ut == UnitType.WORKER) {
+                countWork++;
+            }
             in.unitController.spawn(dir, ut);
-
             Location unitLocation = in.staticVariables.myLocation.add(dir);
             return in.unitController.senseUnit(unitLocation).getID();
         }
