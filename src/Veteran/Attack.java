@@ -37,6 +37,13 @@ public class Attack {
         return myAttack;
     }
 
+    public boolean canAttackTarget(Location target) {
+        int distance = in.staticVariables.myLocation.distanceSquared(target);
+        if (in.staticVariables.type.getAttackRangeSquared() < distance) return false;
+        if (in.staticVariables.type.getMinAttackRangeSquared() > distance) return false;
+        return true;
+    }
+
     public boolean genericTryAttack()  {
         if (!in.unitController.canAttack()) return false;
         UnitInfo[] enemies = in.staticVariables.allenemies;

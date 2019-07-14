@@ -33,7 +33,7 @@ public class Archer {
         if (!microResult) {
             Direction dir = in.pathfinder.getNextLocationTarget(target, loc -> in.memoryManager.isLocationSafe(loc));
             if (dir != null) {
-                if (isTargetBase || isTargetObstructed || in.staticVariables.myLocation.add(dir).distanceSquared(target) >= in.staticVariables.type.getMinAttackRangeSquared()) {
+                if (isTargetBase || isTargetObstructed || !in.attack.canAttackTarget(target)) {
                     if (in.unitController.canMove(dir)) {
                         if (in.memoryManager.isLocationSafe(in.staticVariables.myLocation.add(dir))) {
                             in.unitController.move(dir);

@@ -15,6 +15,27 @@ public class Macro {
             return in.staticVariables.allyBase;
         }
 
+        int enemyTowns = 0;
+        for (TownInfo town: in.staticVariables.allenemytowns) {
+            if (town.getOwner() == in.staticVariables.opponent) {
+                enemyTowns++;
+            }
+        }
+        if (in.staticVariables.myTowns.length > enemyTowns) {
+            TownInfo defendTown = null;
+            int defendDistance = Integer.MAX_VALUE;
+            for (TownInfo town: in.staticVariables.myTowns) {
+                int distance = in.staticVariables.myLocation.distanceSquared(town.getLocation());
+                if (distance < defendDistance) {
+                    defendTown = town;
+                }
+            }
+            if (defendTown != null) {
+                return defendTown.getLocation();
+            }
+            return in.staticVariables.allyBase;
+        }
+
         TownInfo allyTown = null;
         int allyDistance = Integer.MAX_VALUE;
         TownInfo neutralTown = null;
@@ -25,7 +46,7 @@ public class Macro {
         for (TownInfo town : in.staticVariables.myTowns) {
             int maxLoyalty = town.getMaxLoyalty();
             int loyalty = town.getLoyalty();
-            if ((loyalty/maxLoyalty) < 0.2) {
+            if (loyalty * 5 < maxLoyalty) {
                 int distance = in.staticVariables.myLocation.distanceSquared(town.getLocation());
                 if (distance < allyDistance) {
                     allyTown = town;
@@ -38,7 +59,7 @@ public class Macro {
             return allyTown.getLocation();
         }
 
-        for (TownInfo town : in.staticVariables.enemytowns) {
+        for (TownInfo town : in.staticVariables.allenemytowns) {
             Location townLoc = town.getLocation();
             int currentDistance = in.staticVariables.myLocation.distanceSquared(townLoc);
             if (town.getOwner() == in.staticVariables.opponent) {

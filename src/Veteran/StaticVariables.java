@@ -23,7 +23,7 @@ public class StaticVariables {
     public UnitInfo[] allenemies;
     public int baseId;
     public int myId;
-    public TownInfo[] enemytowns;
+    public TownInfo[] allenemytowns;
     public TownInfo[] myTowns;
     public float wood;
     public float iron;
@@ -57,7 +57,7 @@ public class StaticVariables {
         allyUnits = in.unitController.senseUnits(allies, false);
         units = in.unitController.senseUnits();
         myTowns = in.unitController.getTowns(allies, false);
-        enemytowns = in.unitController.getTowns(allies, true);
+        allenemytowns = in.unitController.getTowns(allies, true);
         wood = in.unitController.getWood();
         iron = in.unitController.getIron();
         crystal = in.unitController.getCrystal();

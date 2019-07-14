@@ -1,9 +1,6 @@
 package Veteran;
 
-import aic2019.Direction;
-import aic2019.Location;
-import aic2019.UnitInfo;
-import aic2019.UnitType;
+import aic2019.*;
 
 public class Soldier {
     private Injection in;
@@ -33,7 +30,7 @@ public class Soldier {
         if (!microResult) {
             Direction dir = in.pathfinder.getNextLocationTarget(target, loc -> in.memoryManager.isLocationSafe(loc));
             if (dir != null) {
-                if (isTargetBase || isTargetObstructed || in.staticVariables.myLocation.add(dir).distanceSquared(target) >= in.staticVariables.type.getMinAttackRangeSquared()) {
+                if (isTargetBase || isTargetObstructed || !in.attack.canAttackTarget(target) || (in.attack.canAttackTarget(target) && in.staticVariables.myLocation.add(dir).distanceSquared(target) < in.staticVariables.type.getAttackRangeSquared())) {
                     if (in.unitController.canMove(dir)) {
                         if (in.memoryManager.isLocationSafe(in.staticVariables.myLocation.add(dir))) {
                             in.unitController.move(dir);
