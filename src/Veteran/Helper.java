@@ -5,6 +5,8 @@ import aic2019.Terrain;
 import aic2019.TownInfo;
 import aic2019.UnitType;
 
+import java.util.concurrent.TimeoutException;
+
 public class Helper {
     private final Injection in;
 
@@ -60,154 +62,38 @@ public class Helper {
     }
 
     public boolean isObstructedWater(Location loc1, Location loc2) {
-        if (loc2.x - loc1.x == 0) {
-            if (loc2.y > loc1.y) {
-                for (int y = loc1.y; y <= loc2.y; y++) {
-                    if (in.unitController.senseTerrain(new Location (loc1.x, y)) == Terrain.WATER) {
-                        return true;
-                    }
-                }
-            } else {
-                for (int y = loc2.y; y <= loc1.y; y++) {
-                    if (in.unitController.senseTerrain(new Location (loc1.x, y)) == Terrain.WATER) {
-                        return true;
-                    }
-                }
+        int x0 = loc1.x;
+        int x1 = loc2.x;
+        int y0 = loc1.y;
+        int y1 = loc2.y;
+
+        int dx = Math.abs(x1 - x0);
+        int dy = Math.abs(y1 - y0);
+
+        int sx = x0 < x1 ? 1 : -1;
+        int sy = y0 < y1 ? 1 : -1;
+
+        int err = dx-dy;
+        int e2;
+
+        while (true) {
+
+            if (in.unitController.senseTerrain(new Location(x0, y0)) == Terrain.WATER) return true;
+
+            if (x0 == x1 && y0 == y1) break;
+
+            e2 = 2 * err;
+
+            if (e2 > -dy) {
+                err = err - dy;
+                x0 = x0 + sx;
             }
-        } if (Math.abs(loc1.x -loc2.x) >= Math.abs(loc1.y - loc2.y)) {
-            if (loc2.x > loc1.x) {
-                if (loc2.y >= loc1.y) {
-                    int m_new = 2 * (loc2.y - loc1.y);
-                    int slope_error_new = m_new - (loc2.x - loc1.x);
 
-                    for (int x = loc1.x, y = loc1.y; x <= loc2.x; x++) {
-                        if (in.unitController.senseTerrain(new Location(x, y)) == Terrain.WATER) {
-                            return true;
-                        }
-                        slope_error_new += m_new;
-
-                        if (slope_error_new >= 0) {
-                            y++;
-                            slope_error_new -= 2 * (loc2.x - loc1.x);
-                        }
-                    }
-                } else {
-                    int m_new = 2 * (loc1.y - loc2.y);
-                    int slope_error_new = m_new - (loc2.x - loc1.x);
-
-                    for (int x = loc1.x, y = loc2.y; x <= loc2.x; x++) {
-                        if (in.unitController.senseTerrain(new Location(x, y)) == Terrain.WATER) {
-                            return true;
-                        }
-                        slope_error_new += m_new;
-
-                        if (slope_error_new >= 0) {
-                            y++;
-                            slope_error_new -= 2 * (loc2.x - loc1.x);
-                        }
-                    }
-                }
-            } else {
-                if (loc2.y >= loc1.y) {
-                    int m_new = 2 * (loc2.y - loc1.y);
-                    int slope_error_new = m_new - (loc1.x - loc2.x);
-
-                    for (int x = loc2.x, y = loc1.y; x <= loc1.x; x++) {
-                        if (in.unitController.senseTerrain(new Location(x, y)) == Terrain.WATER) {
-                            return true;
-                        }
-                        slope_error_new += m_new;
-
-                        if (slope_error_new >= 0) {
-                            y++;
-                            slope_error_new -= 2 * (loc1.x - loc2.x);
-                        }
-                    }
-                } else {
-                    int m_new = 2 * (loc1.y - loc2.y);
-                    int slope_error_new = m_new - (loc1.x - loc2.x);
-
-                    for (int x = loc2.x, y = loc2.y; x <= loc1.x; x++) {
-                        if (in.unitController.senseTerrain(new Location(x, y)) == Terrain.WATER) {
-                            return true;
-                        }
-                        slope_error_new += m_new;
-
-                        if (slope_error_new >= 0) {
-                            y++;
-                            slope_error_new -= 2 * (loc1.x - loc2.x);
-                        }
-                    }
-                }
-            }
-        } else {
-            if (loc2.y > loc1.y) {
-                if (loc2.x >= loc1.x) {
-                    int m_new = 2 * (loc2.x - loc1.x);
-                    int slope_error_new = m_new - (loc2.y - loc1.y);
-
-                    for (int y = loc1.y, x = loc1.x; y <= loc2.y; y++) {
-                        if (in.unitController.senseTerrain(new Location(x, y)) == Terrain.WATER) {
-                            return true;
-                        }
-                        slope_error_new += m_new;
-
-                        if (slope_error_new >= 0) {
-                            x++;
-                            slope_error_new -= 2 * (loc2.y - loc1.y);
-                        }
-                    }
-                } else {
-                    int m_new = 2 * (loc1.x - loc2.x);
-                    int slope_error_new = m_new - (loc2.x - loc1.x);
-
-                    for (int y = loc1.y, x = loc2.x; y <= loc2.y; y++) {
-                        if (in.unitController.senseTerrain(new Location(x, y)) == Terrain.WATER) {
-                            return true;
-                        }
-                        slope_error_new += m_new;
-
-                        if (slope_error_new >= 0) {
-                            x++;
-                            slope_error_new -= 2 * (loc2.y - loc1.y);
-                        }
-                    }
-                }
-            } else {
-                if (loc2.x >= loc1.x) {
-                    int m_new = 2 * (loc2.x - loc1.x);
-                    int slope_error_new = m_new - (loc1.y - loc2.y);
-
-                    for (int y = loc2.y, x = loc1.x; y <= loc1.y; y++) {
-                        if (in.unitController.senseTerrain(new Location(x, y)) == Terrain.WATER) {
-                            return true;
-                        }
-                        slope_error_new += m_new;
-
-                        if (slope_error_new >= 0) {
-                            x++;
-                            slope_error_new -= 2 * (loc1.y - loc2.y);
-                        }
-                    }
-                } else {
-                    int m_new = 2 * (loc1.x - loc2.x);
-                    int slope_error_new = m_new - (loc1.y - loc2.y);
-
-                    for (int y = loc2.y, x = loc2.x; y <= loc1.y; y++) {
-                        if (in.unitController.senseTerrain(new Location(x, y)) == Terrain.WATER) {
-                            return true;
-                        }
-                        slope_error_new += m_new;
-
-                        if (slope_error_new >= 0) {
-                            x++;
-                            slope_error_new -= 2 * (loc1.y - loc2.y);
-                        }
-                    }
-                }
+            if (e2 < dx) {
+                err = err + dx;
+                y0 = y0 + sy;
             }
         }
-
         return false;
     }
 
