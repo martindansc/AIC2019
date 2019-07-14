@@ -32,7 +32,7 @@ public class Knight {
 
         if (!microResult) {
             Direction dir = in.pathfinder.getNextLocationTarget(target);
-            if (dir != null) {
+            if (dir != null && in.unitController.senseImpact(in.staticVariables.myLocation.add(dir)) == 0) {
                 if (isTargetBase || isTargetObstructed || !in.attack.canAttackTarget(target) || (in.attack.canAttackTarget(target) && in.staticVariables.myLocation.add(dir).distanceSquared(target) < in.staticVariables.type.getAttackRangeSquared())) {
                     if (in.unitController.canMove(dir)) {
                         if (in.memoryManager.isLocationSafe(in.staticVariables.myLocation.add(dir))) {
@@ -99,6 +99,10 @@ public class Knight {
 
         void update(UnitInfo unit) {
             if (!in.memoryManager.isLocationSafe(loc)) {
+                numEnemies += 100;
+                return;
+            }
+            if (in.unitController.senseImpact(loc) != 0) {
                 numEnemies += 100;
                 return;
             }
