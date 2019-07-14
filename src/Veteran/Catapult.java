@@ -122,6 +122,10 @@ public class Catapult {
                 numEnemies += 100;
                 return;
             }
+            if (in.unitController.senseImpact(loc) != 0) {
+                numEnemies += 100;
+                return;
+            }
             if (unit.getType() != UnitType.WORKER) {
                 int distance = unit.getLocation().distanceSquared(loc);
                 if (distance <= unit.getType().attackRangeSquared) ++numEnemies;

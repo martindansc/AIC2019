@@ -98,7 +98,7 @@ public class Worker {
         if (in.unitController.canMove()) {
             Direction dir = in.pathfinder.getNextLocationTarget(objectiveLocation,
                     (Location loc) -> in.memoryManager.isLocationSafe(loc));
-            if (dir != null && dir != Direction.ZERO) {
+            if (dir != null && dir != Direction.ZERO && in.unitController.senseImpact(in.staticVariables.myLocation.add(dir)) == 0) {
                 String nextMovementIsSafe = checkIfMovementIsSafe(in.staticVariables.myLocation, dir);
                 if(nextMovementIsSafe == "CANMOVE") {
                     in.unitController.move(dir);
@@ -157,7 +157,7 @@ public class Worker {
         //Macro to desired town or base
         if (!in.unitController.canMove()) return;
         Direction dir = in.pathfinder.getNextLocationTarget(objectiveBase, loc-> in.memoryManager.isLocationSafe(loc));
-        if (dir != null && dir != Direction.ZERO) {
+        if (dir != null && dir != Direction.ZERO && in.unitController.senseImpact(in.staticVariables.myLocation.add(dir)) == 0) {
             String nextMovementIsSafe = checkIfMovementIsSafe(in.staticVariables.myLocation, dir);
             if(nextMovementIsSafe == "CANMOVE") {
                 in.unitController.move(dir);
@@ -380,6 +380,10 @@ public class Worker {
         }
 
         void update(UnitInfo unit) {
+            if (!in.memoryManager.isLocationSafe(loc)) {
+                numEnemies += 100;
+                return;
+            }
             if (unit.getType() != UnitType.WORKER) {
                 int distance = unit.getLocation().distanceSquared(loc);
                 if (distance <= unit.getType().attackRangeSquared) ++numEnemies;
