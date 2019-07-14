@@ -15,6 +15,7 @@ public class Injection {
     public final Knight knight;
     public final Archer archer;
     public final Mage mage;
+    public final Explorer explorer;
     public final Catapult catapult;
     public final Worker worker;
     public final Base base;
@@ -35,6 +36,7 @@ public class Injection {
         this.knight = new Knight(this);
         this.archer = new Archer (this);
         this.mage = new Mage (this);
+        this.explorer = new Explorer(this);
         this.catapult = new Catapult(this);
         this.worker = new Worker(this);
         this.base = new Base(this);
