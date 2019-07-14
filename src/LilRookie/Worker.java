@@ -50,13 +50,13 @@ public class Worker {
             Boolean resourceFound = scout("random");
 
             if(!resourceFound){
-                //If worker wants to move to wall change direction
+                //If worker wants to macro to wall change direction
                 Location nextLocation =  in.staticVariables.myLocation.add(randomDir);
                 if(in.unitController.isOutOfMap(nextLocation)){
                     int randomNumber = (int)(Math.random()*8);
                     randomDir = Direction.values()[randomNumber];
                 }
-                //Move unit if possible
+                //Macro unit if possible
                 if (in.unitController.canMove()) {
                     if(in.unitController.canMove(randomDir)){
                         in.unitController.move(randomDir);
@@ -82,7 +82,7 @@ public class Worker {
             }
         }
         if(currentAction == "GOTORESOURCE"){
-            //Move to desired resource
+            //Macro to desired resource
             if (!in.unitController.canMove()) return;
 
             Direction dir = in.pathfinder.getNextLocationTarget(objectiveLocation);
@@ -131,7 +131,7 @@ public class Worker {
                 }
             }
 
-            //Move to desired town or base
+            //Macro to desired town or base
             if (!in.unitController.canMove()) return;
             Direction dir = in.pathfinder.getNextLocationTarget(objectiveBase);
             //Sino avanco cap a lobjectiu
@@ -143,7 +143,7 @@ public class Worker {
             if(in.unitController.canDeposit(dirbase)){
                 in.unitController.deposit(dirbase);
                 currentAction = "GOTORESOURCE";
-                //Move to desired resource
+                //Macro to desired resource
                 if (!in.unitController.canMove()) return;
 
                 dir = in.pathfinder.getNextLocationTarget(objectiveLocation);

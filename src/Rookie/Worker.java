@@ -90,7 +90,7 @@ public class Worker {
     }
 
     public void goToResource(){
-        //Move to desired resource
+        //Macro to desired resource
         if (in.unitController.canMove()) {
             Direction dir = in.pathfinder.getNextLocationTarget(objectiveLocation);
             if (dir != null && dir != Direction.ZERO) {
@@ -149,7 +149,7 @@ public class Worker {
     public void goToTown(){
         //Ceck if destination is own and correct it
         checkDestTownOwnAndCorrect();
-        //Move to desired town or base
+        //Macro to desired town or base
         if (!in.unitController.canMove()) return;
         Direction dir = in.pathfinder.getNextLocationTarget(objectiveBase);
         if (dir != null && dir != Direction.ZERO) {
@@ -201,16 +201,16 @@ public class Worker {
         if(in.unitController.canMove()) {
             String nextMovementIsSafe = checkIfMovementIsSafe(in.staticVariables.myLocation, randomDir);
 
-            //If worker wants to move to wall change direction
+            //If worker wants to macro to wall change direction
             if (nextMovementIsSafe == "WALL") {
                 int randomNumber = (int) (Math.random() * 8);
                 randomDir = Direction.values()[randomNumber];
             }
-            //If there is a catapult attack on the going position dont move
+            //If there is a catapult attack on the going position dont macro
             //TODO
-            //If you see a enemy unit move in opposite direction
+            //If you see a enemy unit macro in opposite direction
             //TODO
-            //If it is safe to move, move
+            //If it is safe to macro, macro
             else if (nextMovementIsSafe == "CANMOVE") {
                 in.unitController.move(randomDir);
                 unitMoved = true;
@@ -247,7 +247,7 @@ public class Worker {
         else if(!in.memoryManager.isLocationSafe(nextLocation)){
             return "TOWER/BASE";
         }
-        //check if unit can move to that location
+        //check if unit can macro to that location
         else if(in.unitController.canMove(dir)){
             return "CANMOVE";
         }

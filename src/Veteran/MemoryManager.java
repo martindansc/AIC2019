@@ -111,13 +111,35 @@ public class MemoryManager {
                 num * in.constants.OBJECTIVE_SIZE;
     }
 
+    private void insertObjective(int id, int[] params) {
+        uc.write(id, params[0]);
+        uc.write(id + 1, params[1]);
+        uc.write(id + 2, params[2]);
+        uc.write(id + 3, params[3]);
+        uc.write(id + 4, params[4]);
+
+        // reset counters
+        resetCounter(id + 6);
+
+        // add location objective
+        this.setObjectiveIdInLocation(params[2], params[3], id);
+
+        uc.write(id + 9, params[9]);
+        uc.write(id + 10, params[10]);
+    }
+
     public int[] addObjective(UnitType unitType, int[] params) {
+
+        if(uc.getEnergyLeft() < 2000) return this.newEmptyObjective();
 
         //todo: check that the objective doesn't exists, if it does maybe update it
         int maybeId = this.getObjectiveIdInLocation(params[2], params[3]);
         if(maybeId > 0) {
             return this.getObjective(maybeId, -1);
         }
+
+        int worstObjective = 0;
+        int worstObjectiveValue = 0;
 
         int type = in.helper.unitTypeToInt(unitType);
 
@@ -126,25 +148,23 @@ public class MemoryManager {
         for(int i = 0; i < in.constants.MAX_OBJECTIVES; i++) {
             int id = this.getObjectiveId(type, i);
             if(uc.read(id) == 0) {
-                uc.write(id, params[0]);
-                uc.write(id + 1, params[1]);
-                uc.write(id + 2, params[2]);
-                uc.write(id + 3, params[3]);
-                uc.write(id + 4, params[4]);
-
-                // reset counters
-                resetCounter(id + 6);
-
-                // add location objective
-                this.setObjectiveIdInLocation(params[2], params[3], id);
-
-                uc.write(id + 9, params[9]);
-                uc.write(id + 10, params[10]);
-
+                this.insertObjective(id, params);
                 lastId = id;
-
                 break;
             }
+            else {
+                int value = uc.read(id + 11);
+                if (value > worstObjectiveValue){
+                    worstObjective = uc.read(id + 5);
+                    worstObjectiveValue = value;
+                }
+            }
+        }
+
+        if(lastId == -1 && worstObjective != 0 && params[11] < worstObjective) {
+            this.removeObjectiveIdInLocation(uc.read(worstObjective + 2), uc.read(worstObjective + 3));
+            this.insertObjective(worstObjective, params);
+            lastId = worstObjective;
         }
 
         if(lastId == -1) return this.newEmptyObjective();
@@ -172,6 +192,9 @@ public class MemoryManager {
 
             objective[9] = uc.read(id + 9);
             objective[10] = uc.read(id + 10);
+
+            // value
+            objective[11] = uc.read(id + 11);
 
         }
 
@@ -215,11 +238,13 @@ public class MemoryManager {
 
     public void removeObjective(Location loc) {
         int idObjectiveLocation = in.helper.locationToInt(loc.x, loc.y);
+        if (idObjectiveLocation == 0) return;
         removeObjective(idObjectiveLocation);
     }
 
     public boolean existsObjectiveInLocation(int locX, int locY) {
         int idObjectiveLocation = in.helper.locationToInt(locX, locY);
+        if (idObjectiveLocation == 0) return false;
         return 0 < uc.read(in.constants.ID_LOCATION_OBJECTIVES + idObjectiveLocation);
     }
 
@@ -259,6 +284,10 @@ public class MemoryManager {
         return in.helper.intToUnitType(in.unitController.read(index));
     }
 
+    public int getIndexMap(int locX, int locY) {
+        return in.constants.ID_MAP_INFO + in.helper.locationToInt(locX, locY) * in.constants.INFO_PER_CELL;
+    }
+
     public int getIndexMap(Location loc) {
         return in.constants.ID_MAP_INFO + in.helper.locationToInt(loc) * in.constants.INFO_PER_CELL;
     }
@@ -268,9 +297,13 @@ public class MemoryManager {
         in.unitController.write(index + 4, in.unitController.read(index + 4) - 1);
     }
 
-    public void setLocationDangerous(Location loc) {
-        int index = getIndexMap(loc);
+    public void setLocationDangerous(int locX, int locY) {
+        int index = getIndexMap(locX, locY);
         in.unitController.write(index + 4, in.unitController.read(index + 4) + 1);
+    }
+
+    public void setLocationDangerous(Location loc) {
+        setLocationDangerous(loc.x, loc.y);
     }
 
     public boolean isLocationSafe(Location loc) {

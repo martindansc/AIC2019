@@ -55,6 +55,9 @@ Estructures i unitats
     }
 
     public void markTower(Location loc) {
+
+        if(in.unitController.getEnergyLeft() < 6000) return;
+
         if (in.memoryManager.getUnitFromLocation(loc) == UnitType.TOWER) return;
         in.memoryManager.saveUnitToMap(loc, UnitType.TOWER);
         int[] objective = in.objectives.createTowerObjective(loc);

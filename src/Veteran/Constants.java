@@ -20,7 +20,7 @@ public class Constants {
     public int OBJECTIVE_SIZE = 15;
     public int MAX_OBJECTIVES = 20;
     public int INFO_PER_CELL = 5;
-    public int COUNTERS_SPACE = 7;
+    public int COUNTERS_SPACE = 3;
 
     //HEURISTIC CONSTANTS
     public int HEU_SOLDIER = 10;

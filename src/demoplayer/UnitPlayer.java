@@ -19,7 +19,7 @@ public class UnitPlayer {
 			/*Get corresponding direction*/
 			Direction dir = Direction.values()[randomNumber];
 
-			/*move in direction dir if possible*/
+			/*macro in direction dir if possible*/
 			if (uc.canMove(dir)) uc.move(dir);
 
 			/*If this unit is a base, try spawning a soldier at direction dir*/

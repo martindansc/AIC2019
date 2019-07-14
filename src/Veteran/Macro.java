@@ -3,10 +3,10 @@ package Veteran;
 import aic2019.Location;
 import aic2019.TownInfo;
 
-public class Move {
+public class Macro {
     private Injection in;
 
-    public Move(Injection in){
+    public Macro(Injection in){
         this.in = in;
     }
 

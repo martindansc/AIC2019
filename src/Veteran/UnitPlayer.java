@@ -16,7 +16,7 @@ public class UnitPlayer {
             in.messages.update();
             in.helper.countUnits();
 
-            Location target = in.move.getTarget();
+            Location target = in.macro.getTarget();
 
 			if (in.staticVariables.type == UnitType.BASE) {
                 in.base.run();
