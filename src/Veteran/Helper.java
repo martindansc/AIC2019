@@ -110,4 +110,19 @@ public class Helper {
         return loc;
     }
 
+    // Returns a Location 1/4th from our base in direction to the enemy base
+    public Location getMeetingPoint() {
+        int x = Math.abs(in.staticVariables.allyBase.x - in.staticVariables.enemyBase.x) / 4;
+        int y = Math.abs(in.staticVariables.allyBase.y - in.staticVariables.enemyBase.y) / 4;
+
+        if (in.staticVariables.allyBase.x > in.staticVariables.enemyBase.x) {
+            x = -x;
+        }
+        if (in.staticVariables.allyBase.y > in.staticVariables.enemyBase.y) {
+            y = -y;
+        }
+
+        return new Location(in.staticVariables.allyBase.x + x, in.staticVariables.allyBase.y + y);
+    }
+
 }

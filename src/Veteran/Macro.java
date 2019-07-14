@@ -11,7 +11,9 @@ public class Macro {
     }
 
     public Location getTarget() {
-        if (in.memoryManager.readValue(in.constants.ID_ALLIES_SOLDIER_COUNTER) + in.memoryManager.readValue(in.constants.ID_ALLIES_ARCHER_COUNTER) + in.memoryManager.readValue(in.constants.ID_ALLIES_KNIGHT_COUNTER) + in.memoryManager.readValue(in.constants.ID_ALLIES_MAGE_COUNTER) < 10 && in.staticVariables.round < 100) {
+        boolean units = in.memoryManager.readValue(in.constants.ID_ALLIES_SOLDIER_COUNTER) + in.memoryManager.readValue(in.constants.ID_ALLIES_ARCHER_COUNTER) + in.memoryManager.readValue(in.constants.ID_ALLIES_KNIGHT_COUNTER) + in.memoryManager.readValue(in.constants.ID_ALLIES_MAGE_COUNTER) < 10;
+        boolean condition = in.staticVariables.round < 100;
+        if (units && condition) {
             return in.staticVariables.allyBase;
         }
 
@@ -28,6 +30,7 @@ public class Macro {
                 int distance = in.staticVariables.myLocation.distanceSquared(town.getLocation());
                 if (distance < defendDistance) {
                     defendTown = town;
+                    defendDistance = distance;
                 }
             }
             if (defendTown != null) {

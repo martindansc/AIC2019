@@ -84,4 +84,14 @@ public class Objectives {
 
         return newObjective;
     }
+
+    public int[] createWaterObjective(Location loc) {
+        int[] newObjective = new int[in.constants.OBJECTIVE_SIZE];
+        newObjective[0] = in.constants.WATER_OBJECTIVE;
+        newObjective[1] = 1;
+        this.setLocationObjective(newObjective, loc);
+        this.addCommonVariables(newObjective);
+
+        return newObjective;
+    }
 }

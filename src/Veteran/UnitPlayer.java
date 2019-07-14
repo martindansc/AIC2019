@@ -32,6 +32,8 @@ public class UnitPlayer {
                 in.mage.run(target);
             } else if (in.staticVariables.type == UnitType.CATAPULT) {
                 in.catapult.run();
+            } else if (in.staticVariables.type == UnitType.EXPLORER) {
+			    in.explorer.run();
             }
 
             in.map.sendResourcesObjective();

@@ -55,13 +55,14 @@ Estructures i unitats
     }
 
     public void markTower(Location loc) {
+        if (in.memoryManager.getUnitFromLocation(loc) == UnitType.TOWER && in.memoryManager.getPaintedTower(loc)) return;
+        in.memoryManager.saveUnitToMap(loc, UnitType.TOWER);
+        in.memoryManager.markTowerForPainting(loc);
+        int[] objective = in.objectives.createTowerObjective(loc);
+        in.memoryManager.addObjective(UnitType.CATAPULT, objective);
 
         if(in.unitController.getEnergyLeft() < 6000) return;
 
-        if (in.memoryManager.getUnitFromLocation(loc) == UnitType.TOWER) return;
-        in.memoryManager.saveUnitToMap(loc, UnitType.TOWER);
-        int[] objective = in.objectives.createTowerObjective(loc);
-        in.memoryManager.addObjective(UnitType.CATAPULT, objective);
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 6; j++) {
                 int suma = i * i + j * j;
@@ -73,10 +74,11 @@ Estructures i unitats
                 }
             }
         }
+        in.memoryManager.unmarkTowerForPainting(loc);
     }
 
     public void unmarkTower(Location loc) {
-        if ( in.memoryManager.getUnitFromLocation(loc) != UnitType.TOWER) return;
+        if (in.memoryManager.getUnitFromLocation(loc) != UnitType.TOWER) return;
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 6; j++) {
                 int suma = i * i + j * j;

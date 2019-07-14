@@ -8,6 +8,7 @@ public class Catapult {
     private int delay = 0;
     private Location objectiveLocation;
     private boolean claimObjective = false;
+    private boolean isTower;
 
     public Catapult(Injection in) {
         this.in = in;
@@ -27,8 +28,8 @@ public class Catapult {
             if (delay == 5) {
                 counter = 0;
                 delay = 0;
-                in.map.unmarkTower(objectiveLocation);
                 in.memoryManager.removeObjective(in.memoryManager.getObjectiveIdInLocation(objectiveLocation));
+                if (isTower) in.map.unmarkTower(objectiveLocation);
                 objectiveLocation = null;
             }
         }
@@ -49,6 +50,10 @@ public class Catapult {
 
     public void tryMove(Location target) {
         if(target != null) {
+            if (tooClose(target)) {
+                in.memoryManager.removeObjective(in.memoryManager.getObjectiveIdInLocation(objectiveLocation));
+                objectiveLocation = null;
+            }
             if (!in.unitController.canMove()) return;
             if (catapultInRange(target)) return;
         }
@@ -65,6 +70,10 @@ public class Catapult {
 
     public boolean catapultInRange(Location target) {
         return target.distanceSquared(in.staticVariables.myLocation) <= GameConstants.CATAPULT_ATTACK_RANGE_SQUARED;
+    }
+
+    public boolean tooClose(Location target) {
+        return target.distanceSquared(in.staticVariables.myLocation) <= GameConstants.CATAPULT_ATTACK_MIN_RANGE_SQUARED;
     }
 
     public boolean doMicro() {
@@ -158,6 +167,7 @@ public class Catapult {
             int distance = in.staticVariables.myLocation.distanceSquared(newObjectiveLocation);
 
             if(in.unitController.canAttack(newObjectiveLocation) && !in.unitController.canAttack(objectiveLocation)) {
+                if (isTower(newObjectiveLocation)) isTower = true;
                 this.fixObjectiveLocation(newObjectiveLocation);
                 claimObjective = true;
             }
@@ -183,6 +193,7 @@ public class Catapult {
         }
 
         if(bestLocation != null && (objectiveLocation == null || !claimObjective)){
+            if (isTower(bestLocation)) isTower = true;
             this.fixObjectiveLocation(bestLocation);
             claimObjective = true;
         }
@@ -190,14 +201,22 @@ public class Catapult {
         // just to do something in case we have nothing to do but there is still an objective...
         // we won't claim it thought
         if(objectiveLocation == null){
+            if (!bestOccupedLocation.isEqual(new Location(0,0))) {
+                if (isTower(bestOccupedLocation)) isTower = true;
+            }
             this.fixObjectiveLocation(bestOccupedLocation);
             claimObjective = false;
         }
 
         // claim objective
         if(objectiveLocation != null && claimObjective) {
+            if (isTower(objectiveLocation)) isTower = true;
             in.objectives.claimObjective(this.objectiveLocation);
         }
+    }
+
+    public boolean isTower(Location loc) {
+        return in.memoryManager.getObjectiveType(in.memoryManager.getObjectiveIdInLocation(loc)) == in.constants.ENEMY_TOWER;
     }
 
 }

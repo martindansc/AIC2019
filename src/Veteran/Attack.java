@@ -1,9 +1,6 @@
 package Veteran;
 
-import aic2019.GameConstants;
-import aic2019.Location;
-import aic2019.UnitInfo;
-import aic2019.UnitType;
+import aic2019.*;
 
 public class Attack {
 
@@ -118,6 +115,14 @@ public class Attack {
         if (in.staticVariables.allyBase.isEqual(town)) return;
         if (in.unitController.canAttack(town) && in.unitController.senseTown(town).getOwner() != in.staticVariables.allies) {
             in.unitController.attack(town);
+            return;
+        }
+        for (TownInfo enemyTown: in.staticVariables.allenemytowns) {
+            Location townLoc = enemyTown.getLocation();
+            if (in.unitController.canAttack(townLoc)) {
+                in.unitController.attack(townLoc);
+                return;
+            }
         }
     }
 

@@ -268,6 +268,10 @@ public class MemoryManager {
         return uc.read(in.constants.ID_LOCATION_OBJECTIVES + idObjectiveLocation);
     }
 
+    public int getObjectiveType(int id) {
+        return uc.read(id);
+    }
+
     public void claimObjective(int idObjective) {
         uc.write(idObjective + 10, in.staticVariables.myId);
         this.increaseValueByOne(idObjective + 6);
@@ -300,6 +304,21 @@ public class MemoryManager {
     public void setLocationDangerous(int locX, int locY) {
         int index = getIndexMap(locX, locY);
         in.unitController.write(index + 4, in.unitController.read(index + 4) + 1);
+    }
+
+    public boolean getPaintedTower(Location loc) {
+        int index = getIndexMap(loc.x, loc.y);
+        return in.unitController.read(index + 3) == 0;
+    }
+
+    public void markTowerForPainting(Location loc) {
+        int index = getIndexMap(loc.x, loc.y);
+        in.unitController.write(index + 3, 1);
+    }
+
+    public void unmarkTowerForPainting(Location loc) {
+        int index = getIndexMap(loc.x, loc.y);
+        in.unitController.write(index + 3, 0);
     }
 
     public void setLocationDangerous(Location loc) {

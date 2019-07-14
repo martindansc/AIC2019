@@ -34,6 +34,7 @@ public class Constants {
     public int WORKERS_GET_CRYSTAL = 3;
     public int WORKERS_DEPOSIT_POSITION = 4;
     public int ENEMY_TOWER = 5;
+    public int WATER_OBJECTIVE = 6;
 
     // UNITS
     public int CATAPULTS_CONSIDER_COSE_DISTANCE = 300;

@@ -56,7 +56,17 @@ public class Soldier {
         boolean enemies = false;
         for (UnitInfo enemy : in.staticVariables.allenemies) {
             Location enemyLoc = enemy.getLocation();
-            if (!in.unitController.isObstructed(enemyLoc, in.staticVariables.myLocation) && !in.helper.isObstructedWater(enemyLoc, in.staticVariables.myLocation)) {
+            boolean isWaterObs = in.helper.isObstructedWater(enemyLoc, in.staticVariables.myLocation);
+            if (isWaterObs) {
+                int[] objective;
+                if (enemy.getType() == UnitType.TOWER) {
+                    objective = in.objectives.createTowerObjective(enemyLoc);
+                } else {
+                    objective = in.objectives.createWaterObjective(enemyLoc);
+                }
+                in.memoryManager.addObjective(UnitType.CATAPULT, objective);
+            }
+            if (!in.unitController.isObstructed(enemyLoc, in.staticVariables.myLocation) && !isWaterObs) {
                 enemies = true;
                 for (int i = 0; i < 9; i++) {
                     microInfo[i].update(enemy);
