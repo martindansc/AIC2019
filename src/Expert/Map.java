@@ -40,9 +40,11 @@ Estructures i unitats
     }
 
     public void sendResourcesObjective() {
-        for (ResourceInfo resource : in.staticVariables.resourcesSeen) {
+        for (ResourceInfo resource : in.unitController.senseResources()) {
             if(in.unitController.getEnergyLeft() < 4000) return;
             Location loc = resource.getLocation();
+            if (in.unitController.isObstructed(in.staticVariables.myLocation, loc)) return;
+            if (in.helper.isObstructedWater(in.staticVariables.myLocation, loc)) return;
             //if(in.helper.getClosestTownToLocation(loc).distanceSquared(loc) < in.constants.WORKERS_CONSIDER_ClOSE_DISTANCE)
                 //return;
             int[] objective = in.objectives.createResourceObjective(loc);
