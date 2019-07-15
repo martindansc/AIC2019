@@ -23,6 +23,13 @@ public class Catapult {
     public boolean tryAttack() {
         int myAttack = in.attack.getMyAttack();
 
+        if (counter == 1 && in.memoryManager.getObjectiveType(in.memoryManager.getObjectiveIdInLocation(objectiveLocation)) == 6) {
+            counter = 0;
+            delay = 0;
+            in.memoryManager.removeObjective(in.memoryManager.getObjectiveIdInLocation(objectiveLocation));
+            objectiveLocation = null;
+        }
+
         if (counter == 2) {
             delay++;
             if (delay == 5) {

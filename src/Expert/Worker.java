@@ -126,21 +126,20 @@ public class Worker {
         }
         //Si ja hem recol.lectat el que voliem del resource tornem a la town o base objectiu
         float wood = in.staticVariables.unitInfo.getWood();
-        if(wood >= in.constants.WORKERS_GATHER_WOOD){ //60
-            objectiveBase = in.helper.getClosestTownToLocation(objectiveLocation);
-            currentAction =  "GOTOTOWN";
-            goToTown();
-            return;
-        }
         float iron = in.staticVariables.unitInfo.getIron();
-        if( iron >= in.constants.WORKERS_GATHER_IRON){ //20
-            objectiveBase = in.helper.getClosestTownToLocation(objectiveLocation);
-            currentAction =  "GOTOTOWN";
-            goToTown();
-            return;
-        }
         float crystal = in.staticVariables.unitInfo.getCrystal();
-        if( crystal >= in.constants.WORKERS_GATHER_MINERAL){ //6
+
+        /* Long-temr optimum
+        float distance = (float)Math.sqrt(in.staticVariables.myLocation.distanceSquared(in.helper.getClosestTownToLocation(objectiveLocation)));
+        float result;
+        if (distance > 30) {
+            result = 120.f;
+        } else {
+            result = 17.7f + 31.1f * (float)Math.log(distance);
+        }
+        */
+
+        if (wood + iron * 3 + crystal * 10 > in.constants.WORKERS_GATHER_ABSOLUTE) {
             objectiveBase = in.helper.getClosestTownToLocation(objectiveLocation);
             currentAction = "GOTOTOWN";
             goToTown();

@@ -39,6 +39,7 @@ public class Constants {
     // UNITS
     public int CATAPULTS_CONSIDER_COSE_DISTANCE = 300;
     public int WORKERS_CONSIDER_ClOSE_DISTANCE = 300;
+    public float WORKERS_GATHER_ABSOLUTE = 50.f;
     public float WORKERS_GATHER_WOOD = 60.f;
     public float WORKERS_GATHER_IRON = 20.f;
     public float WORKERS_GATHER_MINERAL = 6.f;
