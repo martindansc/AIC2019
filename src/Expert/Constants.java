@@ -26,7 +26,7 @@ public class Constants {
     public int HEU_SOLDIER = 160;
     public int HEU_KNIGHT = 80;
     public int HEU_ARCHER = 80;
-    public int HEU_MAGE = 50;
+    public int HEU_MAGE = 30;
 
     // OBJECTIVE CONSTANTS
     public int WORKERS_GET_WOOD = 1;
@@ -39,7 +39,7 @@ public class Constants {
     // UNITS
     public int CATAPULTS_CONSIDER_COSE_DISTANCE = 300;
     public int WORKERS_CONSIDER_ClOSE_DISTANCE = 300;
-    public float WORKERS_GATHER_ABSOLUTE = 50.f;
+    public float WORKERS_GATHER_ABSOLUTE = 60.f;
     public float WORKERS_GATHER_WOOD = 60.f;
     public float WORKERS_GATHER_IRON = 20.f;
     public float WORKERS_GATHER_MINERAL = 6.f;

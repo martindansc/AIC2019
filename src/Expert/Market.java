@@ -77,6 +77,7 @@ public class Market {
     }
 
     public UnitType heuristic() {
+
         int knights = in.memoryManager.readValue(in.constants.ID_ALLIES_KNIGHT_COUNTER);
         int soldiers = in.memoryManager.readValue(in.constants.ID_ALLIES_SOLDIER_COUNTER);
         int archers = in.memoryManager.readValue(in.constants.ID_ALLIES_ARCHER_COUNTER);
