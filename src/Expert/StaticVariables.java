@@ -28,8 +28,8 @@ public class StaticVariables {
     public float wood;
     public float iron;
     public float crystal;
-    float crystalwood;
-    float crystaliron;
+    float woodcrystal;
+    float ironcrystal;
     float woodiron;
     public UnitInfo unitInfo;
 
@@ -65,8 +65,8 @@ public class StaticVariables {
         unitInfo = in.unitController.getInfo();
         visiblelocs = in.unitController.getVisibleLocations();
         if (type == UnitType.BASE) {
-            crystalwood = in.unitController.tradeOutput(Resource.CRYSTAL, Resource.WOOD, 1);
-            crystaliron = in.unitController.tradeOutput(Resource.CRYSTAL, Resource.IRON, 1);
+            woodcrystal = in.unitController.tradeOutput(Resource.WOOD, Resource.CRYSTAL, 1);
+            ironcrystal = in.unitController.tradeOutput(Resource.IRON, Resource.CRYSTAL, 1);
             woodiron = in.unitController.tradeOutput(Resource.WOOD, Resource.IRON, 1);
         }
     }

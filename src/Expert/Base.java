@@ -78,10 +78,7 @@ public class Base {
             }
         }
 
-  //      return in.market.heuristic();
-
-        if (soldiers <= 2 * (archers)) return UnitType.SOLDIER;
-        return UnitType.ARCHER;
+        return in.market.heuristic();
 
     }
 

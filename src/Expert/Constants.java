@@ -23,10 +23,10 @@ public class Constants {
     public int COUNTERS_SPACE = 3;
 
     //HEURISTIC CONSTANTS
-    public int HEU_SOLDIER = 10;
-    public int HEU_KNIGHT = 14;
-    public int HEU_ARCHER = 6;
-    public int HEU_MAGE = 12;
+    public int HEU_SOLDIER = 160;
+    public int HEU_KNIGHT = 80;
+    public int HEU_ARCHER = 80;
+    public int HEU_MAGE = 50;
 
     // OBJECTIVE CONSTANTS
     public int WORKERS_GET_WOOD = 1;

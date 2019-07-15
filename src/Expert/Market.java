@@ -39,7 +39,7 @@ public class Market {
         if (freewood < 0 && freeiron < 0 && freecrystal < 0) return false;
 
         if (freewood < 0) {
-            if (-freewood > freecrystal * in.staticVariables.crystalwood + freeiron * 1/in.staticVariables.woodiron) return false;
+            if (-freewood > freecrystal * in.staticVariables.woodcrystal + freeiron * 1/in.staticVariables.woodiron) return false;
             if (freeiron < 0) {
                 in.unitController.trade(Resource.CRYSTAL, Resource.WOOD, freecrystal);
                 return false;
@@ -53,7 +53,7 @@ public class Market {
                 }
             }
         } else if (freeiron < 0) {
-            if (-freeiron > freecrystal * in.staticVariables.crystaliron + freewood * in.staticVariables.woodiron) return false;
+            if (-freeiron > freecrystal * in.staticVariables.ironcrystal + freewood * in.staticVariables.woodiron) return false;
             if (freecrystal < 0) {
                 in.unitController.trade(Resource.WOOD, Resource.IRON, freewood);
                 return false;
@@ -64,7 +64,7 @@ public class Market {
                 }
             }
         } else {
-            if (-freecrystal > freeiron * 1/in.staticVariables.crystaliron + freewood * 1/in.staticVariables.crystalwood) return false;
+            if (-freecrystal > freeiron * 1/in.staticVariables.ironcrystal + freewood * 1/in.staticVariables.woodcrystal) return false;
             else {
                 in.unitController.trade(maxFree, Resource.CRYSTAL, maxFreeFloat);
                 if (in.unitController.getCrystal() > crystalNeeded) {
@@ -81,17 +81,17 @@ public class Market {
         int soldiers = in.memoryManager.readValue(in.constants.ID_ALLIES_SOLDIER_COUNTER);
         int archers = in.memoryManager.readValue(in.constants.ID_ALLIES_ARCHER_COUNTER);
         int mages = in.memoryManager.readValue(in.constants.ID_ALLIES_MAGE_COUNTER);
-        int total = knights + soldiers + archers + mages;
+        int total = knights + soldiers + archers + mages + 1;
 
         float soldierResources = GameConstants.SOLDIER_WOOD_COST + GameConstants.SOLDIER_IRON_COST * 1/in.staticVariables.woodiron;
         float knightResources = GameConstants.KNIGHT_WOOD_COST + GameConstants.KNIGHT_IRON_COST * 1/in.staticVariables.woodiron;
         float archerResources = GameConstants.ARCHER_WOOD_COST + GameConstants.ARCHER_IRON_COST * 1/in.staticVariables.woodiron;
-        float mageResources = GameConstants.MAGE_WOOD_COST + GameConstants.MAGE_IRON_COST * 1/in.staticVariables.woodiron + GameConstants.MAGE_CRYSTAL_COST * in.staticVariables.crystalwood;
+        float mageResources = GameConstants.MAGE_WOOD_COST + GameConstants.MAGE_IRON_COST * 1/in.staticVariables.woodiron + GameConstants.MAGE_CRYSTAL_COST * 1/in.staticVariables.woodcrystal;
 
-        float soldierScore = total/(soldiers * soldiers + 1) * in.constants.HEU_SOLDIER / soldierResources;
-        float knightScore = total/(knights * knights + 1) * in.constants.HEU_KNIGHT / knightResources;
-        float archerScore = total/(archers * archers + 1) * in.constants.HEU_ARCHER / archerResources;
-        float mageScore = total/(mages * mages + 1) * in.constants.HEU_MAGE / mageResources;
+        float soldierScore = (1 - (float)(soldiers + knights)/total) * (in.constants.HEU_SOLDIER / soldierResources);
+        float knightScore =  (1 - (float)(soldiers + knights)/total) * (in.constants.HEU_KNIGHT / knightResources);
+        float archerScore =  (1 - (float)(archers + mages)/total) * (in.constants.HEU_ARCHER / archerResources);
+        float mageScore =  (1 - (float)(archers + mages)/total) * (in.constants.HEU_MAGE / mageResources);
 
         UnitType bestType;
         if (soldierScore >= knightScore && soldierScore >= archerScore && soldierScore > mageScore) bestType = UnitType.SOLDIER;
