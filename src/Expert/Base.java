@@ -87,18 +87,16 @@ public class Base {
         Direction dir = in.staticVariables.myLocation.directionTo(in.staticVariables.opponent.getInitialLocation());
         Direction bestDir = dir;
 
-        if(!in.unitController.canSpawn(bestDir, UnitType.SOLDIER)) {
+        if(in.memoryManager.isLocationSafe(in.staticVariables.myLocation.add(bestDir)) && !in.unitController.canSpawn(bestDir, UnitType.SOLDIER)) {
             bestDir = dir.rotateLeft();
         }
 
-        if(!in.unitController.canSpawn(bestDir, UnitType.SOLDIER)) {
+        if(in.memoryManager.isLocationSafe(in.staticVariables.myLocation.add(bestDir)) && !in.unitController.canSpawn(bestDir, UnitType.SOLDIER)) {
             bestDir = dir.rotateRight();
         }
 
-        while(!in.unitController.canSpawn(bestDir, UnitType.SOLDIER)) {
-
+        while(in.memoryManager.isLocationSafe(in.staticVariables.myLocation.add(bestDir)) && !in.unitController.canSpawn(bestDir, UnitType.SOLDIER)) {
             if(dir.isEqual(bestDir)) return Direction.ZERO;
-
             bestDir = bestDir.rotateRight();
         }
 
