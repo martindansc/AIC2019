@@ -54,6 +54,7 @@ public class Archer {
         MicroInfo[] microInfo = new MicroInfo[9];
         for (int i = 0; i < 9; i++) {
             microInfo[i] = new MicroInfo(in.staticVariables.myLocation.add(in.staticVariables.dirs[i]));
+            microInfo[i].updateArea();
         }
 
         boolean enemies = false;
@@ -97,6 +98,14 @@ public class Archer {
         }
 
         void update(UnitInfo unit) {
+            int distance = unit.getLocation().distanceSquared(loc);
+            if (distance <= unit.getType().attackRangeSquared || (unit.getType() == UnitType.MAGE && distance < 14)) {
+                ++numEnemies;
+            }
+            if (distance < minDistToEnemy) minDistToEnemy = distance;
+        }
+
+        void updateArea() {
             if (!in.memoryManager.isLocationSafe(loc)) {
                 numEnemies += 100;
                 return;
@@ -105,15 +114,10 @@ public class Archer {
                 numEnemies += 100;
                 return;
             }
-            int distance = unit.getLocation().distanceSquared(loc);
-            if (distance <= unit.getType().attackRangeSquared || (unit.getType() == UnitType.MAGE && distance < 14)) {
-                ++numEnemies;
-            }
-            if (distance < minDistToEnemy) minDistToEnemy = distance;
         }
 
         boolean canAttack() {
-            return in.staticVariables.type.getAttackRangeSquared() >= minDistToEnemy;
+            return in.staticVariables.type.getAttackRangeSquared() >= minDistToEnemy && minDistToEnemy >= in.staticVariables.type.getMinAttackRangeSquared();
         }
 
         boolean isBetter(MicroInfo m) {
