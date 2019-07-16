@@ -58,7 +58,11 @@ public class Archer {
         }
 
         boolean enemies = false;
+        boolean allneutrals = true;
         for (UnitInfo enemy : in.staticVariables.allenemies) {
+            if (enemy.getTeam() == in.staticVariables.opponent) {
+                allneutrals = false;
+            }
             if (!in.unitController.isObstructed(enemy.getLocation(), in.staticVariables.myLocation)) {
                 enemies = true;
                 for (int i = 0; i < 9; i++) {
@@ -71,9 +75,16 @@ public class Archer {
 
         int bestIndex = -1;
 
-        for (int i = 8; i >= 0; i--) {
-            if (!in.unitController.canMove(in.staticVariables.dirs[i])) continue;
-            if (bestIndex < 0 || !microInfo[bestIndex].isBetter(microInfo[i])) bestIndex = i;
+        if (allneutrals) {
+            for (int i = 8; i >= 0; i--) {
+                if (!in.unitController.canMove(in.staticVariables.dirs[i])) continue;
+                if (bestIndex < 0 || !microInfo[bestIndex].isBetterNeutral(microInfo[i])) bestIndex = i;
+            }
+        } else {
+            for (int i = 8; i >= 0; i--) {
+                if (!in.unitController.canMove(in.staticVariables.dirs[i])) continue;
+                if (bestIndex < 0 || !microInfo[bestIndex].isBetter(microInfo[i])) bestIndex = i;
+            }
         }
 
         if (bestIndex != -1) {
@@ -121,6 +132,18 @@ public class Archer {
         }
 
         boolean isBetter(MicroInfo m) {
+            if (!in.memoryManager.isLocationSafe(m.loc)) return true;
+            if (numEnemies < m.numEnemies) return true;
+            if (numEnemies > m.numEnemies) return false;
+            if (canAttack()) {
+                if (!m.canAttack()) return true;
+                return minDistToEnemy >= m.minDistToEnemy;
+            }
+            if (m.canAttack()) return false;
+            return minDistToEnemy <= m.minDistToEnemy;
+        }
+
+        boolean isBetterNeutral(MicroInfo m) {
             if (!in.memoryManager.isLocationSafe(m.loc)) return true;
             if (numEnemies < m.numEnemies) return true;
             if (numEnemies > m.numEnemies) return false;
