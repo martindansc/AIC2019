@@ -41,10 +41,6 @@ public class Macro {
 
         TownInfo allyTown = null;
         int allyDistance = Integer.MAX_VALUE;
-        TownInfo neutralTown = null;
-        int neutralDistance = Integer.MAX_VALUE;
-        TownInfo enemyTown = null;
-        int enemyDistance = Integer.MAX_VALUE;
 
         for (TownInfo town : in.staticVariables.myTowns) {
             int maxLoyalty = town.getMaxLoyalty();
@@ -62,31 +58,41 @@ public class Macro {
             return allyTown.getLocation();
         }
 
-        for (TownInfo town : in.staticVariables.allenemytowns) {
-            Location townLoc = town.getLocation();
-            int currentDistance = in.staticVariables.myLocation.distanceSquared(townLoc);
-            if (town.getOwner() == in.staticVariables.opponent) {
-                if (currentDistance < enemyDistance) {
-                    enemyDistance = currentDistance;
-                    enemyTown = town;
+        return setTarget();
+    }
+
+    public Location setTarget() {
+        int bestScore = 10000;
+        Location bestTarget = null;
+        int closestStolen = 10000;
+        Location stolen = null;
+        for (TownInfo town: in.staticVariables.allenemytowns) {
+            Location loc = town.getLocation();
+            if (in.memoryManager.isTownExplored(loc)) {
+                int currentScore = in.memoryManager.getTownScore(loc);
+                if (currentScore < bestScore) {
+                    bestScore = currentScore;
+                    bestTarget = loc;
                 }
-            } else {
-                if (currentDistance < neutralDistance) {
-                    neutralDistance = currentDistance;
-                    neutralTown = town;
+            }
+
+            if (in.memoryManager.wasClaimed(loc)) {
+                int distance = loc.distanceSquared(in.staticVariables.allyBase);
+                if (closestStolen < distance) {
+                    closestStolen = distance;
+                    stolen = loc;
                 }
             }
         }
 
-        if (neutralTown != null && enemyTown != null) {
-            if (neutralDistance > enemyDistance) return enemyTown.getLocation();
-            return neutralTown.getLocation();
-        } else if (neutralTown != null) {
-            return neutralTown.getLocation();
-        } else if (enemyTown != null) {
-            return enemyTown.getLocation();
-        } else {
-            return in.staticVariables.enemyBase;
+        if (stolen != null) {
+            return stolen;
         }
+
+        if (bestTarget != null) {
+            return bestTarget;
+        }
+
+        return in.staticVariables.allyBase;
     }
 }

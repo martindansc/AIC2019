@@ -58,6 +58,10 @@ public class Base {
             return in.helper.intToUnitType(newMessage[1]);
         }
 
+        if (in.staticVariables.round == 1) {
+            return UnitType.EXPLORER;
+        }
+
         if (catapults < 1) {
             int[][] objectives = in.memoryManager.getObjectives(UnitType.CATAPULT);
             for (int[] objective: objectives) {

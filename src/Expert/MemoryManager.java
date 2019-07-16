@@ -331,4 +331,34 @@ public class MemoryManager {
         return enemies <= 0;
     }
 
+    public boolean isTownExplored(Location loc) {
+        int index = getIndexMap(loc.x, loc.y);
+        return in.unitController.read(index) > 0;
+    }
+
+    public void markTownAsExplored(Location loc) {
+        int index = getIndexMap(loc.x, loc.y);
+        in.unitController.write(index, 1);
+    }
+
+    public void setTownScore(Location loc, int score) {
+        int index = getIndexMap(loc.x, loc.y);
+        in.unitController.write(index + 1, score);
+    }
+
+    public int getTownScore(Location loc) {
+        int index = getIndexMap(loc.x, loc.y);
+        return in.unitController.read(index + 1);
+    }
+
+    public void setClaimed(Location loc) {
+        int index = getIndexMap(loc.x, loc.y);
+        in.unitController.write(index + 2, 1);
+    }
+
+    public boolean wasClaimed(Location loc) {
+        int index = getIndexMap(loc.x, loc.y);
+        return in.unitController.read(index + 2) > 0;
+    }
+
 }
