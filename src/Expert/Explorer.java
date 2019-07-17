@@ -153,6 +153,10 @@ public class Explorer {
             UnitType enemyType = unit.getType();
 
             //TODO check distances
+            int sightDistance = enemyType.getSightRangeSquared();
+            int attackDistance = enemyType.getAttackRangeSquared();
+            if (enemyType == UnitType.MAGE) attackDistance = 13; // Mages splash turns range from 5 to 13
+            if (enemyType == UnitType.BASE) attackDistance = 52; // 36 to 52 for Base
 
             if (enemyType == UnitType.SOLDIER) {
                 if (distance < 14) numEnemies++;
