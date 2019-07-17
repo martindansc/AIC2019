@@ -34,15 +34,18 @@ public class Constants {
     public int WORKERS_GET_CRYSTAL = 3;
     public int WORKERS_DEPOSIT_POSITION = 4;
     public int ENEMY_TOWER = 5;
-    public int WATER_OBJECTIVE = 6;
+    public int NEUTRAL_TOWER = 6;
+    public int WATER_OBJECTIVE = 7;
+    public int FORGET_OBJECTIVE_ROUNDS = 100;
 
     // UNITS
-    public int CATAPULTS_CONSIDER_COSE_DISTANCE = 300;
+    public int CATAPULTS_CONSIDER_CLOSE_DISTANCE = 300;
     public int WORKERS_CONSIDER_ClOSE_DISTANCE = 300;
     public float WORKERS_GATHER_ABSOLUTE = 60.f;
     public float WORKERS_GATHER_WOOD = 60.f;
     public float WORKERS_GATHER_IRON = 20.f;
     public float WORKERS_GATHER_MINERAL = 6.f;
+
 
 
 }

@@ -64,7 +64,7 @@ public class Attack {
         for (UnitInfo unit : enemies) {
             Location target = unit.getLocation();
             if (unit.getType() == UnitType.TOWER) {
-                in.map.markTower(target);
+                in.map.markTower(target, unit.getTeam() != in.staticVariables.opponent);
             }
             if (in.unitController.canAttack(target)) {
                 int health = unit.getHealth();

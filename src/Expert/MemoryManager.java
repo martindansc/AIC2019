@@ -111,6 +111,19 @@ public class MemoryManager {
                 num * in.constants.OBJECTIVE_SIZE;
     }
 
+    private void updateObjective(int id, int[] params) {
+        if(params[0] != 0) uc.write(id, params[0]);
+        if(params[1] != 0) uc.write(id + 1, params[1]);
+        if(params[2] != 0) uc.write(id + 2, params[2]);
+        if(params[3] != 0) uc.write(id + 3, params[3]);
+        if(params[4] != 0) uc.write(id + 4, params[4]);
+
+        if(params[9] != 0) uc.write(id + 9, params[9]);
+        if(params[10] != 0) uc.write(id + 10, params[10]);
+        if(params[11] != 0) uc.write(id + 11, params[11]);
+        if(params[12] != 0) uc.write(id + 12, params[12]);
+    }
+
     private void insertObjective(int id, int[] params) {
         uc.write(id, params[0]);
         uc.write(id + 1, params[1]);
@@ -126,6 +139,8 @@ public class MemoryManager {
 
         uc.write(id + 9, params[9]);
         uc.write(id + 10, params[10]);
+        uc.write(id + 11, params[11]);
+        uc.write(id + 12, params[12]);
     }
 
     public int[] addObjective(UnitType unitType, int[] params) {
@@ -195,6 +210,8 @@ public class MemoryManager {
 
             // value
             objective[11] = uc.read(id + 11);
+
+            objective[12] = uc.read(id + 12);
 
         }
 
@@ -277,7 +294,17 @@ public class MemoryManager {
         this.increaseValueByOne(idObjective + 6);
     }
 
+    public void updateRoundAction(int idObjective) {
+        uc.write(idObjective + 12, in.staticVariables.round);
+    }
+
     // MAP FUNCTIONS
+
+    public void clearUnitMap(Location loc) {
+        int index = getIndexMap(loc);
+        in.unitController.write(index, 0);
+    }
+
     public void saveUnitToMap(Location loc, UnitType unit) {
         int index = getIndexMap(loc);
         in.unitController.write(index, in.helper.unitTypeToInt(unit));

@@ -23,7 +23,8 @@ public class Catapult {
     public boolean tryAttack() {
         int myAttack = in.attack.getMyAttack();
 
-        if (counter == 1 && in.memoryManager.getObjectiveType(in.memoryManager.getObjectiveIdInLocation(objectiveLocation)) == 6) {
+        if (counter == 1 && in.memoryManager.getObjectiveType(in.memoryManager.getObjectiveIdInLocation(objectiveLocation))
+                == in.constants.WATER_OBJECTIVE) {
             counter = 0;
             delay = 0;
             in.memoryManager.removeObjective(in.memoryManager.getObjectiveIdInLocation(objectiveLocation));
@@ -66,7 +67,7 @@ public class Catapult {
         }
 
         if (!doMicro()) {
-            Direction dir = in.pathfinder.getNextLocationTarget(target);
+            Direction dir = in.pathfinder.getNextLocationTarget(target, in.memoryManager::isLocationSafe);
             if (dir != null && in.unitController.canMove(dir)) {
                 if (in.memoryManager.isLocationSafe(in.staticVariables.myLocation.add(dir))) {
                     in.unitController.move(dir);
@@ -174,6 +175,9 @@ public class Catapult {
         int[][] objectives = in.memoryManager.getObjectives();
 
         for (int[] objective: objectives) {
+
+            if(objective[0] == 0) continue;
+
             Location newObjectiveLocation = in.objectives.getLocationObjective(objective);
             int distance = in.staticVariables.myLocation.distanceSquared(newObjectiveLocation);
 
@@ -184,7 +188,7 @@ public class Catapult {
             }
 
             if(!in.objectives.isFull(objective) || in.objectives.getLastClaimedId(objective) == in.staticVariables.myId){
-                // for now, as heuristic we are going to get the distance to the resource
+                // for now, as heuristic we are going to get the distance to the objective
                 if(distance < closestObjective) {
                     closestObjective = distance;
                     bestLocation = newObjectiveLocation;
@@ -197,8 +201,8 @@ public class Catapult {
                 }
             }
 
-            if(distance < in.constants.CATAPULTS_CONSIDER_COSE_DISTANCE ||
-                    in.staticVariables.myLocation.distanceSquared(newObjectiveLocation) < in.constants.CATAPULTS_CONSIDER_COSE_DISTANCE) {
+            if(distance < in.constants.CATAPULTS_CONSIDER_CLOSE_DISTANCE ||
+                    in.staticVariables.myLocation.distanceSquared(newObjectiveLocation) < in.constants.CATAPULTS_CONSIDER_CLOSE_DISTANCE) {
                 in.objectives.claimObjective(newObjectiveLocation);
             }
         }
@@ -211,7 +215,7 @@ public class Catapult {
 
         // just to do something in case we have nothing to do but there is still an objective...
         // we won't claim it thought
-        if(objectiveLocation == null){
+        if(objectiveLocation == null && bestOccupedLocation != null){
             if (!bestOccupedLocation.isEqual(new Location(0,0))) {
                 if (isTower(bestOccupedLocation)) isTower = true;
             }
@@ -227,7 +231,8 @@ public class Catapult {
     }
 
     public boolean isTower(Location loc) {
-        return in.memoryManager.getObjectiveType(in.memoryManager.getObjectiveIdInLocation(loc)) == in.constants.ENEMY_TOWER;
+        int type = in.memoryManager.getObjectiveType(in.memoryManager.getObjectiveIdInLocation(loc));
+        return type == in.constants.ENEMY_TOWER || type == in.constants.NEUTRAL_TOWER;
     }
 
 }

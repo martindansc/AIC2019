@@ -65,10 +65,12 @@ public class Base {
         if (catapults < 1) {
             int[][] objectives = in.memoryManager.getObjectives(UnitType.CATAPULT);
             for (int[] objective: objectives) {
-                if(!in.objectives.isFull(objective) &&
-                        (in.staticVariables.round - in.objectives.getRound(objective) > 5 ||
-                        catapults < 1)) {
-                    return UnitType.CATAPULT;
+                if(objective[0] != in.constants.WATER_OBJECTIVE) {
+                    if(!in.objectives.isFull(objective) &&
+                            (in.staticVariables.round - in.objectives.getRound(objective) > 5 ||
+                                    catapults < 1)) {
+                        return UnitType.CATAPULT;
+                    }
                 }
             }
         }
