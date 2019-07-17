@@ -93,7 +93,10 @@ public class Catapult {
 
         for (UnitInfo enemy : in.staticVariables.allenemies) {
             if (enemy.getType() == UnitType.TOWER) {
-                in.map.markTower(enemy.getLocation());
+                int type = enemy.getTeam() != in.staticVariables.opponent ?
+                        in.constants.NEUTRAL_TOWER : in.constants.ENEMY_TOWER;
+                int[] objectives = in.objectives.createCatapultObjective(enemy.getLocation(), type);
+                in.memoryManager.addObjective(UnitType.BASE, objectives);
             }
             for (int i = 0; i < 9; i++) {
                 microInfo[i].update(enemy);
