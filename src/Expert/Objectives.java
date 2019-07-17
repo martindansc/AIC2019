@@ -1,6 +1,7 @@
 package Expert;
 
 import aic2019.Location;
+import aic2019.UnitType;
 
 public class Objectives {
     private final Injection in;
@@ -52,6 +53,9 @@ public class Objectives {
     public int getRound(int[] objective) {
         return objective[9];
     }
+    public int getUpdatedRound(int[] objective) {
+        return objective[12];
+    }
 
     public int getLastClaimedId(int[] objective) {
         return objective[10];
@@ -60,8 +64,8 @@ public class Objectives {
     private void addCommonVariables(int[] objective) {
         objective[9] = in.staticVariables.round;
         objective[10] = in.staticVariables.myId;
+        objective[12] = in.staticVariables.round;
     }
-
 
     // CREATE FUNCTIONS
 
@@ -71,26 +75,18 @@ public class Objectives {
         newObjective[1] = 1;
         this.setLocationObjective(newObjective, loc);
         this.addCommonVariables(newObjective);
+        newObjective[11] = loc.distanceSquared(in.staticVariables.allyBase);
 
         return newObjective;
     }
 
-    public int[] createTowerObjective(Location loc) {
+    public int[] createCatapultObjective(Location loc, int type) {
         int[] newObjective = new int[in.constants.OBJECTIVE_SIZE];
-        newObjective[0] = in.constants.ENEMY_TOWER;
+        newObjective[0] = type;
         newObjective[1] = 1;
         this.setLocationObjective(newObjective, loc);
         this.addCommonVariables(newObjective);
-
-        return newObjective;
-    }
-
-    public int[] createWaterObjective(Location loc) {
-        int[] newObjective = new int[in.constants.OBJECTIVE_SIZE];
-        newObjective[0] = in.constants.WATER_OBJECTIVE;
-        newObjective[1] = 1;
-        this.setLocationObjective(newObjective, loc);
-        this.addCommonVariables(newObjective);
+        newObjective[11] = type == in.constants.NEUTRAL_TOWER ? 10 : 1;
 
         return newObjective;
     }

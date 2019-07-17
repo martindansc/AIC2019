@@ -66,14 +66,17 @@ public class Soldier {
             }
             Location enemyLoc = enemy.getLocation();
             boolean isWaterObs = in.helper.isObstructedWater(enemyLoc, in.staticVariables.myLocation);
-            if (isWaterObs) {
-                int[] objective;
-                if (enemy.getType() == UnitType.TOWER) {
-                    objective = in.objectives.createTowerObjective(enemyLoc);
-                } else {
-                    objective = in.objectives.createWaterObjective(enemyLoc);
+            if (in.staticVariables.allenemies.length > 8) {
+                if (isWaterObs) {
+                    int[] objective;
+                    if (enemy.getType() == UnitType.TOWER) {
+                        int type = enemy.getTeam() != in.staticVariables.opponent ? in.constants.NEUTRAL_TOWER : in.constants.ENEMY_TOWER;
+                        objective = in.objectives.createCatapultObjective(enemyLoc, type);
+                    } else {
+                        objective = in.objectives.createCatapultObjective(enemyLoc, in.constants.WATER_OBJECTIVE);
+                    }
+                    in.memoryManager.addObjective(UnitType.CATAPULT, objective);
                 }
-                in.memoryManager.addObjective(UnitType.CATAPULT, objective);
             }
             if (!in.unitController.isObstructed(enemyLoc, in.staticVariables.myLocation) && !isWaterObs) {
                 enemies = true;
