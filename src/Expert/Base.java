@@ -1,9 +1,6 @@
 package Expert;
 
-import aic2019.Direction;
-import aic2019.Location;
-import aic2019.UnitInfo;
-import aic2019.UnitType;
+import aic2019.*;
 
 public class Base {
 
@@ -52,6 +49,7 @@ public class Base {
         int catapults = in.memoryManager.readValue(in.constants.ID_ALLIES_CATAPULT_COUNTER);
         int mages = in.memoryManager.readValue(in.constants.ID_ALLIES_MAGE_COUNTER);
         int workers = in.memoryManager.readValue(in.constants.ID_ALLIES_WORKERS_COUNTER);
+        int explorers = in.memoryManager.readValue(in.constants.ID_ALLIES_EXPLORERS_COUNTER);
 
         if(in.messages.hasMessage()) {
             int[] newMessage = in.messages.readMessage();
@@ -121,6 +119,22 @@ public class Base {
         return -1;
     }
 
+    private boolean isSafeAttack(Location loc) {
+        for (int i = -1; i < 2; i++) {
+            for (int j = -1; j < 2; j++) {
+                Location myLoc = new Location(loc.x + i, loc.y + j);
+                if (in.unitController.canSenseLocation(myLoc)) {
+                    UnitInfo unit = in.unitController.senseUnit(myLoc);
+                    if (unit == null) continue;
+                    if (unit.getTeam() == in.staticVariables.allies) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
     private boolean tryAttack() {
         if (!in.unitController.canAttack()) return false;
 
@@ -157,7 +171,10 @@ public class Base {
 
         if (outerUnit != null) {
             Location outerLoc = outerUnit.getLocation();
-            in.unitController.attack(outerLoc.add(outerLoc.directionTo(in.staticVariables.myLocation)));
+            Location target = outerLoc.add(outerLoc.directionTo(in.staticVariables.myLocation));
+            if (isSafeAttack(target)) {
+                in.unitController.attack(target);
+            }
             return true;
         }
 
@@ -166,7 +183,7 @@ public class Base {
         if (innerUnit != null) {
             Location innerLoc = innerUnit.getLocation();
             Location target = innerLoc.add(in.staticVariables.myLocation.directionTo(innerLoc));
-            if (in.unitController.canAttack(target)) {
+            if (in.unitController.canAttack(target) && isSafeAttack(target)) {
                 in.unitController.attack(target);
             }
             return true;

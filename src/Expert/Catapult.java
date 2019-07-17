@@ -56,12 +56,14 @@ public class Catapult {
     }
 
     public void tryMove(Location target) {
+        if (!in.unitController.canMove()) return;
         if(target != null) {
             if (tooClose(target)) {
-                in.memoryManager.removeObjective(in.memoryManager.getObjectiveIdInLocation(objectiveLocation));
-                objectiveLocation = null;
+                if (in.unitController.canMove(in.staticVariables.myLocation.directionTo(target).opposite())) {
+                    in.unitController.move(in.staticVariables.myLocation.directionTo(target).opposite());
+                    return;
+                }
             }
-            if (!in.unitController.canMove()) return;
             if (catapultInRange(target)) return;
         }
 
@@ -91,6 +93,9 @@ public class Catapult {
         }
 
         for (UnitInfo enemy : in.staticVariables.allenemies) {
+            if (enemy.getType() == UnitType.TOWER) {
+                in.map.markTower(enemy.getLocation());
+            }
             for (int i = 0; i < 9; i++) {
                 microInfo[i].update(enemy);
             }
@@ -177,7 +182,8 @@ public class Catapult {
             Location newObjectiveLocation = in.objectives.getLocationObjective(objective);
             int distance = in.staticVariables.myLocation.distanceSquared(newObjectiveLocation);
 
-            if(in.unitController.canAttack(newObjectiveLocation) && !in.unitController.canAttack(objectiveLocation)) {
+            if(in.staticVariables.type.getAttackRangeSquared() >= in.staticVariables.myLocation.distanceSquared(newObjectiveLocation) &&
+                    !in.unitController.canAttack(objectiveLocation)) {
                 if (isTower(newObjectiveLocation)) isTower = true;
                 this.fixObjectiveLocation(newObjectiveLocation);
                 claimObjective = true;

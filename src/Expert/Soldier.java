@@ -23,6 +23,7 @@ public class Soldier {
         }
         in.attack.genericTryAttack();
         in.attack.genericTryAttackTown(target);
+        in.helper.updateScores();
     }
 
     public boolean tryMove(Location target) {
@@ -156,7 +157,6 @@ public class Soldier {
 
         boolean isBetterNeutral(MicroInfo m) {
             if (!in.memoryManager.isLocationSafe(m.loc)) return true;
-            if (in.staticVariables.allyUnits.length < 3 * numEnemies) return false;
             if (!in.unitController.canAttack()) return minDistToEnemy >= m.minDistToEnemy;
             if (canAttack()) {
                 if (!m.canAttack()) return true;

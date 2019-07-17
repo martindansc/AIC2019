@@ -52,6 +52,8 @@ public class Helper {
             in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_MAGE_COUNTER);
         } else if (ut == UnitType.WORKER) {
             in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_WORKERS_COUNTER);
+        } else if (ut == UnitType.EXPLORER) {
+            in.memoryManager.increaseValueByOne(in.constants.ID_ALLIES_EXPLORERS_COUNTER);
         }
     }
 
@@ -121,6 +123,18 @@ public class Helper {
         }
 
         return new Location(in.staticVariables.allyBase.x + x, in.staticVariables.allyBase.y + y);
+    }
+
+    public void updateScores() {
+        for (TownInfo town: in.staticVariables.allenemytowns) {
+            Location loc = town.getLocation();
+            int distance = in.staticVariables.myLocation.distanceSquared(loc);
+            if (distance < 17) {
+                int score = in.explorer.calculateScore(loc);
+                in.memoryManager.setTownScore(loc, score);
+                in.memoryManager.markTownAsExplored(loc);
+            }
+        }
     }
 
 }

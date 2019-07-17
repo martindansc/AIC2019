@@ -23,6 +23,7 @@ public class Archer {
         }
         in.attack.genericTryAttack();
         in.attack.genericTryAttackTown(target);
+        in.helper.updateScores();
     }
 
     public boolean tryMove(Location target) {
@@ -145,8 +146,10 @@ public class Archer {
 
         boolean isBetterNeutral(MicroInfo m) {
             if (!in.memoryManager.isLocationSafe(m.loc)) return true;
-            if (numEnemies < m.numEnemies) return true;
-            if (numEnemies > m.numEnemies) return false;
+            if (numEnemies != 0 || m.numEnemies * 10 >= in.staticVariables.allyUnits.length) {
+                if (numEnemies < m.numEnemies) return true;
+                if (numEnemies > m.numEnemies) return false;
+            }
             if (canAttack()) {
                 if (!m.canAttack()) return true;
                 return minDistToEnemy >= m.minDistToEnemy;

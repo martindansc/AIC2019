@@ -353,12 +353,22 @@ public class MemoryManager {
 
     public void setClaimed(Location loc) {
         int index = getIndexMap(loc.x, loc.y);
-        in.unitController.write(index + 2, 1);
+        in.unitController.write(index + 2, in.constants.CLAIMED_TOWN);
     }
 
-    public boolean wasClaimed(Location loc) {
+    public void setStolen(Location loc) {
         int index = getIndexMap(loc.x, loc.y);
-        return in.unitController.read(index + 2) > 0;
+        in.unitController.write(index + 2, in.constants.STOLEN_TOWN);
+    }
+
+    public void setClaimedEnemy(Location loc) {
+        int index = getIndexMap(loc.x, loc.y);
+        in.unitController.write(index + 2, in.constants.ENEMY_TOWN);
+    }
+
+    public int getTownStatus(Location loc) {
+        int index = getIndexMap(loc.x, loc.y);
+        return in.unitController.read(index + 2);
     }
 
 }

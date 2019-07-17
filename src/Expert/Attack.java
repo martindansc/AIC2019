@@ -112,10 +112,11 @@ public class Attack {
     }
 
     public void genericTryAttackTown(Location town) {
-        if (in.staticVariables.allyBase.isEqual(town)) return;
-        if (in.unitController.canAttack(town) && in.unitController.senseTown(town).getOwner() != in.staticVariables.allies) {
-            in.unitController.attack(town);
-            return;
+        if (!in.staticVariables.allyBase.isEqual(town)) {
+            if (in.unitController.canAttack(town) && in.unitController.senseTown(town).getOwner() != in.staticVariables.allies) {
+                in.unitController.attack(town);
+                return;
+            }
         }
         for (TownInfo enemyTown: in.staticVariables.allenemytowns) {
             Location townLoc = enemyTown.getLocation();

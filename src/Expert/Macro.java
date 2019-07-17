@@ -11,19 +11,13 @@ public class Macro {
     }
 
     public Location getTarget() {
-        boolean units = in.memoryManager.readValue(in.constants.ID_ALLIES_SOLDIER_COUNTER) + in.memoryManager.readValue(in.constants.ID_ALLIES_ARCHER_COUNTER) + in.memoryManager.readValue(in.constants.ID_ALLIES_KNIGHT_COUNTER) + in.memoryManager.readValue(in.constants.ID_ALLIES_MAGE_COUNTER) < 10;
-        boolean condition = in.staticVariables.round < 100;
-        if (units && condition) {
-            return in.staticVariables.allyBase;
-        }
-
         int enemyTowns = 0;
         for (TownInfo town: in.staticVariables.allenemytowns) {
             if (town.getOwner() == in.staticVariables.opponent) {
                 enemyTowns++;
             }
         }
-        if (in.staticVariables.myTowns.length > enemyTowns && in.staticVariables.allies.getVictoryPoints() > in.staticVariables.opponent.getVictoryPoints()) {
+        if (in.staticVariables.myTowns.length > enemyTowns && in.staticVariables.allies.getVictoryPoints() >= in.staticVariables.opponent.getVictoryPoints()) {
             TownInfo defendTown = null;
             int defendDistance = Integer.MAX_VALUE;
             for (TownInfo town: in.staticVariables.myTowns) {
@@ -76,7 +70,7 @@ public class Macro {
                 }
             }
 
-            if (in.memoryManager.wasClaimed(loc)) {
+            if (in.memoryManager.getTownStatus(loc) == in.constants.STOLEN_TOWN) {
                 int distance = loc.distanceSquared(in.staticVariables.allyBase);
                 if (closestStolen < distance) {
                     closestStolen = distance;
@@ -90,7 +84,13 @@ public class Macro {
         }
 
         if (bestTarget != null) {
-            return bestTarget;
+            int knights = in.memoryManager.readValue(in.constants.ID_ALLIES_KNIGHT_COUNTER);
+            int soldiers = in.memoryManager.readValue(in.constants.ID_ALLIES_SOLDIER_COUNTER);
+            int archers = in.memoryManager.readValue(in.constants.ID_ALLIES_ARCHER_COUNTER);
+            int mages = in.memoryManager.readValue(in.constants.ID_ALLIES_MAGE_COUNTER);
+            if (knights + soldiers + archers + mages > 2 * bestScore) {
+                return bestTarget;
+            }
         }
 
         return in.staticVariables.allyBase;

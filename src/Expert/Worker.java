@@ -340,6 +340,9 @@ public class Worker {
 
         boolean noworkers = false;
         for (UnitInfo enemy : in.staticVariables.allenemies) {
+            if (enemy.getType() == UnitType.TOWER) {
+                in.map.markTower(enemy.getLocation());
+            }
             if (!in.unitController.isObstructed(enemy.getLocation(), in.staticVariables.myLocation)) {
                 if (enemy.getType() != UnitType.WORKER) {
                     noworkers = true;

@@ -36,26 +36,39 @@ public class Explorer {
                         closestUnexplored = distance;
                         target = loc;
                     }
+                } else if (in.staticVariables.myLocation.distanceSquared(loc) < 37) {
+                    in.memoryManager.setTownScore(loc, calculateScore(loc));
+                }
+                if (town.getOwner() == in.staticVariables.opponent) {
+                    if (in.memoryManager.getTownStatus(loc) == in.constants.CLAIMED_TOWN) {
+                        in.memoryManager.setStolen(loc);
+                        in.memoryManager.setTownScore(loc, 5);
+                    } else {
+                        in.memoryManager.setClaimedEnemy(loc);
+                        in.memoryManager.setTownScore(loc, 5);
+                    }
                 }
             } else {
                 in.memoryManager.setClaimed(loc);
+                in.memoryManager.setTownScore(loc, 0);
             }
         }
 
         if (target != null) {
-            if (in.unitController.canSenseLocation(target)) {
-                boolean tower = false;
-                for (UnitInfo enemy: in.staticVariables.allenemies) {
-                    if (enemy.getType() == UnitType.TOWER) {
+
+            boolean tower = false;
+            for (UnitInfo enemy: in.staticVariables.allenemies) {
+                if (enemy.getType() == UnitType.TOWER) {
+                    if (in.staticVariables.myLocation.distanceSquared(enemy.getLocation()) < 26) {
                         tower = true;
                         break;
                     }
                 }
-                if (microResult || closestUnexplored < 26 || tower) {
-                    in.memoryManager.markTownAsExplored(target);
-                    int score = calculateScore(target);
-                    in.memoryManager.setTownScore(target, score);
-                }
+            }
+            if ((microResult && in.staticVariables.myLocation.distanceSquared(target) < 65) || closestUnexplored < 26 || tower) {
+                in.memoryManager.markTownAsExplored(target);
+                int score = calculateScore(target);
+                in.memoryManager.setTownScore(target, score);
             }
 
             return target;
@@ -105,16 +118,37 @@ public class Explorer {
         MicroInfo[] microInfo = new MicroInfo[9];
         for (int i = 0; i < 9; i++) {
             microInfo[i] = new MicroInfo(in.staticVariables.myLocation.add(in.staticVariables.dirs[i]));
-            microInfo[i].updateArea();
         }
 
         boolean enemies = false;
-        for (UnitInfo enemy : in.staticVariables.allenemies) {
-            for (int i = 0; i < 9; i++) {
-                microInfo[i].update(enemy);
-                if (microInfo[i].numEnemies != 0) {
-                    enemies = true;
+        for (int i = 0; i < 9; i++) {
+            microInfo[i].updateArea();
+            int length = Math.min(11, in.staticVariables.allenemies.length);
+            for (int j = 0; j < length; j++) {
+                UnitInfo enemy = in.staticVariables.allenemies[j];
+                UnitType enemyType = enemy.getType();
+                Team unitTeam = enemy.getTeam();
+                int distance = microInfo[i].loc.distanceSquared(enemy.getLocation());
+
+                if (unitTeam == in.staticVariables.opponent) {
+                    microInfo[i].updateSafe(distance, enemyType);
+                } else {
+                    int health = enemy.getHealth();
+                    int maxHealth = enemyType.maxHealth;
+                    if (health < maxHealth) {
+                        microInfo[i].updateSafe(distance, enemyType);
+                    } else {
+                        microInfo[i].updateGreedy(distance, enemyType);
+                    }
                 }
+
+                if (enemyType == UnitType.TOWER) {
+                    if (distance < enemyType.getAttackRangeSquared()) microInfo[i].numEnemies++;
+                }
+            }
+
+            if (microInfo[i].numEnemies != 0) {
+                enemies = true;
             }
         }
 
@@ -148,37 +182,33 @@ public class Explorer {
             minDistToEnemy = 100000;
         }
 
-        void update(UnitInfo unit) {
-            int distance = unit.getLocation().distanceSquared(loc);
-            UnitType enemyType = unit.getType();
+        void updateSafe(int distance, UnitType enemyType) {
+            if (enemyType == UnitType.SOLDIER) {
+                if (distance < 14) numEnemies++;
+            } else if (enemyType == UnitType.ARCHER) {
+                if (distance < 33) numEnemies++;
+            } else if (enemyType == UnitType.KNIGHT) {
+                if (distance < 9) numEnemies++;
+            } else if (enemyType == UnitType.MAGE) {
+                if (distance < 26) numEnemies++;
+            } else if (enemyType == UnitType.EXPLORER) {
+                if (distance < 14) numEnemies++;
+            }
 
-            //TODO check distances
-            int sightDistance = enemyType.getSightRangeSquared();
-            int attackDistance = enemyType.getAttackRangeSquared();
-            if (enemyType == UnitType.MAGE) attackDistance = 13; // Mages splash turns range from 5 to 13
-            if (enemyType == UnitType.BASE) attackDistance = 52; // 36 to 52 for Base
+            if (distance < minDistToEnemy) minDistToEnemy = distance;
+        }
 
-//            if (enemyType == UnitType.SOLDIER) {
-//                if (distance < 14) numEnemies++;
-//            } else if (enemyType == UnitType.ARCHER) {
-//                if (distance < 33) numEnemies++;
-//            } else if (enemyType == UnitType.KNIGHT) {
-//                if (distance < 9) numEnemies++;
-//            } else if (enemyType == UnitType.MAGE) {
-//                if (distance < 26) numEnemies++;
-//            }
-
-            if (distance <= sightDistance) numEnemies++;
-            if (distance <= attackDistance) numEnemies++; //TODO modify values to add
+        void updateGreedy(int distance, UnitType enemyType) {
+            if (enemyType == UnitType.SOLDIER || enemyType == UnitType.ARCHER || enemyType == UnitType.KNIGHT || enemyType == UnitType.EXPLORER) {
+                if (distance <= enemyType.getAttackRangeSquared()) numEnemies++;
+            } else if (enemyType == UnitType.MAGE) {
+                if (distance < 14) numEnemies++;
+            }
 
             if (distance < minDistToEnemy) minDistToEnemy = distance;
         }
 
         void updateArea() {
-            if (!in.memoryManager.isLocationSafe(loc)) {
-                numEnemies += 100;
-                return;
-            }
             if (in.unitController.senseImpact(loc) != 0) {
                 numEnemies += 100;
                 return;

@@ -10,6 +10,7 @@ public class Constants {
     public int ID_ALLIES_CATAPULT_COUNTER = 29;
     public int ID_ALLIES_MAGE_COUNTER = 36;
     public int ID_ALLIES_WORKERS_COUNTER = 43;
+    public int ID_ALLIES_EXPLORERS_COUNTER = 50;
     public int ID_MESSAGING_BOX = 100; // 40000 positions
     public int ID_OBJECTIVES = 50000; // 3000 positions: 10 unit types * 20 objectives * 15
     public int ID_LOCATION_OBJECTIVES = 60000; // 10000 positions
@@ -27,6 +28,11 @@ public class Constants {
     public int HEU_KNIGHT = 80;
     public int HEU_ARCHER = 80;
     public int HEU_MAGE = 30;
+
+    // TOWN CONSTANTS
+    public int CLAIMED_TOWN = 1;
+    public int STOLEN_TOWN = 2;
+    public int ENEMY_TOWN = 3;
 
     // OBJECTIVE CONSTANTS
     public int WORKERS_GET_WOOD = 1;
