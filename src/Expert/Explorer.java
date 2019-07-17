@@ -158,15 +158,18 @@ public class Explorer {
             if (enemyType == UnitType.MAGE) attackDistance = 13; // Mages splash turns range from 5 to 13
             if (enemyType == UnitType.BASE) attackDistance = 52; // 36 to 52 for Base
 
-            if (enemyType == UnitType.SOLDIER) {
-                if (distance < 14) numEnemies++;
-            } else if (enemyType == UnitType.ARCHER) {
-                if (distance < 33) numEnemies++;
-            } else if (enemyType == UnitType.KNIGHT) {
-                if (distance < 9) numEnemies++;
-            } else if (enemyType == UnitType.MAGE) {
-                if (distance < 26) numEnemies++;
-            }
+//            if (enemyType == UnitType.SOLDIER) {
+//                if (distance < 14) numEnemies++;
+//            } else if (enemyType == UnitType.ARCHER) {
+//                if (distance < 33) numEnemies++;
+//            } else if (enemyType == UnitType.KNIGHT) {
+//                if (distance < 9) numEnemies++;
+//            } else if (enemyType == UnitType.MAGE) {
+//                if (distance < 26) numEnemies++;
+//            }
+
+            if (distance <= sightDistance) numEnemies++;
+            if (distance <= attackDistance) numEnemies++; //TODO modify values to add
 
             if (distance < minDistToEnemy) minDistToEnemy = distance;
         }
