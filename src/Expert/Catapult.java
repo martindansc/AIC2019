@@ -5,7 +5,6 @@ import aic2019.*;
 public class Catapult {
     private Injection in;
     private int counter = 0;
-    private int delay = 0;
     private Location objectiveLocation;
     private boolean claimObjective = false;
     private boolean isTower;
@@ -26,20 +25,8 @@ public class Catapult {
         if (counter == 1 && in.memoryManager.getObjectiveType(in.memoryManager.getObjectiveIdInLocation(objectiveLocation))
                 == in.constants.WATER_OBJECTIVE) {
             counter = 0;
-            delay = 0;
             in.memoryManager.removeObjective(in.memoryManager.getObjectiveIdInLocation(objectiveLocation));
             objectiveLocation = null;
-        }
-
-        if (counter == 2) {
-            delay++;
-            if (delay == 5) {
-                counter = 0;
-                delay = 0;
-                in.memoryManager.removeObjective(in.memoryManager.getObjectiveIdInLocation(objectiveLocation));
-                if (isTower) in.map.unmarkTower(objectiveLocation);
-                objectiveLocation = null;
-            }
         }
 
         if (!in.unitController.canAttack()) return false;
@@ -50,6 +37,17 @@ public class Catapult {
             in.unitController.attack(objectiveLocation);
             if (counter < 2) {
                 counter++;
+
+                if(counter == 2) {
+                    counter = 0;
+                    in.memoryManager.removeObjective(in.memoryManager.getObjectiveIdInLocation(objectiveLocation));
+                    if (isTower) {
+                        int newObjective[] = in.objectives.createCatapultObjective(objectiveLocation,
+                                in.constants.DESTROYED_TOWER);
+                        in.memoryManager.addObjective(UnitType.BASE, newObjective);
+                    }
+                    objectiveLocation = null;
+                }
             }
             return true;
         }
