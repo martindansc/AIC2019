@@ -217,6 +217,8 @@ public class Explorer {
 
         boolean isBetter(MicroInfo m) {
             if (!in.memoryManager.isLocationSafe(m.loc)) return true;
+            if (numEnemies >= 100) return false;
+            if (m.numEnemies >= 100) return true;
             if (numEnemies < m.numEnemies) return true;
             if (numEnemies > m.numEnemies) return false;
             return minDistToEnemy >= m.minDistToEnemy;
