@@ -54,6 +54,7 @@ public class Knight {
         MicroInfo[] microInfo = new MicroInfo[9];
         for (int i = 0; i < 9; i++) {
             microInfo[i] = new MicroInfo(in.staticVariables.myLocation.add(in.staticVariables.dirs[i]));
+            microInfo[i].updateArea();
         }
 
         boolean enemies = false;
@@ -98,6 +99,14 @@ public class Knight {
         }
 
         void update(UnitInfo unit) {
+            int distance = unit.getLocation().distanceSquared(loc);
+            if (distance <= unit.getType().attackRangeSquared || (unit.getType() == UnitType.MAGE && distance < 14)) {
+                ++numEnemies;
+            }
+            if (distance < minDistToEnemy) minDistToEnemy = distance;
+        }
+
+        void updateArea() {
             if (!in.memoryManager.isLocationSafe(loc)) {
                 numEnemies += 100;
                 return;
@@ -106,11 +115,6 @@ public class Knight {
                 numEnemies += 100;
                 return;
             }
-            int distance = unit.getLocation().distanceSquared(loc);
-            if (distance <= unit.getType().attackRangeSquared || (unit.getType() == UnitType.MAGE && distance < 14)) {
-                ++numEnemies;
-            }
-            if (distance < minDistToEnemy) minDistToEnemy = distance;
         }
 
         boolean canAttack() {
@@ -119,6 +123,8 @@ public class Knight {
 
         boolean isBetter(MicroInfo m) {
             if (!in.memoryManager.isLocationSafe(m.loc)) return true;
+            if (numEnemies >= 100) return false;
+            if (m.numEnemies >= 100) return true;
             if (2 * in.staticVariables.allyUnits.length < numEnemies) return false;
             if (canAttack()) {
                 if (!m.canAttack()) return true;

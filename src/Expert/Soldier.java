@@ -148,6 +148,8 @@ public class Soldier {
 
         boolean isBetter(MicroInfo m) {
             if (!in.memoryManager.isLocationSafe(m.loc)) return true;
+            if (numEnemies >= 100) return false;
+            if (m.numEnemies >= 100) return true;
             if (canAttack()) {
                 if (!m.canAttack()) return true;
                 if (numEnemies < m.numEnemies) return true;
@@ -160,6 +162,8 @@ public class Soldier {
 
         boolean isBetterNeutral(MicroInfo m) {
             if (!in.memoryManager.isLocationSafe(m.loc)) return true;
+            if (numEnemies >= 100) return false;
+            if (m.numEnemies >= 100) return true;
             if (!in.unitController.canAttack()) return minDistToEnemy >= m.minDistToEnemy;
             if (canAttack()) {
                 if (!m.canAttack()) return true;

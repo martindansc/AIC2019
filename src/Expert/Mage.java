@@ -121,6 +121,7 @@ public class Mage {
         MicroInfo[] microInfo = new MicroInfo[9];
         for (int i = 0; i < 9; i++) {
             microInfo[i] = new MicroInfo(in.staticVariables.myLocation.add(in.staticVariables.dirs[i]));
+            microInfo[i].updateArea();
         }
 
         for (int j = 0; j < in.staticVariables.allenemies.length; j++) {
@@ -163,6 +164,13 @@ public class Mage {
         }
 
         void update(UnitInfo unit) {
+            int distance = unit.getLocation().distanceSquared(loc);
+            if (distance <= unit.getType().attackRangeSquared) ++numEnemies;
+            if (distance < minDistToEnemy) minDistToEnemy = distance;
+
+        }
+
+        void updateArea() {
             if (!in.memoryManager.isLocationSafe(loc)) {
                 numEnemies += 100;
                 return;
@@ -171,10 +179,6 @@ public class Mage {
                 numEnemies += 100;
                 return;
             }
-            int distance = unit.getLocation().distanceSquared(loc);
-            if (distance <= unit.getType().attackRangeSquared) ++numEnemies;
-            if (distance < minDistToEnemy) minDistToEnemy = distance;
-
         }
 
         boolean canAttack() {
@@ -183,6 +187,8 @@ public class Mage {
 
         boolean isBetter(MicroInfo m) {
             if (!in.memoryManager.isLocationSafe(m.loc)) return true;
+            if (numEnemies >= 100) return false;
+            if (m.numEnemies >= 100) return true;
             if (numEnemies < m.numEnemies) return true;
             if (numEnemies > m.numEnemies) return false;
             if (canAttack()) {
