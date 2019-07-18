@@ -107,7 +107,7 @@ public class MemoryManager {
 
     private int getObjectiveId(int type, int num) {
         // types start at 1
-        return in.constants.ID_OBJECTIVES + (type - 1) * UnitType.values().length * in.constants.MAX_OBJECTIVES +
+        return in.constants.ID_OBJECTIVES + (type - 1) * in.constants.OBJECTIVE_SIZE* in.constants.MAX_OBJECTIVES +
                 num * in.constants.OBJECTIVE_SIZE;
     }
 
