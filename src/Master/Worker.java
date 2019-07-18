@@ -72,6 +72,9 @@ public class Worker {
         if(unitMoved && in.unitController.canGather()){
             in.unitController.gather();
         }
+
+        Direction dir = in.staticVariables.myLocation.directionTo(in.helper.getClosestTownToLocation(in.staticVariables.myLocation));
+        depositResource(dir);
     }
 
 
@@ -166,7 +169,8 @@ public class Worker {
             //else if()
         }
         //Desposit resource if possible
-        Boolean resourceDeposited = depositResource(dir);
+        Direction dirbase = in.unitController.getLocation().directionTo(objectiveBase);
+        Boolean resourceDeposited = depositResource(dirbase);
         //Scout viewing zone
         //TODO
         if(resourceDeposited){
@@ -178,9 +182,8 @@ public class Worker {
 
     public Boolean depositResource(Direction dir){
         //Si puc depositar deposito
-        Direction dirbase = in.unitController.getLocation().directionTo(objectiveBase);
-        if(in.unitController.canDeposit(dirbase)){
-            in.unitController.deposit(dirbase);
+        if(in.unitController.canDeposit(dir)){
+            in.unitController.deposit(dir);
             return true;
         }
         else return false;

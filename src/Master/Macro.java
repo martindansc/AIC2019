@@ -88,7 +88,7 @@ public class Macro {
             int soldiers = in.memoryManager.readValue(in.constants.ID_ALLIES_SOLDIER_COUNTER);
             int archers = in.memoryManager.readValue(in.constants.ID_ALLIES_ARCHER_COUNTER);
             int mages = in.memoryManager.readValue(in.constants.ID_ALLIES_MAGE_COUNTER);
-            if (knights + soldiers + archers + mages > 2 * bestScore) {
+            if (knights + soldiers + archers + mages > 1.5 * bestScore) {
                 return bestTarget;
             }
         }

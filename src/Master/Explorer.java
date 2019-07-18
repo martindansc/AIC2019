@@ -4,8 +4,7 @@ import aic2019.*;
 
 public class Explorer {
     private Injection in;
-    private Boolean microResult;
-    private Direction microDir;
+    boolean micro;
 
 
     public Explorer(Injection in) {
@@ -13,14 +12,12 @@ public class Explorer {
     }
 
     public void run() {
-        microResult = doMicro();
-        in.attack.genericTryAttack();
+        in.explorer.tryAttack();
         Location target = getTarget();
-        if (in.explorer.tryMove(target)) {
-            in.staticVariables.myLocation = in.unitController.getLocation();
-            in.staticVariables.allenemies = in.unitController.senseUnits(in.staticVariables.allies, true);
-        }
-        in.attack.genericTryAttack();
+        in.explorer.tryMove(target);
+        in.staticVariables.myLocation = in.unitController.getLocation();
+        in.staticVariables.allenemies = in.unitController.senseUnits(in.staticVariables.allies, true);
+        in.explorer.tryAttack();
         in.attack.genericTryAttackTown(target);
     }
 
@@ -42,10 +39,10 @@ public class Explorer {
                 if (town.getOwner() == in.staticVariables.opponent) {
                     if (in.memoryManager.getTownStatus(loc) == in.constants.CLAIMED_TOWN) {
                         in.memoryManager.setStolen(loc);
-                        in.memoryManager.setTownScore(loc, 5);
+                        in.memoryManager.setTownScore(loc, 2);
                     } else {
                         in.memoryManager.setClaimedEnemy(loc);
-                        in.memoryManager.setTownScore(loc, 5);
+                        in.memoryManager.setTownScore(loc, 2);
                     }
                 }
             } else {
@@ -59,13 +56,13 @@ public class Explorer {
             boolean tower = false;
             for (UnitInfo enemy: in.staticVariables.allenemies) {
                 if (enemy.getType() == UnitType.TOWER) {
-                    if (in.staticVariables.myLocation.distanceSquared(enemy.getLocation()) < 26) {
+                    if (target.distanceSquared(enemy.getLocation()) < 26) {
                         tower = true;
                         break;
                     }
                 }
             }
-            if ((microResult && in.staticVariables.myLocation.distanceSquared(target) < 65) || closestUnexplored < 26 || tower) {
+            if ((micro && in.staticVariables.myLocation.distanceSquared(target) < 65) || closestUnexplored < 50 || tower) {
                 in.memoryManager.markTownAsExplored(target);
                 int score = calculateScore(target);
                 in.memoryManager.setTownScore(target, score);
@@ -94,134 +91,79 @@ public class Explorer {
     }
 
 
-    public boolean tryMove(Location target) {
-        if (!in.unitController.canMove()) return false;
+    public void tryMove(Location target) {
+        if (!in.unitController.canMove()) return;
 
-        if (!microResult) {
-            Direction dir = in.pathfinder.getNextLocationTarget(target, loc -> in.memoryManager.isLocationSafe(loc));
-            if (dir != null && in.unitController.senseImpact(in.staticVariables.myLocation.add(dir)) == 0) {
-                if (in.unitController.canMove(dir)) {
-                    if (in.memoryManager.isLocationSafe(in.staticVariables.myLocation.add(dir))) {
-                        in.unitController.move(dir);
-                        return true;
+        micro = in.explorerPathfinder.getNextLocationTarget(target);
+    }
+
+    public boolean tryAttack()  {
+        if (!in.unitController.canAttack()) return false;
+        UnitInfo[] enemies = in.staticVariables.enemies;
+        if (enemies.length == 0) return false;
+
+        int myAttack = in.attack.getMyAttack();
+
+        UnitInfo bestTarget = null;
+        int bestTargetHealth = 10000;
+        Location bestLoc = null;
+        UnitInfo killableTarget = null;
+        int killableTargetHealth = 0;
+        Location killableLoc = null;
+        UnitInfo killableEnemy = null;
+        int killableEnemyHealth = 0;
+        Location killableEnemyLoc = null;
+        UnitInfo bestEnemy = null;
+        int bestTargetEnemy = 10000;
+        Location bestEnemyLoc = null;
+
+        for (UnitInfo unit : enemies) {
+            Location target = unit.getLocation();
+            if (unit.getType() == UnitType.TOWER) {
+                in.map.markTower(target, unit.getTeam() != in.staticVariables.opponent);
+            }
+            if (in.unitController.canAttack(target)) {
+                int health = unit.getHealth();
+                boolean teamEnemy = unit.getTeam() == in.staticVariables.opponent;
+                if (bestTargetHealth > health) {
+                    bestTarget = unit;
+                    bestTargetHealth = health;
+                    bestLoc = target;
+                }
+                if (teamEnemy && bestTargetEnemy < health) {
+                    bestEnemy = unit;
+                    bestTargetEnemy = health;
+                    bestEnemyLoc = target;
+                }
+                if (myAttack >= health) {
+                    if (killableTargetHealth < health) {
+                        killableTarget = unit;
+                        killableTargetHealth = health;
+                        killableLoc = target;
+                    }
+                    if (teamEnemy && killableEnemyHealth < health) {
+                        killableEnemy = unit;
+                        killableEnemyHealth = health;
+                        killableEnemyLoc = target;
                     }
                 }
             }
-        } else {
-            in.unitController.move(microDir);
+        }
+
+        if (killableEnemy != null) {
+            in.unitController.attack(killableEnemyLoc);
+            return true;
+        } else if (bestEnemy != null) {
+            in.unitController.attack(bestEnemyLoc);
+            return true;
+        } else if (killableTarget != null) {
+            in.unitController.attack(killableLoc);
+            return true;
+        } else if (bestTarget != null) {
+            in.unitController.attack(bestLoc);
+            return true;
         }
 
         return false;
-    }
-
-    public boolean doMicro() {
-        MicroInfo[] microInfo = new MicroInfo[9];
-        for (int i = 0; i < 9; i++) {
-            microInfo[i] = new MicroInfo(in.staticVariables.myLocation.add(in.staticVariables.dirs[i]));
-        }
-
-        boolean enemies = false;
-        for (int i = 0; i < 9; i++) {
-            microInfo[i].updateArea();
-            int length = Math.min(11, in.staticVariables.allenemies.length);
-            for (int j = 0; j < length; j++) {
-                UnitInfo enemy = in.staticVariables.allenemies[j];
-                UnitType enemyType = enemy.getType();
-                Team unitTeam = enemy.getTeam();
-                int distance = microInfo[i].loc.distanceSquared(enemy.getLocation());
-
-                if (unitTeam == in.staticVariables.opponent) {
-                    microInfo[i].updateSafe(distance, enemyType);
-                } else {
-                    int health = enemy.getHealth();
-                    int maxHealth = enemyType.maxHealth;
-                    if (health < maxHealth) {
-                        microInfo[i].updateSafe(distance, enemyType);
-                    } else {
-                        microInfo[i].updateGreedy(distance, enemyType);
-                    }
-                }
-
-                if (enemyType == UnitType.TOWER) {
-                    if (distance < enemyType.getAttackRangeSquared()) microInfo[i].numEnemies++;
-                }
-            }
-
-            if (microInfo[i].numEnemies != 0) {
-                enemies = true;
-            }
-        }
-
-        if (!enemies) return false;
-
-        int bestIndex = -1;
-
-        for (int i = 8; i >= 0; i--) {
-            if (!in.unitController.canMove(in.staticVariables.dirs[i])) continue;
-            if (bestIndex < 0 || !microInfo[bestIndex].isBetter(microInfo[i])) bestIndex = i;
-        }
-
-        if (bestIndex != -1) {
-            if (in.staticVariables.allenemies.length > 0) {
-                microDir = (in.staticVariables.dirs[bestIndex]);
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    class MicroInfo {
-        int numEnemies;
-        int minDistToEnemy;
-        Location loc;
-
-        public MicroInfo(Location loc) {
-            this.loc = loc;
-            numEnemies = 0;
-            minDistToEnemy = 100000;
-        }
-
-        void updateSafe(int distance, UnitType enemyType) {
-            if (enemyType == UnitType.SOLDIER) {
-                if (distance < 14) numEnemies++;
-            } else if (enemyType == UnitType.ARCHER) {
-                if (distance < 33) numEnemies++;
-            } else if (enemyType == UnitType.KNIGHT) {
-                if (distance < 9) numEnemies++;
-            } else if (enemyType == UnitType.MAGE) {
-                if (distance < 26) numEnemies++;
-            } else if (enemyType == UnitType.EXPLORER) {
-                if (distance < 14) numEnemies++;
-            }
-
-            if (distance < minDistToEnemy) minDistToEnemy = distance;
-        }
-
-        void updateGreedy(int distance, UnitType enemyType) {
-            if (enemyType == UnitType.SOLDIER || enemyType == UnitType.ARCHER || enemyType == UnitType.KNIGHT || enemyType == UnitType.EXPLORER) {
-                if (distance <= enemyType.getAttackRangeSquared()) numEnemies++;
-            } else if (enemyType == UnitType.MAGE) {
-                if (distance < 14) numEnemies++;
-            }
-
-            if (distance < minDistToEnemy) minDistToEnemy = distance;
-        }
-
-        void updateArea() {
-            if (in.unitController.senseImpact(loc) != 0) {
-                numEnemies += 100;
-                return;
-            }
-        }
-
-        boolean isBetter(MicroInfo m) {
-            if (!in.memoryManager.isLocationSafe(m.loc)) return true;
-            if (numEnemies >= 100) return false;
-            if (m.numEnemies >= 100) return true;
-            if (numEnemies < m.numEnemies) return true;
-            if (numEnemies > m.numEnemies) return false;
-            return minDistToEnemy >= m.minDistToEnemy;
-        }
     }
 }
