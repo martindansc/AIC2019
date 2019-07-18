@@ -98,7 +98,7 @@ public class Catapult {
                 int type = enemy.getTeam() != in.staticVariables.opponent ?
                         in.constants.NEUTRAL_TOWER : in.constants.ENEMY_TOWER;
                 int[] objectives = in.objectives.createCatapultObjective(enemy.getLocation(), type);
-                in.memoryManager.addObjective(UnitType.BASE, objectives);
+                in.memoryManager.addObjective(UnitType.CATAPULT, objectives);
             }
             for (int i = 0; i < 9; i++) {
                 microInfo[i].update(enemy);
