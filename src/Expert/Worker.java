@@ -344,7 +344,7 @@ public class Worker {
                 int type = enemy.getTeam() != in.staticVariables.opponent ?
                         in.constants.NEUTRAL_TOWER : in.constants.ENEMY_TOWER;
                 int[] objectives = in.objectives.createCatapultObjective(enemy.getLocation(), type);
-                in.memoryManager.addObjective(UnitType.BASE, objectives);
+                in.memoryManager.addObjective(UnitType.CATAPULT, objectives);
             }
             if (!in.unitController.isObstructed(enemy.getLocation(), in.staticVariables.myLocation)) {
                 if (enemy.getType() != UnitType.WORKER) {
