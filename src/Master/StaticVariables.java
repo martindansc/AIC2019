@@ -17,7 +17,6 @@ public class StaticVariables {
     public Location enemyBase;
     public Location[] visiblelocs;
     public UnitType type;
-    public UnitInfo[] units;
     public UnitInfo[] allyUnits;
     public UnitInfo[] enemies;
     public UnitInfo[] allenemies;
@@ -53,7 +52,6 @@ public class StaticVariables {
         enemies = in.unitController.senseUnits(opponent, false);
         allenemies = in.unitController.senseUnits(allies, true);
         allyUnits = in.unitController.senseUnits(allies, false);
-        units = in.unitController.senseUnits();
         myTowns = in.unitController.getTowns(allies, false);
         allenemytowns = in.unitController.getTowns(allies, true);
         wood = in.unitController.getWood();

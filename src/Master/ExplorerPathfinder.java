@@ -13,6 +13,7 @@ public class ExplorerPathfinder {
     final int INF = 1000000;
 
     boolean rotateRight = true; //if I should rotate right or left
+    boolean rotate = false;
     Location lastObstacleFound = null; //latest obstacle I've found in my way
     int minDistToEnemy = INF; //minimum distance I've been to the enemy while going around an obstacle
     Location prevTarget = null; //previous target
@@ -55,6 +56,10 @@ public class ExplorerPathfinder {
                     }
                     break;
                 }
+            }
+            if (!rotate && myLoc.add(dir.rotateLeft()).distanceSquared(target) > myLoc.add(dir.rotateRight()).distanceSquared(target)) {
+                rotateRight = true;
+                rotate = true;
             }
             Location newLoc = myLoc.add(dir);
             if (in.unitController.isOutOfMap(newLoc)) rotateRight = !rotateRight;
