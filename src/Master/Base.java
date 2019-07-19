@@ -1,9 +1,6 @@
 package Master;
 
-import aic2019.Direction;
-import aic2019.Location;
-import aic2019.UnitInfo;
-import aic2019.UnitType;
+import aic2019.*;
 
 public class Base {
 
@@ -14,13 +11,9 @@ public class Base {
     }
 
     public void run() {
-
-        in.helper.addCocoonUnits();
-
+        //if (in.staticVariables.round == 1) init();
         tryAttack();
-
         Direction bestDir = in.helper.getBestDirectionSpawn();
-
         int[] message = in.messages.readMessage();
 
         UnitType bestUnitType = in.helper.chooseBestUnitType(message);
@@ -32,6 +25,21 @@ public class Base {
 
                 if(id != -1 && message[0] != 0) {
                     in.messages.sendToLocation(id, message[0], message[1]);
+                }
+            }
+        }
+        in.helper.addCocoonUnits();
+    }
+
+    private void init() {
+        for (int i = -1; i < 2; i++) {
+            for (int j = -1; j < 2; j++) {
+                Location loc = new Location(in.staticVariables.myLocation.x + i,in.staticVariables.myLocation.y + j);
+                if (in.unitController.canSenseLocation(loc)) {
+                    Resource resource = in.unitController.senseResource(loc);
+                    if (resource != null && resource != Resource.NONE) {
+                        in.map.markSafeResource(loc);
+                    }
                 }
             }
         }

@@ -70,7 +70,7 @@ public class Worker {
                     }
                 }
             } else {
-                Direction dir = in.pathfinder.getNextLocationTarget(in.staticVariables.enemyBase);
+                Direction dir = in.pathfinder.getNextLocationTarget(in.staticVariables.enemyBase, loc -> in.memoryManager.isLocationSafe(loc));
                 if (in.unitController.canMove(dir)) {
                     in.unitController.move(dir);
                 }
