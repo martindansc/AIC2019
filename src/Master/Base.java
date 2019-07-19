@@ -24,12 +24,15 @@ public class Base {
         int[] message = in.messages.readMessage();
 
         UnitType bestUnitType = in.helper.chooseBestUnitType(message);
+        in.memoryManager.setBestUnitType(bestUnitType);
 
         if(bestUnitType != UnitType.BASE) {
-            int id = in.helper.spawnAndGetIdIfPossible(bestDir, bestUnitType);
+            if (in.market.canBuild(bestUnitType)) {
+                int id = in.helper.spawnAndGetIdIfPossible(bestDir, bestUnitType);
 
-            if(id != -1 && message[0] != 0) {
-                in.messages.sendToLocation(id, message[0], message[1]);
+                if(id != -1 && message[0] != 0) {
+                    in.messages.sendToLocation(id, message[0], message[1]);
+                }
             }
         }
     }

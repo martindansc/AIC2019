@@ -21,7 +21,6 @@ public class StaticVariables {
     public UnitInfo[] allyUnits;
     public UnitInfo[] enemies;
     public UnitInfo[] allenemies;
-    public int baseId;
     public int myId;
     public TownInfo[] allenemytowns;
     public TownInfo[] myTowns;
@@ -43,7 +42,6 @@ public class StaticVariables {
 
         enemyBase = in.unitController.getTeam().getOpponent().getInitialLocation();
         allyBase = in.unitController.getTeam().getInitialLocation();
-        baseId = in.unitController.senseUnit(allies.getInitialLocation()).getID();
         myId = in.unitController.getInfo().getID();
 
         resources = Resource.values();

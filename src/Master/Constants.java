@@ -11,6 +11,9 @@ public class Constants {
     public int ID_ALLIES_MAGE_COUNTER = 36;
     public int ID_ALLIES_WORKERS_COUNTER = 43;
     public int ID_ALLIES_EXPLORERS_COUNTER = 50;
+    public int ID_WORKER_BARRACKS = 57;
+    public int ID_BARRACKS_BUILT = 58;
+    public int ID_BEST_UNIT_TYPE = 59;
     public int ID_MESSAGING_BOX = 100; // 40000 positions
     public int ID_OBJECTIVES = 50000; // 3000 positions: 10 unit types * 20 objectives * 15
     public int ID_LOCATION_OBJECTIVES = 60000; // 10000 positions
@@ -51,7 +54,4 @@ public class Constants {
     public float WORKERS_GATHER_WOOD = 60.f;
     public float WORKERS_GATHER_IRON = 20.f;
     public float WORKERS_GATHER_MINERAL = 6.f;
-
-
-
 }

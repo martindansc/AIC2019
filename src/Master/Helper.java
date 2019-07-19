@@ -167,8 +167,6 @@ public class Helper {
     }
 
     public int spawnAndGetIdIfPossible(Direction dir, UnitType ut) {
-        if (!in.market.canBuild(ut)) return -1;
-
         if (in.unitController.canSpawn(dir, ut)) {
             if (ut == UnitType.WORKER) {
                 countWork++;
@@ -211,11 +209,13 @@ public class Helper {
             }
         }
 
-        if(countWork < 4) {
-            int[][] objectives = in.memoryManager.getObjectives(UnitType.WORKER);
-            for (int[] objective: objectives) {
-                if(!in.objectives.isFull(objective)){
-                    return UnitType.WORKER;
+        if (in.staticVariables.type == UnitType.BASE) {
+            if (countWork < 4) {
+                int[][] objectives = in.memoryManager.getObjectives(UnitType.WORKER);
+                for (int[] objective : objectives) {
+                    if (!in.objectives.isFull(objective)) {
+                        return UnitType.WORKER;
+                    }
                 }
             }
         }

@@ -1,8 +1,6 @@
 package Master;
 
 import aic2019.Direction;
-import aic2019.Location;
-import aic2019.UnitInfo;
 import aic2019.UnitType;
 
 public class Barracks {
@@ -14,11 +12,10 @@ public class Barracks {
     }
 
     public void run() {
-        in.helper.addCocoonUnits();
         Direction bestDir = in.helper.getBestDirectionSpawn();
 
         int[] message = in.messages.readMessage();
-        UnitType bestUnitType = in.helper.chooseBestUnitType(message);
+        UnitType bestUnitType = in.memoryManager.getBestUnitType();
 
         if(bestUnitType != UnitType.BASE) {
             int id = in.helper.spawnAndGetIdIfPossible(bestDir, bestUnitType);
@@ -27,6 +24,8 @@ public class Barracks {
                 in.messages.sendToLocation(id, message[0], message[1]);
             }
         }
+
+        in.helper.addCocoonUnits();
     }
 
 }

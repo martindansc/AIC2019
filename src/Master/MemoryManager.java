@@ -398,4 +398,43 @@ public class MemoryManager {
         return in.unitController.read(index + 2);
     }
 
+    public int getBarracksWorkerId() {
+        return uc.read(in.constants.ID_WORKER_BARRACKS);
+    }
+
+    public void setBarracksWorkerId(int id) {
+        uc.write(in.constants.ID_WORKER_BARRACKS, id);
+    }
+
+    public boolean isBarracksBuilt() {
+        return uc.read(in.constants.ID_BARRACKS_BUILT) != 0;
+    }
+
+    public void setBarracksBuilt() {
+        uc.write(in.constants.ID_BARRACKS_BUILT, 1);
+    }
+
+    public UnitType getBestUnitType() {
+        int id = uc.read(in.constants.ID_BEST_UNIT_TYPE);
+        if (id == 1) return UnitType.SOLDIER;
+        else if (id == 2) return UnitType.ARCHER;
+        else if (id == 3) return UnitType.KNIGHT;
+        else if (id == 4) return UnitType.MAGE;
+        else if (id == 5) return UnitType.EXPLORER;
+        else if (id == 6) return UnitType.CATAPULT;
+        else if (id == 7) return UnitType.WORKER;
+        else return UnitType.BASE;
+    }
+
+    public void setBestUnitType(UnitType unit) {
+        int id = 0;
+        if (unit == UnitType.SOLDIER) id = 1;
+        else if (unit == UnitType.ARCHER) id = 2;
+        else if (unit == UnitType.KNIGHT) id = 3;
+        else if (unit == UnitType.MAGE) id = 4;
+        else if (unit == UnitType.EXPLORER) id = 5;
+        else if (unit == UnitType.CATAPULT) id = 6;
+        else if (unit == UnitType.WORKER) id = 7;
+        uc.write(in.constants.ID_BEST_UNIT_TYPE, id);
+    }
 }

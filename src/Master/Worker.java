@@ -43,28 +43,56 @@ public class Worker {
         currentAction = "GOTORANDOM";
     }
 
-    public void run(){
-        unitMoved = false;
-        this.selectObjective();
-
+    public void run() {
         //Si estic a sobre dun resource agafarlo
         if(in.unitController.canGather()){
             in.unitController.gather();
         }
 
-        microResult = doMicro();
-        if (microResult) {
-            in.unitController.move(microDir);
-            currentAction = "GOTORESOURCE";
+        int barracksWorkerId = in.memoryManager.getBarracksWorkerId();
+
+        if (in.staticVariables.wood > 2 * GameConstants.BARRACKS_WOOD_COST &&
+                in.staticVariables.iron > 2 * GameConstants.BARRACKS_IRON_COST && barracksWorkerId == 0) {
+            in.memoryManager.setBarracksWorkerId(in.staticVariables.myId);
+            objectiveLocation = null;
+        }
+
+        if (barracksWorkerId == in.staticVariables.myId && !in.memoryManager.isBarracksBuilt()) {
+            int distanceToBase = in.staticVariables.myLocation.distanceSquared(in.staticVariables.allyBase);
+            int distanceToEnemyBase = in.staticVariables.myLocation.distanceSquared(in.staticVariables.enemyBase);
+            if (distanceToBase * 4 > distanceToEnemyBase) {
+                for (int i = 0; i < in.staticVariables.dirs.length; i++) {
+                    if (in.unitController.canSpawn(in.staticVariables.dirs[i], UnitType.BARRACKS)) {
+                        in.unitController.spawn(in.staticVariables.dirs[i], UnitType.BARRACKS);
+                        in.memoryManager.setBarracksBuilt();
+                        fixRandomDirection();
+                        break;
+                    }
+                }
+            } else {
+                Direction dir = in.pathfinder.getNextLocationTarget(in.staticVariables.enemyBase);
+                if (in.unitController.canMove(dir)) {
+                    in.unitController.move(dir);
+                }
+            }
         } else {
-            if (currentAction == "GOTORANDOM") {
-                goToRandom();
-            } else if (currentAction == "GOTORESOURCE") {
-                goToResource();
-            } else if (currentAction == "GATHERRESOURCE") {
-                gatherResource();
-            } else if (currentAction == "GOTOTOWN") {
-                goToTown();
+            unitMoved = false;
+            this.selectObjective();
+
+            microResult = doMicro();
+            if (microResult) {
+                in.unitController.move(microDir);
+                currentAction = "GOTORESOURCE";
+            } else {
+                if (currentAction == "GOTORANDOM") {
+                    goToRandom();
+                } else if (currentAction == "GOTORESOURCE") {
+                    goToResource();
+                } else if (currentAction == "GATHERRESOURCE") {
+                    gatherResource();
+                } else if (currentAction == "GOTOTOWN") {
+                    goToTown();
+                }
             }
         }
 
@@ -73,6 +101,7 @@ public class Worker {
             in.unitController.gather();
         }
 
+        //If can deposit, deposit
         Direction dir = in.staticVariables.myLocation.directionTo(in.helper.getClosestTownToLocation(in.staticVariables.myLocation));
         depositResource(dir);
     }
