@@ -8,7 +8,6 @@ import aic2019.UnitType;
 public class Base {
 
     private final Injection in;
-    private int countWork = 0;
 
     Base(Injection in) {
         this.in = in;
@@ -16,112 +15,23 @@ public class Base {
 
     public void run() {
 
-        addCocoonUnits();
+        in.helper.addCocoonUnits();
 
         tryAttack();
 
-        Direction bestDir = this.getBestDirectionSpawn();
+        Direction bestDir = in.helper.getBestDirectionSpawn();
 
         int[] message = in.messages.readMessage();
 
-        UnitType bestUnitType = this.chooseBestUnitType(message);
+        UnitType bestUnitType = in.helper.chooseBestUnitType(message);
 
         if(bestUnitType != UnitType.BASE) {
-            int id = spawnAndGetIdIfPossible(bestDir, bestUnitType);
+            int id = in.helper.spawnAndGetIdIfPossible(bestDir, bestUnitType);
 
             if(id != -1 && message[0] != 0) {
                 in.messages.sendToLocation(id, message[0], message[1]);
             }
         }
-    }
-
-    private void addCocoonUnits() {
-        Location[] spawnLocations = in.unitController.getVisibleLocations(2);
-        for (Location spawnLocation: spawnLocations) {
-            UnitInfo unit = in.unitController.senseUnit(spawnLocation);
-            if(unit != null && unit.isBeingConstructed()) {
-                in.helper.countUnit(unit.getType());
-            }
-        }
-    }
-
-    private UnitType chooseBestUnitType(int[] message) {
-        int knights = in.memoryManager.readValue(in.constants.ID_ALLIES_KNIGHT_COUNTER);
-        int soldiers = in.memoryManager.readValue(in.constants.ID_ALLIES_SOLDIER_COUNTER);
-        int archers = in.memoryManager.readValue(in.constants.ID_ALLIES_ARCHER_COUNTER);
-        int catapults = in.memoryManager.readValue(in.constants.ID_ALLIES_CATAPULT_COUNTER);
-        int mages = in.memoryManager.readValue(in.constants.ID_ALLIES_MAGE_COUNTER);
-        int workers = in.memoryManager.readValue(in.constants.ID_ALLIES_WORKERS_COUNTER);
-        int explorers = in.memoryManager.readValue(in.constants.ID_ALLIES_EXPLORERS_COUNTER);
-
-        if(in.messages.hasMessage()) {
-            int[] newMessage = in.messages.readMessage();
-            return in.helper.intToUnitType(newMessage[1]);
-        }
-
-        if (in.staticVariables.round == 1) {
-            return UnitType.EXPLORER;
-        }
-
-        if (catapults < 1) {
-            int[][] objectives = in.memoryManager.getObjectives(UnitType.CATAPULT);
-            for (int[] objective: objectives) {
-                if(objective[0] != in.constants.WATER_OBJECTIVE) {
-                    if(!in.objectives.isFull(objective) &&
-                            (in.staticVariables.round - in.objectives.getRound(objective) > 5 ||
-                                    catapults < 1)) {
-                        return UnitType.CATAPULT;
-                    }
-                }
-            }
-        }
-
-        if(countWork < 4) {
-            int[][] objectives = in.memoryManager.getObjectives(UnitType.WORKER);
-            for (int[] objective: objectives) {
-                if(!in.objectives.isFull(objective)){
-                    return UnitType.WORKER;
-                }
-            }
-        }
-
-        return in.market.heuristic();
-
-    }
-
-    private Direction getBestDirectionSpawn() {
-        // get direction to enemy base
-        Direction dir = in.staticVariables.myLocation.directionTo(in.staticVariables.opponent.getInitialLocation());
-        Direction bestDir = dir;
-
-        if(in.memoryManager.isLocationSafe(in.staticVariables.myLocation.add(bestDir)) && !in.unitController.canSpawn(bestDir, UnitType.SOLDIER)) {
-            bestDir = dir.rotateLeft();
-        }
-
-        if(in.memoryManager.isLocationSafe(in.staticVariables.myLocation.add(bestDir)) && !in.unitController.canSpawn(bestDir, UnitType.SOLDIER)) {
-            bestDir = dir.rotateRight();
-        }
-
-        while(in.memoryManager.isLocationSafe(in.staticVariables.myLocation.add(bestDir)) && !in.unitController.canSpawn(bestDir, UnitType.SOLDIER)) {
-            if(dir.isEqual(bestDir)) return Direction.ZERO;
-            bestDir = bestDir.rotateRight();
-        }
-
-        return bestDir;
-    }
-
-    private int spawnAndGetIdIfPossible(Direction dir, UnitType ut) {
-        if (!in.market.canBuild(ut)) return -1;
-
-        if (in.unitController.canSpawn(dir, ut)) {
-            if (ut == UnitType.WORKER) {
-                countWork++;
-            }
-            in.unitController.spawn(dir, ut);
-            Location unitLocation = in.staticVariables.myLocation.add(dir);
-            return in.unitController.senseUnit(unitLocation).getID();
-        }
-        return -1;
     }
 
     private boolean isSafeAttack(Location loc) {

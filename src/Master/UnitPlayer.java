@@ -34,6 +34,10 @@ public class UnitPlayer {
                 in.catapult.run();
             } else if (in.staticVariables.type == UnitType.EXPLORER) {
 			    in.explorer.run();
+            } else if (in.staticVariables.type == UnitType.TOWER) {
+                in.tower.run(target);
+            } else if (in.staticVariables.type == UnitType.BARRACKS) {
+                in.barracks.run();
             }
 
             in.map.sendResourcesObjective();

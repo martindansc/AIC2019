@@ -25,6 +25,8 @@ public class Injection {
     public final Map map;
     public final Helper helper;
     public final Objectives objectives;
+    public final Tower tower;
+    public final Barracks barracks;
 
     Injection (UnitController uc) {
         this.unitController = uc;
@@ -47,5 +49,7 @@ public class Injection {
         this.map = new Map(this);
         this.helper = new Helper(this);
         this.objectives = new Objectives(this);
+        this.tower = new Tower(this);
+        this.barracks = new Barracks(this);
     }
 }

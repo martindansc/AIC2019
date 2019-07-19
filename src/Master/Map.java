@@ -23,7 +23,7 @@ Estructures i unitats
     - Torre
         - Propietari
         - Health
-    - Quarter
+    - Barracks
         - Propietari
         - Health
     - Unitat
@@ -50,6 +50,11 @@ Estructures i unitats
             int[] objective = in.objectives.createResourceObjective(loc);
             in.memoryManager.addObjective(UnitType.WORKER, objective);
         }
+    }
+
+    public void markSafeResource(Location loc) {
+        int[] objective = in.objectives.createResourceObjective(loc);
+        in.memoryManager.addObjective(UnitType.WORKER, objective);
     }
 
     public UnitInfo getClosestAlliedUnitToLocation(UnitType unitType) {

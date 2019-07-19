@@ -23,7 +23,7 @@ Estructures i unitats
     - Torre
         - Propietari
         - Health
-    - Quarter
+    - Barracks
         - Propietari
         - Health
     - Unitat

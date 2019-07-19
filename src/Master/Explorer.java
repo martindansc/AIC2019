@@ -19,6 +19,7 @@ public class Explorer {
         in.staticVariables.allenemies = in.unitController.senseUnits(in.staticVariables.allies, true);
         in.explorer.tryAttack();
         in.attack.genericTryAttackTown(target);
+        //markSafeResources();
     }
 
     public Location getTarget() {
@@ -171,5 +172,19 @@ public class Explorer {
         }
 
         return false;
+    }
+
+    private void markSafeResources() {
+        if (in.staticVariables.allenemies.length == 0) {
+            for (int i = 0; i < in.staticVariables.dirs.length; i++) {
+                Location loc = in.staticVariables.myLocation.add(in.staticVariables.dirs[i]);
+                if (in.unitController.canSenseLocation(loc)) {
+                    Resource resource = in.unitController.senseResource(loc);
+                    if (resource != Resource.NONE && resource != null) {
+                        in.map.markSafeResource(loc);
+                    }
+                }
+            }
+        }
     }
 }
