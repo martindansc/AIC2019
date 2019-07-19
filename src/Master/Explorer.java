@@ -5,7 +5,7 @@ import aic2019.*;
 public class Explorer {
     private Injection in;
     boolean micro;
-
+    int counter = 0;
 
     public Explorer(Injection in) {
         this.in = in;
@@ -39,10 +39,10 @@ public class Explorer {
                 if (town.getOwner() == in.staticVariables.opponent) {
                     if (in.memoryManager.getTownStatus(loc) == in.constants.CLAIMED_TOWN) {
                         in.memoryManager.setStolen(loc);
-                        in.memoryManager.setTownScore(loc, 2);
+                        in.memoryManager.setTownScore(loc, 1);
                     } else {
                         in.memoryManager.setClaimedEnemy(loc);
-                        in.memoryManager.setTownScore(loc, 2);
+                        in.memoryManager.setTownScore(loc, 1);
                     }
                 }
             } else {
@@ -54,6 +54,7 @@ public class Explorer {
         if (target != null) {
 
             boolean tower = false;
+            int distance = in.staticVariables.myLocation.distanceSquared(target);
             for (UnitInfo enemy: in.staticVariables.allenemies) {
                 if (enemy.getType() == UnitType.TOWER) {
                     if (target.distanceSquared(enemy.getLocation()) < 26) {
@@ -62,10 +63,15 @@ public class Explorer {
                     }
                 }
             }
-            if ((micro && in.staticVariables.myLocation.distanceSquared(target) < 65) || closestUnexplored < 50 || tower) {
+            if (counter > 15 || distance < 26 || (tower && distance < 82)) {
                 in.memoryManager.markTownAsExplored(target);
                 int score = calculateScore(target);
                 in.memoryManager.setTownScore(target, score);
+                counter = 0;
+            }
+
+            if (distance < 65) {
+                counter++;
             }
 
             return target;
