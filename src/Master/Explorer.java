@@ -6,23 +6,45 @@ public class Explorer {
     private Injection in;
     boolean micro;
     int counter = 0;
+    boolean enemySeen = false;
 
     public Explorer(Injection in) {
         this.in = in;
     }
 
     public void run() {
+        markSafeResources();
         in.explorer.tryAttack();
         Location target = getTarget();
         in.explorer.tryMove(target);
         in.staticVariables.myLocation = in.unitController.getLocation();
         in.staticVariables.allenemies = in.unitController.senseUnits(in.staticVariables.allies, true);
         in.explorer.tryAttack();
-        in.attack.genericTryAttackTown(target);
-        //markSafeResources();
+        in.explorer.tryAttackTown();
     }
 
     public Location getTarget() {
+        if (in.staticVariables.resourcesSeen.length != 0 && in.staticVariables.allenemies.length == 0) {
+            if (in.memoryManager.getSafeResources() < 10) {
+                int min = Math.min(in.staticVariables.resourcesSeen.length, 8);
+                int bestDistance = 10000;
+                Location bestLoc = null;
+                for (int i = 0; i < min; i++) {
+                    Location currentLoc = in.staticVariables.resourcesSeen[i].getLocation();
+                    int distance = in.staticVariables.myLocation.distanceSquared(currentLoc);
+                    if (in.memoryManager.getObjectiveIdInLocation(currentLoc) == 0 && distance > 2 && !in.unitController.isObstructed(in.staticVariables.myLocation, currentLoc)) {
+                        if (distance < bestDistance) {
+                            bestDistance = distance;
+                            bestLoc = currentLoc;
+                        }
+                    }
+                }
+                if (bestLoc != null) {
+                    return bestLoc;
+                }
+            }
+        }
+
         int closestUnexplored = 100000;
         Location target = null;
         for (TownInfo town: in.staticVariables.allenemytowns) {
@@ -38,7 +60,9 @@ public class Explorer {
                     in.memoryManager.setTownScore(loc, calculateScore(loc));
                 }
                 if (town.getOwner() == in.staticVariables.opponent) {
-                    if (in.memoryManager.getTownStatus(loc) == in.constants.CLAIMED_TOWN) {
+                    int status = in.memoryManager.getTownStatus(loc);
+                    in.memoryManager.markTownAsExplored(loc);
+                    if (status == in.constants.CLAIMED_TOWN || status == in.constants.STOLEN_TOWN) {
                         in.memoryManager.setStolen(loc);
                         in.memoryManager.setTownScore(loc, 1);
                     } else {
@@ -59,6 +83,12 @@ public class Explorer {
             }
         }
 
+        for (TownInfo town: in.staticVariables.myTowns) {
+            Location loc = town.getLocation();
+            in.memoryManager.setClaimed(loc);
+            in.memoryManager.setTownScore(loc, 0);
+        }
+
         if (target != null) {
 
             boolean tower = false;
@@ -74,6 +104,7 @@ public class Explorer {
             if (counter > 15 || distance < 26 || (tower && distance < 82)) {
                 in.memoryManager.markTownAsExplored(target);
                 int score = calculateScore(target);
+                if (tower) score = score + 5;
                 in.memoryManager.setTownScore(target, score);
                 counter = 0;
             }
@@ -182,15 +213,28 @@ public class Explorer {
     }
 
     private void markSafeResources() {
-        if (in.staticVariables.allenemies.length == 0) {
+        if (in.staticVariables.allenemies.length == 0 && !enemySeen) {
             for (int i = 0; i < in.staticVariables.dirs.length; i++) {
                 Location loc = in.staticVariables.myLocation.add(in.staticVariables.dirs[i]);
                 if (in.unitController.canSenseLocation(loc)) {
                     Resource resource = in.unitController.senseResource(loc);
-                    if (resource != Resource.NONE && resource != null) {
+                    if (resource != Resource.NONE && resource != null && in.memoryManager.getObjectiveIdInLocation(loc) == 0) {
                         in.map.markSafeResource(loc);
+                        in.memoryManager.increaseSafeResources();
                     }
                 }
+            }
+        } else {
+            enemySeen = true;
+        }
+    }
+
+    public void tryAttackTown() {
+        for (TownInfo enemyTown: in.staticVariables.allenemytowns) {
+            Location townLoc = enemyTown.getLocation();
+            if (in.unitController.canAttack(townLoc)) {
+                in.unitController.attack(townLoc);
+                return;
             }
         }
     }

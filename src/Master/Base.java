@@ -11,7 +11,7 @@ public class Base {
     }
 
     public void run() {
-        //if (in.staticVariables.round == 1) init();
+        if (in.staticVariables.round == 1) init();
         tryAttack();
         Direction bestDir = in.helper.getBestDirectionSpawn();
         int[] message = in.messages.readMessage();
@@ -32,14 +32,16 @@ public class Base {
     }
 
     private void init() {
-        for (int i = -1; i < 2; i++) {
-            for (int j = -1; j < 2; j++) {
-                Location loc = new Location(in.staticVariables.myLocation.x + i,in.staticVariables.myLocation.y + j);
-                if (in.unitController.canSenseLocation(loc)) {
-                    Resource resource = in.unitController.senseResource(loc);
-                    if (resource != null && resource != Resource.NONE) {
-                        in.map.markSafeResource(loc);
-                    }
+        for (ResourceInfo resource: in.staticVariables.resourcesSeen) {
+            Location loc = resource.getLocation();
+            int distance = in.staticVariables.myLocation.distanceSquared(loc);
+            if (in.memoryManager.isLocationSafe(loc)) {
+                if (distance < 3) {
+                    in.map.markSafeResource(loc);
+                    in.memoryManager.increaseSafeResources();
+                } else if (!in.unitController.isObstructed(loc, in.staticVariables.myLocation)) {
+                    in.map.markSafeResource(loc);
+                    in.memoryManager.increaseSafeResources();
                 }
             }
         }

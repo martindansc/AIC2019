@@ -4,7 +4,6 @@ import aic2019.*;
 
 public class Helper {
     private final Injection in;
-    private int countWork = 0;
 
     Helper(Injection in) {
         this.in = in;
@@ -168,9 +167,6 @@ public class Helper {
 
     public int spawnAndGetIdIfPossible(Direction dir, UnitType ut) {
         if (in.unitController.canSpawn(dir, ut)) {
-            if (ut == UnitType.WORKER) {
-                countWork++;
-            }
             in.unitController.spawn(dir, ut);
             Location unitLocation = in.staticVariables.myLocation.add(dir);
             return in.unitController.senseUnit(unitLocation).getID();
@@ -209,13 +205,13 @@ public class Helper {
             }
         }
 
-        if (in.staticVariables.type == UnitType.BASE) {
-            if (countWork < 4) {
-                int[][] objectives = in.memoryManager.getObjectives(UnitType.WORKER);
-                for (int[] objective : objectives) {
-                    if (!in.objectives.isFull(objective)) {
-                        return UnitType.WORKER;
-                    }
+        if (in.staticVariables.type == UnitType.BASE && !in.memoryManager.isBarracksBuilt() &&
+                workers < in.memoryManager.getSafeResources() &&
+                (workers < 5 || workers - 5 < in.staticVariables.round / 100)) {
+            int[][] objectives = in.memoryManager.getObjectives(UnitType.WORKER);
+            for (int[] objective : objectives) {
+                if (!in.objectives.isFull(objective)) {
+                    return UnitType.WORKER;
                 }
             }
         }

@@ -40,10 +40,8 @@ public class UnitPlayer {
                 in.barracks.run();
             }
 
-
             // use the extra cpu for delayed actions
             this.delayedActions(in);
-            in.map.sendResourcesObjective();
 
             in.unitController.yield(); //End of turn
         }

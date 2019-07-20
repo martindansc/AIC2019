@@ -5,6 +5,7 @@ import aic2019.TownInfo;
 
 public class Macro {
     private Injection in;
+    private Location previousStolen = null;
 
     public Macro(Injection in){
         this.in = in;
@@ -28,8 +29,10 @@ public class Macro {
                 }
             }
             if (defendTown != null) {
+                previousStolen = null;
                 return defendTown.getLocation();
             }
+            previousStolen = null;
             return in.staticVariables.allyBase;
         }
 
@@ -37,6 +40,7 @@ public class Macro {
         int allyDistance = Integer.MAX_VALUE;
 
         for (TownInfo town : in.staticVariables.myTowns) {
+            if (previousStolen!= null && previousStolen.isEqual(town.getLocation())) previousStolen = null;
             int maxLoyalty = town.getMaxLoyalty();
             int loyalty = town.getLoyalty();
             if (loyalty * 5 < maxLoyalty) {
@@ -49,6 +53,7 @@ public class Macro {
         }
 
         if (allyTown != null) {
+            previousStolen = null;
             return allyTown.getLocation();
         }
 
@@ -56,6 +61,8 @@ public class Macro {
     }
 
     public Location setTarget() {
+        if (previousStolen != null) return previousStolen;
+
         int bestScore = 10000;
         Location bestTarget = null;
         int closestStolen = 10000;
@@ -72,7 +79,7 @@ public class Macro {
 
             if (in.memoryManager.getTownStatus(loc) == in.constants.STOLEN_TOWN) {
                 int distance = loc.distanceSquared(in.staticVariables.allyBase);
-                if (closestStolen < distance) {
+                if (closestStolen > distance) {
                     closestStolen = distance;
                     stolen = loc;
                 }
@@ -80,6 +87,7 @@ public class Macro {
         }
 
         if (stolen != null) {
+            previousStolen = stolen;
             return stolen;
         }
 
@@ -88,11 +96,13 @@ public class Macro {
             int soldiers = in.memoryManager.readValue(in.constants.ID_ALLIES_SOLDIER_COUNTER);
             int archers = in.memoryManager.readValue(in.constants.ID_ALLIES_ARCHER_COUNTER);
             int mages = in.memoryManager.readValue(in.constants.ID_ALLIES_MAGE_COUNTER);
-            if (knights + soldiers + archers + mages > 1.5 * bestScore) {
+            if (knights + soldiers + archers + mages > 2 * bestScore) {
+                previousStolen = null;
                 return bestTarget;
             }
         }
 
+        previousStolen = null;
         return in.staticVariables.allyBase;
     }
 }

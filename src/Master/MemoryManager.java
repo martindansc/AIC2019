@@ -440,4 +440,16 @@ public class MemoryManager {
         else if (unit == UnitType.WORKER) id = 7;
         uc.write(in.constants.ID_BEST_UNIT_TYPE, id);
     }
+
+    public int getSafeResources() {
+        return in.unitController.read(in.constants.ID_CURRENT_OBJECTIVE_RESOURCES);
+    }
+
+    public void increaseSafeResources() {
+        int safeResources = getSafeResources();
+        if (safeResources > 19) {
+            return;
+        }
+        in.unitController.write(in.constants.ID_CURRENT_OBJECTIVE_RESOURCES, safeResources + 1);
+    }
 }
