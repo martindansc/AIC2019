@@ -45,20 +45,114 @@ public class Base {
         }
     }
 
-    private boolean isSafeAttack(Location loc) {
-        for (int i = -1; i < 2; i++) {
-            for (int j = -1; j < 2; j++) {
-                Location myLoc = new Location(loc.x + i, loc.y + j);
-                if (in.unitController.canSenseLocation(myLoc)) {
-                    UnitInfo unit = in.unitController.senseUnit(myLoc);
-                    if (unit == null) continue;
-                    if (unit.getTeam() == in.staticVariables.allies) {
-                        return false;
+    public boolean genericTryAttack()  {
+        if (!in.unitController.canAttack()) return false;
+        UnitInfo[] enemies = in.staticVariables.allenemies;
+        if (enemies.length == 0) return false;
+
+        int myAttack = in.attack.getMyAttack();
+
+        UnitInfo bestTarget = null;
+        int bestTargetHealth = 10000;
+        Location bestLoc = null;
+        UnitInfo killableTarget = null;
+        int killableTargetHealth = 0;
+        Location killableLoc = null;
+        UnitInfo killableEnemy = null;
+        int killableEnemyHealth = 0;
+        Location killableEnemyLoc = null;
+        UnitInfo bestEnemy = null;
+        int bestTargetEnemy = 10000;
+        Location bestEnemyLoc = null;
+
+        for (UnitInfo unit : enemies) {
+            Location target = unit.getLocation();
+            if (unit.getType() == UnitType.TOWER) {
+                in.map.markTower(target, unit.getTeam() != in.staticVariables.opponent);
+            }
+            if (in.unitController.canAttack(target)) {
+                int health = unit.getHealth();
+                boolean teamEnemy = unit.getTeam() == in.staticVariables.opponent;
+                if (bestTargetHealth > health) {
+                    bestTarget = unit;
+                    bestTargetHealth = health;
+                    bestLoc = target;
+                }
+                if (teamEnemy && bestTargetEnemy < health) {
+                    bestEnemy = unit;
+                    bestTargetEnemy = health;
+                    bestEnemyLoc = target;
+                }
+                if (myAttack >= health) {
+                    if (killableTargetHealth < health) {
+                        killableTarget = unit;
+                        killableTargetHealth = health;
+                        killableLoc = target;
+                    }
+                    if (teamEnemy && killableEnemyHealth < health) {
+                        killableEnemy = unit;
+                        killableEnemyHealth = health;
+                        killableEnemyLoc = target;
                     }
                 }
             }
         }
-        return true;
+
+        if (killableEnemy != null) {
+            aoeAttack(killableEnemyLoc);
+            return true;
+        } else if (bestEnemy != null) {
+            aoeAttack(bestEnemyLoc);
+            return true;
+        } else if (killableTarget != null) {
+            aoeAttack(killableLoc);
+            return true;
+        } else if (bestTarget != null) {
+            aoeAttack(bestLoc);
+            return true;
+        }
+
+        return false;
+    }
+
+    public void aoeAttack(Location target){
+        Location bestTargetLoc = null;
+        int bestTargetScore = 0;
+
+        for (Direction dir : in.staticVariables.dirs) {
+            Location targetLoc = target.add(dir);
+
+            if (in.unitController.canAttack(targetLoc)) {
+                UnitInfo[] unitsInRange = in.unitController.senseUnits(targetLoc, 2);
+                int score = 0;
+
+                for (UnitInfo uir : unitsInRange){
+                    Team team = uir.getTeam();
+                    UnitType type = uir.getType();
+                    if (team == in.staticVariables.allies){
+                        if (type == UnitType.BASE) score -= 10;
+                        else if (type == UnitType.TOWER) score -= 5;
+                        else if (type == UnitType.MAGE) score -= 4;
+                        else if (uir.getHealth() <= 4) score -= 2;
+                        else score -= 1;
+                    }
+                    else if (team == in.staticVariables.opponent){
+                        if (type == UnitType.CATAPULT) score += 10;
+                        else if (type == UnitType.MAGE) score += 3;
+                        else if (uir.getHealth() <= 4) score += 2;
+                        else score += 1;
+                    }
+                    else score += 1;
+                }
+
+                if (score > bestTargetScore){
+                    bestTargetLoc = targetLoc;
+                    bestTargetScore = score;
+                }
+            }
+        }
+
+        in.unitController.attack(bestTargetLoc);
     }
 
     private boolean tryAttack() {
@@ -66,12 +160,22 @@ public class Base {
 
         UnitInfo bestCatapult = null;
         UnitInfo outerUnit = null;
-        UnitInfo innerUnit = null;
         int health = 10000;
 
         for (UnitInfo enemy : in.staticVariables.allenemies) {
+            UnitType enemyType = enemy.getType();
             int distance = enemy.getLocation().distanceSquared(in.staticVariables.myLocation);
-            if (enemy.getType() == UnitType.CATAPULT) {
+
+            if (enemyType == UnitType.BASE){
+                if (distance > 36){
+                    in.unitController.attack(in.staticVariables.enemyBase.add(in.staticVariables.enemyBase.directionTo(in.staticVariables.myLocation)));
+                }
+                else {
+                    in.unitController.attack(in.staticVariables.enemyBase);
+                }
+                return true;
+            }
+            if (enemyType == UnitType.CATAPULT) {
                 int enemyhealth = enemy.getHealth();
                 if (enemyhealth < health) {
                     health = enemyhealth;
@@ -80,42 +184,44 @@ public class Base {
             }
             if (distance > 36) {
                 outerUnit = enemy;
-            } else if (distance < 3) {
-                innerUnit = enemy;
             }
         }
 
         if (bestCatapult != null) {
-            Location catapultLoc = bestCatapult.getLocation();
-            if (bestCatapult.getLocation().distanceSquared(in.staticVariables.myLocation) > 36) {
-                in.unitController.attack(catapultLoc.add(catapultLoc.directionTo(in.staticVariables.myLocation)));
-                return true;
-            }
-            in.unitController.attack(catapultLoc);
+            aoeAttack(bestCatapult.getLocation());
             return true;
         }
 
         if (outerUnit != null) {
-            Location outerLoc = outerUnit.getLocation();
-            Location target = outerLoc.add(outerLoc.directionTo(in.staticVariables.myLocation));
-            if (isSafeAttack(target)) {
-                in.unitController.attack(target);
-            }
+            aoeAttack(outerUnit.getLocation());
             return true;
         }
 
-        boolean attacked = in.attack.genericTryAttack();
+        if (genericTryAttack()) return true;
 
-        if (innerUnit != null) {
-            Location innerLoc = innerUnit.getLocation();
-            Location target = innerLoc.add(in.staticVariables.myLocation.directionTo(innerLoc));
-            if (in.unitController.canAttack(target) && isSafeAttack(target)) {
-                in.unitController.attack(target);
+        TownInfo bestTown = null;
+        int bestHealth = 100000;
+
+        // Check towns in range if no enemies available
+        for (TownInfo town : in.staticVariables.allenemytowns){
+            if (bestTown == null || bestHealth > town.getLoyalty()){
+                bestTown = town;
+                bestHealth = town.getLoyalty();
             }
-            return true;
         }
 
-        return attacked;
+        if (bestTown == null) return false;
+
+        Location townLoc = bestTown.getLocation();
+        int distance = townLoc.distanceSquared(in.staticVariables.myLocation);
+
+        if (distance > 36){
+            in.unitController.attack(townLoc.add(townLoc.directionTo(in.staticVariables.myLocation)));
+        }
+        else {
+            in.unitController.attack(townLoc);
+        }
+        return true;
     }
 
 }

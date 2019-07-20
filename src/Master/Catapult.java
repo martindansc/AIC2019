@@ -5,52 +5,60 @@ import aic2019.*;
 public class Catapult {
     private Injection in;
     private int counter = 0;
-    private int delay = 0;
     private Location objectiveLocation;
-    private boolean claimObjective = false;
     private boolean isTower;
+    private int turnsAfterObjectiveChanged = 0;
+
+    private Location savedObjective;
 
     public Catapult(Injection in) {
         this.in = in;
     }
 
     public void run() {
+        deleteObjective();
+        turnsAfterObjectiveChanged++;
         selectObjective();
         in.catapult.tryMove(objectiveLocation);
         tryAttack();
     }
 
-    public boolean tryAttack() {
-        int myAttack = in.attack.getMyAttack();
+    private void deleteObjective() {
+        if(savedObjective == null) return;
 
+        in.memoryManager.removeObjective(in.memoryManager.getObjectiveIdInLocation(savedObjective));
+        if (isTower) {
+            int newObjective[] = in.objectives.createCatapultObjective(savedObjective,
+                    in.constants.DESTROYED_TOWER);
+            in.memoryManager.addObjective(UnitType.BASE, newObjective);
+        }
+        savedObjective = null;
+    }
+
+    public boolean tryAttack() {
         if (counter == 1 && in.memoryManager.getObjectiveType(in.memoryManager.getObjectiveIdInLocation(objectiveLocation))
                 == in.constants.WATER_OBJECTIVE) {
             counter = 0;
-            delay = 0;
             in.memoryManager.removeObjective(in.memoryManager.getObjectiveIdInLocation(objectiveLocation));
             objectiveLocation = null;
         }
 
-        if (counter == 2) {
-            delay++;
-            if (delay == 5) {
-                counter = 0;
-                delay = 0;
-                in.memoryManager.removeObjective(in.memoryManager.getObjectiveIdInLocation(objectiveLocation));
-                if (isTower) in.map.unmarkTower(objectiveLocation);
-                objectiveLocation = null;
-            }
-        }
 
         if (!in.unitController.canAttack()) return false;
         if (objectiveLocation == null) return false;
         if (in.staticVariables.allyBase.isEqual(objectiveLocation)) return false;
 
-        if (in.unitController.canAttack(objectiveLocation)) {
+        if (in.unitController.canAttack(objectiveLocation) && counter < 2) {
             in.unitController.attack(objectiveLocation);
-            if (counter < 2) {
-                counter++;
+            counter++;
+
+            if(counter == 2) {
+                counter = 0;
+                savedObjective = objectiveLocation;
+                this.deleteObjective();
+                objectiveLocation = null;
             }
+
             return true;
         }
         return false;
@@ -169,7 +177,9 @@ public class Catapult {
     }
 
     public void fixObjectiveLocation(Location loc){
+        counter = 0;
         objectiveLocation = loc;
+        turnsAfterObjectiveChanged = 0;
     }
 
     public void selectObjective() {
@@ -178,9 +188,7 @@ public class Catapult {
         // if I don't have an objective, I can check for one in the objectives array and get the best
         // can we add a new objective?
         int closestObjective = Integer.MAX_VALUE;
-        int closestOccupedObjective = Integer.MAX_VALUE;
         Location bestLocation = null;
-        Location bestOccupedLocation = null;
 
         int[][] objectives = in.memoryManager.getObjectives();
 
@@ -192,50 +200,34 @@ public class Catapult {
             int distance = in.staticVariables.myLocation.distanceSquared(newObjectiveLocation);
 
             if(in.staticVariables.type.getAttackRangeSquared() >= in.staticVariables.myLocation.distanceSquared(newObjectiveLocation) &&
-                    !in.unitController.canAttack(objectiveLocation)) {
+                    !in.unitController.canAttack(objectiveLocation) && !newObjectiveLocation.isEqual(objectiveLocation) &&
+                    turnsAfterObjectiveChanged > 20 && counter != 1) {
                 if (isTower(newObjectiveLocation)) isTower = true;
                 this.fixObjectiveLocation(newObjectiveLocation);
-                claimObjective = true;
             }
 
-            if(!in.objectives.isFull(objective) || in.objectives.getLastClaimedId(objective) == in.staticVariables.myId){
+            // if we are here, we can skip the target if it's not our target
+            if(objectiveLocation != null && in.macro.getTarget().distanceSquared(newObjectiveLocation) < 30) {
+                continue;
+            }
+
+            if(!in.objectives.isFull(objective)){
                 // for now, as heuristic we are going to get the distance to the objective
                 if(distance < closestObjective) {
                     closestObjective = distance;
                     bestLocation = newObjectiveLocation;
                 }
 
-            } else {
-                if(distance < closestOccupedObjective) {
-                    closestOccupedObjective = distance;
-                    bestOccupedLocation = newObjectiveLocation;
-                }
-            }
-
-            if(distance < in.constants.CATAPULTS_CONSIDER_CLOSE_DISTANCE ||
-                    in.staticVariables.myLocation.distanceSquared(newObjectiveLocation) < in.constants.CATAPULTS_CONSIDER_CLOSE_DISTANCE) {
-                in.objectives.claimObjective(newObjectiveLocation);
             }
         }
 
-        if(bestLocation != null && (objectiveLocation == null || !claimObjective)){
+        if(bestLocation != null && objectiveLocation == null){
             if (isTower(bestLocation)) isTower = true;
             this.fixObjectiveLocation(bestLocation);
-            claimObjective = true;
-        }
-
-        // just to do something in case we have nothing to do but there is still an objective...
-        // we won't claim it thought
-        if(objectiveLocation == null && bestOccupedLocation != null){
-            if (!bestOccupedLocation.isEqual(new Location(0,0))) {
-                if (isTower(bestOccupedLocation)) isTower = true;
-            }
-            this.fixObjectiveLocation(bestOccupedLocation);
-            claimObjective = false;
         }
 
         // claim objective
-        if(objectiveLocation != null && claimObjective) {
+        if(objectiveLocation != null) {
             if (isTower(objectiveLocation)) isTower = true;
             in.objectives.claimObjective(this.objectiveLocation);
         }

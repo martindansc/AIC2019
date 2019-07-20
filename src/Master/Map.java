@@ -61,12 +61,10 @@ Estructures i unitats
         return null;
     }
 
-    public void markTower(Location loc, boolean isNeutral) {
+    public void markTower(Location loc, int type) {
         if (in.memoryManager.getUnitFromLocation(loc) == UnitType.TOWER && in.memoryManager.getPaintedTower(loc)) return;
         in.memoryManager.saveUnitToMap(loc, UnitType.TOWER);
         in.memoryManager.markTowerForPainting(loc);
-
-        int type = isNeutral ? in.constants.NEUTRAL_TOWER : in.constants.ENEMY_TOWER;
 
         int[] objective = in.objectives.createCatapultObjective(loc, type);
         in.memoryManager.addObjective(UnitType.CATAPULT, objective);
@@ -85,6 +83,11 @@ Estructures i unitats
             }
         }
         in.memoryManager.unmarkTowerForPainting(loc);
+    }
+
+    public void markTower(Location loc, boolean isNeutral) {
+        int type = isNeutral ? in.constants.NEUTRAL_TOWER : in.constants.ENEMY_TOWER;
+        this.markTower(loc, type);
     }
 
     public void unmarkTower(Location loc) {
