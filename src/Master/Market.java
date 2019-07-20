@@ -30,37 +30,37 @@ public class Market {
         if (freewood < 0 && freeiron < 0 && freecrystal < 0) return false;
 
         if (freewood < 0) {
-            if(freecrystal > woodNeeded / in.staticVariables.woodcrystal) {
+            if(freecrystal > -freewood * in.staticVariables.woodcrystal) {
                 in.unitController.trade(Resource.CRYSTAL, Resource.WOOD, freecrystal);
             }
-            else if(freeiron > woodNeeded / in.staticVariables.woodiron) {
-                in.unitController.trade(Resource.IRON, Resource.WOOD, woodNeeded / in.staticVariables.woodiron);
+            else if(freeiron > -freewood * in.staticVariables.woodiron) {
+                in.unitController.trade(Resource.IRON, Resource.WOOD, -freewood * in.staticVariables.woodiron);
             }
 
         }
         else if (freeiron < 0) {
-            if(freecrystal > ironNeeded / in.staticVariables.ironcrystal) {
+            if(freecrystal > -freeiron * in.staticVariables.ironcrystal) {
                 in.unitController.trade(Resource.CRYSTAL, Resource.IRON, freecrystal);
             }
-            else if(freewood > ironNeeded / in.staticVariables.woodiron) {
-                in.unitController.trade(Resource.WOOD, Resource.IRON, ironNeeded / in.staticVariables.woodiron);
+            else if(freewood > -freeiron / in.staticVariables.woodiron) {
+                in.unitController.trade(Resource.WOOD, Resource.IRON, -freeiron / in.staticVariables.woodiron);
             }
 
         }
 
         else if(freecrystal < 0) {
-            if(freewood > crystalNeeded * in.staticVariables.woodcrystal) {
-                in.unitController.trade(Resource.WOOD, Resource.CRYSTAL, woodNeeded * in.staticVariables.woodcrystal);
+            if(freewood > -freecrystal / in.staticVariables.woodcrystal) {
+                in.unitController.trade(Resource.WOOD, Resource.CRYSTAL, -freecrystal / in.staticVariables.woodcrystal);
             }
-            else if(freeiron > crystalNeeded / in.staticVariables.ironcrystal) {
-                in.unitController.trade(Resource.IRON, Resource.CRYSTAL, woodNeeded * in.staticVariables.ironcrystal);
+            else if(freeiron > -freecrystal / in.staticVariables.ironcrystal) {
+                in.unitController.trade(Resource.IRON, Resource.CRYSTAL, -freecrystal / in.staticVariables.ironcrystal);
             }
 
         }
 
-        return unit.getCrystalCost() < in.unitController.getCrystal() &&
-                unit.getWoodCost() < in.unitController.getWood() &&
-                unit.getIronCost() < in.unitController.getIron();
+        return unit.getCrystalCost() <= in.unitController.getCrystal() &&
+                unit.getWoodCost() <= in.unitController.getWood() &&
+                unit.getIronCost() <= in.unitController.getIron();
     }
 
     public UnitType heuristic() {
