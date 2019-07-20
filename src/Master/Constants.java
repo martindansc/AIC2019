@@ -36,6 +36,7 @@ public class Constants {
     public int CLAIMED_TOWN = 1;
     public int STOLEN_TOWN = 2;
     public int ENEMY_TOWN = 3;
+    public int CONQUEST_TOWN = 4;
 
     // OBJECTIVE CONSTANTS
     public int WORKERS_GET_WOOD = 1;
@@ -46,6 +47,8 @@ public class Constants {
     public int NEUTRAL_TOWER = 6;
     public int WATER_OBJECTIVE = 7;
     public int DESTROYED_TOWER = 8;
+    public int CREATE_TOWER_OBJECTIVE = 9;
+
     public int FORGET_OBJECTIVE_ROUNDS = 100;
 
     // UNITS
