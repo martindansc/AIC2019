@@ -18,6 +18,8 @@ public class Objectives {
         return new Location(objective[2], objective[3]);
     }
 
+    public int getObjectiveType(int[] objective) { return objective[0];}
+
     public void setNumberUnits(int[] objective, int numberUnitsRequired) {
         objective[1] = numberUnitsRequired;
     }
@@ -86,6 +88,17 @@ public class Objectives {
         this.setLocationObjective(newObjective, loc);
         this.addCommonVariables(newObjective);
         newObjective[11] = type == in.constants.NEUTRAL_TOWER ? 10 : 1;
+
+        return newObjective;
+    }
+
+    public int[] createTowerObjective(Location loc){
+        int[] newObjective = new int[in.constants.OBJECTIVE_SIZE];
+        newObjective[0] = in.constants.CREATE_TOWER_OBJECTIVE;
+        newObjective[1] = 1;
+        this.setLocationObjective(newObjective, loc);
+        this.addCommonVariables(newObjective);
+        newObjective[11] = loc.distanceSquared(in.staticVariables.allyBase) - 10000;
 
         return newObjective;
     }

@@ -33,7 +33,7 @@ public class Worker {
         directionIsRandom = false;
         objectiveLocation = loc;
         if(resourceObjective) currentAction = "GOTORESOURCE";
-        else currentAction = "GOTOTOWN";
+        else currentAction = "GOTOCREATETOWER";
     }
 
     public void fixRandomDirection(){
@@ -93,6 +93,9 @@ public class Worker {
                 } else if (currentAction == "GOTOTOWN") {
                     goToTown();
                 }
+                else if(currentAction == "GOTOCREATETOWER"){
+                    goToCreateTower();
+                }
             }
         }
 
@@ -104,6 +107,11 @@ public class Worker {
         //If can deposit, deposit
         Direction dir = in.staticVariables.myLocation.directionTo(in.helper.getClosestTownToLocation(in.staticVariables.myLocation));
         depositResource(dir);
+    }
+
+
+    public void goToCreateTower(){
+        return;
     }
 
 
@@ -326,35 +334,63 @@ public class Worker {
 
     public void selectObjective() {
         // is there any message that points me to go somewhere and it's better than my current objective?
+        /*
         int[] message = in.messages.readMessage();
         if(message[0] != 0) {
             this.fixObjectiveLocation(new Location(message[0], message[1]), true);
         }
-
+        */
         // do I currently have an objective set up?
         // if I don't have an objective, I can check for one in the objectives array and get the best
-        if(directionIsRandom) {
-            int closestObjective = Integer.MAX_VALUE;
-            Location bestLocation = null;
 
-            int[][] objectives = in.memoryManager.getObjectives();
+        int closestObjective = Integer.MAX_VALUE;
+        Location bestLocation = null;
+        Boolean towerObjective = false;
 
-            for (int[] objective: objectives) {
-                if(!in.objectives.isFull(objective)){
-                    // for now, as heuristic we are going to get the distance to the resource
-                    Location objectiveLocation = in.objectives.getLocationObjective(objective);
-                    int distance = in.staticVariables.myLocation.distanceSquared(objectiveLocation);
-                    if(distance < closestObjective) {
-                        closestObjective = distance;
+        int[][] objectives = in.memoryManager.getObjectives();
+
+        for (int[] objective: objectives) {
+            if(!in.objectives.isFull(objective)){
+                // for now, as heuristic we are going to get the distance to the resource
+                if(towerObjective){
+                    if(in.objectives.getObjectiveType(objective) == in.constants.CREATE_TOWER_OBJECTIVE){
+                        Location objectiveLocation = in.objectives.getLocationObjective(objective);
+                        int distance = in.staticVariables.myLocation.distanceSquared(objectiveLocation);
+                        if(distance < closestObjective) {
+                            closestObjective = distance;
+                            bestLocation = objectiveLocation;
+                        }
+                    }
+                }
+                else{
+                    if(in.objectives.getObjectiveType(objective) == in.constants.CREATE_TOWER_OBJECTIVE) {
+                        closestObjective = in.staticVariables.myLocation.distanceSquared(objectiveLocation);
                         bestLocation = objectiveLocation;
+                        towerObjective = true;
+                    }
+                    else{
+                        Location objectiveLocation = in.objectives.getLocationObjective(objective);
+                        int distance = in.staticVariables.myLocation.distanceSquared(objectiveLocation);
+                        if(distance < closestObjective) {
+                            closestObjective = distance;
+                            bestLocation = objectiveLocation;
+                        }
                     }
                 }
             }
+        }
 
-            if(bestLocation != null){
-                this.fixObjectiveLocation(bestLocation, true);
+        if(bestLocation != null){
+            if(towerObjective){
+                if(directionIsRandom || currentAction == "GOTORESOURCE"){
+                    //GOTO crete resource
+                    this.fixObjectiveLocation(bestLocation, false);
+                }
             }
+            else if(directionIsRandom) {
+                this.fixObjectiveLocation(bestLocation, true);
 
+            }
         }
 
         // claim objective
