@@ -36,6 +36,7 @@ public class Constants {
     public int CLAIMED_TOWN = 1;
     public int STOLEN_TOWN = 2;
     public int ENEMY_TOWN = 3;
+    public int CONQUEST_TOWN = 4;
 
     // OBJECTIVE CONSTANTS
     public int WORKERS_GET_WOOD = 1;

@@ -393,6 +393,11 @@ public class MemoryManager {
         in.unitController.write(index + 2, in.constants.ENEMY_TOWN);
     }
 
+    public void setTownConquest(Location loc) {
+        int index = getIndexMap(loc.x, loc.y);
+        in.unitController.write(index + 2, in.constants.CONQUEST_TOWN);
+    }
+
     public int getTownStatus(Location loc) {
         int index = getIndexMap(loc.x, loc.y);
         return in.unitController.read(index + 2);
