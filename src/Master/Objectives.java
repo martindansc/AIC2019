@@ -18,6 +18,8 @@ public class Objectives {
         return new Location(objective[2], objective[3]);
     }
 
+    public int getObjectiveType(int[] objective) { return objective[0];}
+
     public void setNumberUnits(int[] objective, int numberUnitsRequired) {
         objective[1] = numberUnitsRequired;
     }
@@ -96,7 +98,7 @@ public class Objectives {
         newObjective[1] = 1;
         this.setLocationObjective(newObjective, loc);
         this.addCommonVariables(newObjective);
-        newObjective[11] = loc.distanceSquared(in.staticVariables.allyBase);
+        newObjective[11] = loc.distanceSquared(in.staticVariables.allyBase) - 10000;
 
         return newObjective;
     }
