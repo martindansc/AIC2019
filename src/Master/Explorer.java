@@ -38,7 +38,7 @@ public class Explorer {
                     in.memoryManager.setTownScore(loc, calculateScore(loc));
                 }
                 if (town.getOwner() == in.staticVariables.opponent) {
-                    if (in.memoryManager.getTownStatus(loc) == in.constants.CLAIMED_TOWN) {
+                    if (in.memoryManager.getTownStatus(loc) == in.constants.CLAIMED_TOWN || in.memoryManager.getTownStatus(loc) == in.constants.CONQUEST_TOWN) {
                         in.memoryManager.setStolen(loc);
                         in.memoryManager.setTownScore(loc, 1);
                     } else {
@@ -46,16 +46,19 @@ public class Explorer {
                         in.memoryManager.setTownScore(loc, 1);
                     }
                 }
-            } else {
-                if (in.memoryManager.getTownStatus(loc) == in.constants.ENEMY_TOWN || in.memoryManager.getTownStatus(loc) == in.constants.STOLEN_TOWN) {
-                    in.memoryManager.setTownConquest(loc);
-                    in.objectives.createTowerObjective(loc);
-                    in.memoryManager.setTownScore(loc, 0);
-                }
-                else{
-                    in.memoryManager.setClaimed(loc);
-                    in.memoryManager.setTownScore(loc, 0);
-                }
+            }
+        }
+        for (TownInfo town: in.unitController.getTowns(in.staticVariables.allies, false)) {
+            Location loc = town.getLocation();
+            if (in.memoryManager.getTownStatus(loc) == in.constants.ENEMY_TOWN || in.memoryManager.getTownStatus(loc) == in.constants.STOLEN_TOWN) {
+                in.memoryManager.setTownConquest(loc);
+                int[] newObjective = in.objectives.createTowerObjective(loc);
+                in.memoryManager.addObjective(UnitType.WORKER, newObjective);
+                in.memoryManager.setTownScore(loc, 0);
+            }
+            else{
+                in.memoryManager.setClaimed(loc);
+                in.memoryManager.setTownScore(loc, 0);
             }
         }
 

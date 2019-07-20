@@ -14,6 +14,7 @@ public class Constants {
     public int ID_WORKER_BARRACKS = 57;
     public int ID_BARRACKS_BUILT = 58;
     public int ID_BEST_UNIT_TYPE = 59;
+    public int ID_NUMBER_OF_TOWERS_TO_BUILD_COUNTER = 60;
     public int ID_MESSAGING_BOX = 100; // 40000 positions
     public int ID_OBJECTIVES = 50000; // 3000 positions: 10 unit types * 20 objectives * 15
     public int ID_LOCATION_OBJECTIVES = 60000; // 10000 positions
