@@ -145,8 +145,6 @@ public class MemoryManager {
 
     public int[] addObjective(UnitType unitType, int[] params) {
 
-        if(uc.getEnergyLeft() < 2000) return this.newEmptyObjective();
-
         //todo: check that the objective doesn't exists, if it does maybe update it
         int maybeId = this.getObjectiveIdInLocation(params[2], params[3]);
         if(maybeId > 0) {
@@ -391,6 +389,11 @@ public class MemoryManager {
     public void setClaimedEnemy(Location loc) {
         int index = getIndexMap(loc.x, loc.y);
         in.unitController.write(index + 2, in.constants.ENEMY_TOWN);
+    }
+
+    public void setTownConquest(Location loc) {
+        int index = getIndexMap(loc.x, loc.y);
+        in.unitController.write(index + 2, in.constants.CONQUEST_TOWN);
     }
 
     public int getTownStatus(Location loc) {
