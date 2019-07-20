@@ -46,6 +46,7 @@ public class Constants {
     public int ENEMY_TOWER = 5;
     public int NEUTRAL_TOWER = 6;
     public int WATER_OBJECTIVE = 7;
+    public int CREATE_TOWER_OBJECTIVE = 8;
     public int FORGET_OBJECTIVE_ROUNDS = 100;
 
     // UNITS

@@ -326,11 +326,12 @@ public class Worker {
 
     public void selectObjective() {
         // is there any message that points me to go somewhere and it's better than my current objective?
+        /*
         int[] message = in.messages.readMessage();
         if(message[0] != 0) {
             this.fixObjectiveLocation(new Location(message[0], message[1]), true);
         }
-
+        */
         // do I currently have an objective set up?
         // if I don't have an objective, I can check for one in the objectives array and get the best
         if(directionIsRandom) {

@@ -89,4 +89,15 @@ public class Objectives {
 
         return newObjective;
     }
+
+    public int[] createTowerObjective(Location loc){
+        int[] newObjective = new int[in.constants.OBJECTIVE_SIZE];
+        newObjective[0] = in.constants.CREATE_TOWER_OBJECTIVE;
+        newObjective[1] = 1;
+        this.setLocationObjective(newObjective, loc);
+        this.addCommonVariables(newObjective);
+        newObjective[11] = loc.distanceSquared(in.staticVariables.allyBase);
+
+        return newObjective;
+    }
 }
