@@ -63,28 +63,23 @@ public class Explorer {
                     int status = in.memoryManager.getTownStatus(loc);
                     in.memoryManager.markTownAsExplored(loc);
                     if (status == in.constants.CLAIMED_TOWN || status == in.constants.STOLEN_TOWN) {
-                        if (in.memoryManager.getTownStatus(loc) == in.constants.CLAIMED_TOWN || in.memoryManager.getTownStatus(loc) == in.constants.CONQUEST_TOWN) {
-                            in.memoryManager.setStolen(loc);
-                            in.memoryManager.setTownScore(loc, 1);
-                        } else {
-                            in.memoryManager.setClaimedEnemy(loc);
-                            in.memoryManager.setTownScore(loc, 1);
-                        }
+                        in.memoryManager.setStolen(loc);
+                        in.memoryManager.setTownScore(loc, 1);
+                    } else {
+                        in.memoryManager.setClaimedEnemy(loc);
+                        in.memoryManager.setTownScore(loc, 1);
                     }
                 }
-            }
-        }
-        for (TownInfo town: in.unitController.getTowns(in.staticVariables.allies, false)) {
-            Location loc = town.getLocation();
-            if (in.memoryManager.getTownStatus(loc) == in.constants.ENEMY_TOWN || in.memoryManager.getTownStatus(loc) == in.constants.STOLEN_TOWN) {
-                in.memoryManager.setTownConquest(loc);
-                int[] newObjective = in.objectives.createTowerObjective(loc);
-                in.memoryManager.addObjective(UnitType.WORKER, newObjective);
-                in.memoryManager.setTownScore(loc, 0);
-            }
-            else{
-                in.memoryManager.setClaimed(loc);
-                in.memoryManager.setTownScore(loc, 0);
+            } else {
+                if (in.memoryManager.getTownStatus(loc) == in.constants.ENEMY_TOWN || in.memoryManager.getTownStatus(loc) == in.constants.STOLEN_TOWN) {
+                    in.memoryManager.setTownConquest(loc);
+                    in.objectives.createTowerObjective(loc);
+                    in.memoryManager.setTownScore(loc, 0);
+                }
+                else{
+                    in.memoryManager.setClaimed(loc);
+                    in.memoryManager.setTownScore(loc, 0);
+                }
             }
         }
 
@@ -109,6 +104,7 @@ public class Explorer {
             if (counter > 15 || distance < 26 || (tower && distance < 82)) {
                 in.memoryManager.markTownAsExplored(target);
                 int score = calculateScore(target);
+                if (tower) score = score + 5;
                 in.memoryManager.setTownScore(target, score);
                 counter = 0;
             }

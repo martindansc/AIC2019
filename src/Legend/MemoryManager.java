@@ -7,6 +7,7 @@ import aic2019.UnitType;
 public class MemoryManager {
 
     private final UnitController uc;
+    private final Constants constants = new Constants();
     private final Injection in;
 
     // GENERAL
@@ -57,7 +58,7 @@ public class MemoryManager {
     // DIRECT MESSAGING FUNCTIONS
 
     public int getMessageId(int unitId) {
-        return in.constants.ID_MESSAGING_BOX + unitId * in.constants.MESSAGE_SIZE;
+        return constants.ID_MESSAGING_BOX + unitId * constants.MESSAGE_SIZE;
     }
 
     public boolean checkIfMessageInBoxPlayer(int to) {
@@ -66,19 +67,19 @@ public class MemoryManager {
 
     public void sendMessageTo(int to, int[] params) {
         if(!checkIfMessageInBoxPlayer(to)) {
-            for (int i = 0; i < in.constants.MESSAGE_SIZE; i++) {
+            for (int i = 0; i < constants.MESSAGE_SIZE; i++) {
                 uc.write(getMessageId(to) + i, params[i]);
             }
         }
     }
 
     public int[] getNewMessage() {
-        return getNewMessageUnit(in.staticVariables.myId);
+       return getNewMessageUnit(in.staticVariables.myId);
     }
 
     public int[] getNewMessageUnit(int unitId) {
-        int[] params = new int[in.constants.MESSAGE_SIZE];
-        for(int i = 0; i < in.constants.MESSAGE_SIZE; i++) {
+        int[] params = new int[constants.MESSAGE_SIZE];
+        for(int i = 0; i < constants.MESSAGE_SIZE; i++) {
             int id = getMessageId(unitId) + i;
             params[i] = uc.read(id);
         }
@@ -87,7 +88,7 @@ public class MemoryManager {
     }
 
     public void clearMessageUnit(int unitId) {
-        for(int i = 0; i < in.constants.MESSAGE_SIZE; i++) {
+        for(int i = 0; i < constants.MESSAGE_SIZE; i++) {
             int id = getMessageId(unitId) + i;
             uc.write(id, 0);
         }
@@ -151,7 +152,7 @@ public class MemoryManager {
         }
 
         int worstObjective = 0;
-        int worstObjectiveValue = Integer.MIN_VALUE;
+        int worstObjectiveValue = 0;
 
         int type = in.helper.unitTypeToInt(unitType);
 
@@ -167,7 +168,7 @@ public class MemoryManager {
             else {
                 int value = uc.read(id + 11);
                 if (value > worstObjectiveValue){
-                    worstObjective = id;
+                    worstObjective = uc.read(id + 5);
                     worstObjectiveValue = value;
                 }
             }

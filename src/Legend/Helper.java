@@ -192,12 +192,6 @@ public class Helper {
             return UnitType.EXPLORER;
         }
 
-        int nTowersToBuild = in.memoryManager.readValue(in.constants.ID_NUMBER_OF_TOWERS_TO_BUILD_COUNTER);
-        if(nTowersToBuild>0) nTowersToBuild +=1;
-        if(in.staticVariables.wood < GameConstants.TOWER_WOOD_COST * nTowersToBuild || in.staticVariables.iron < GameConstants.TOWER_IRON_COST * nTowersToBuild){
-            return UnitType.TOWER;
-        }
-
         if (catapults < 1) {
             int[][] objectives = in.memoryManager.getObjectives(UnitType.CATAPULT);
             for (int[] objective: objectives) {

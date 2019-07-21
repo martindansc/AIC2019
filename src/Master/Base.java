@@ -20,7 +20,7 @@ public class Base {
         in.memoryManager.setBestUnitType(bestUnitType);
 
         if(bestUnitType != UnitType.BASE) {
-            if (in.market.canBuild(bestUnitType) && bestUnitType!=UnitType.TOWER) {
+            if (in.market.canBuild(bestUnitType)) {
                 int id = in.helper.spawnAndGetIdIfPossible(bestDir, bestUnitType);
 
                 if(id != -1 && message[0] != 0) {

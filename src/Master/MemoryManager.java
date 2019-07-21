@@ -152,7 +152,7 @@ public class MemoryManager {
         }
 
         int worstObjective = 0;
-        int worstObjectiveValue = Integer.MIN_VALUE;
+        int worstObjectiveValue = 0;
 
         int type = in.helper.unitTypeToInt(unitType);
 
@@ -168,7 +168,7 @@ public class MemoryManager {
             else {
                 int value = uc.read(id + 11);
                 if (value > worstObjectiveValue){
-                    worstObjective = id;
+                    worstObjective = uc.read(id + 5);
                     worstObjectiveValue = value;
                 }
             }
