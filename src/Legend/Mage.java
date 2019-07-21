@@ -103,6 +103,9 @@ public class Mage {
                 if (isTargetBase || isTargetObstructed || !in.attack.canAttackTarget(target)) {
                     if (in.unitController.canMove(dir)) {
                         if (in.memoryManager.isLocationSafe(in.staticVariables.myLocation.add(dir))) {
+                            if (target.isEqual(in.staticVariables.allyBase) && in.staticVariables.myLocation.distanceSquared(in.staticVariables.allyBase) > 50) {
+                                return false;
+                            }
                             in.unitController.move(dir);
                             return true;
                         }

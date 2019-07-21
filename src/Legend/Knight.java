@@ -36,6 +36,9 @@ public class Knight {
                 if (isTargetBase || isTargetObstructed || !in.attack.canAttackTarget(target) || (in.attack.canAttackTarget(target) && in.staticVariables.myLocation.add(dir).distanceSquared(target) < in.staticVariables.type.getAttackRangeSquared())) {
                     if (in.unitController.canMove(dir)) {
                         if (in.memoryManager.isLocationSafe(in.staticVariables.myLocation.add(dir))) {
+                            if (target.isEqual(in.staticVariables.allyBase) && in.staticVariables.myLocation.distanceSquared(in.staticVariables.allyBase) > 50) {
+                                return false;
+                            }
                             in.unitController.move(dir);
                             return true;
                         }
