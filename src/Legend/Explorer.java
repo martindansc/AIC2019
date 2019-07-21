@@ -92,7 +92,6 @@ public class Explorer {
                 in.memoryManager.setTownConquest(loc);
                 int[] newObjective = in.objectives.createTowerObjective(loc);
                 in.memoryManager.addObjective(UnitType.WORKER, newObjective);
-                in.unitController.println("Explorer defends tower at:" + loc.x + " " + loc.y);
                 in.memoryManager.setTownScore(loc, 0);
             }
             else{
