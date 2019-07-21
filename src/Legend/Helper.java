@@ -188,7 +188,7 @@ public class Helper {
             return in.helper.intToUnitType(newMessage[1]);
         }
 
-        if (in.staticVariables.round == 1) {
+        if (explorers < 1) {
             return UnitType.EXPLORER;
         }
 
@@ -202,9 +202,7 @@ public class Helper {
             int[][] objectives = in.memoryManager.getObjectives(UnitType.CATAPULT);
             for (int[] objective: objectives) {
                 if(objective[0] != in.constants.WATER_OBJECTIVE) {
-                    if(!in.objectives.isFull(objective) &&
-                            (in.staticVariables.round - in.objectives.getRound(objective) > 5 ||
-                                    catapults < 1)) {
+                    if(!in.objectives.isFull(objective)) {
                         return UnitType.CATAPULT;
                     }
                 }
