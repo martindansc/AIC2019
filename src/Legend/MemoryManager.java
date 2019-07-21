@@ -254,7 +254,7 @@ public class MemoryManager {
     public void removeObjective(Location loc) {
         int idObjectiveLocation = in.helper.locationToInt(loc.x, loc.y);
         if (idObjectiveLocation == 0) return;
-        removeObjective(idObjectiveLocation);
+        removeObjective(getObjectiveIdInLocation(loc.x, loc.y));
     }
 
     public boolean existsObjectiveInLocation(int locX, int locY) {

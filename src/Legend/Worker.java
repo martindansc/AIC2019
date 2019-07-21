@@ -119,7 +119,7 @@ public class Worker {
         //If tower is built goto random and erease objective
         if(towerBuilt){
             in.memoryManager.removeObjective(objectiveLocation);
-            fixRandomDirection();
+            objectiveLocation = null;
             positionBuildToweFound = false;
             return;
         }
@@ -153,10 +153,11 @@ public class Worker {
 
     public boolean buildTowerInObjectiveDirection(){
         //Build tower if it is in desired rank of objective
-        if(in.unitController.canSenseLocation(objectiveLocation)){
-            if(!in.unitController.isObstructed(in.unitController.getLocation(), objectiveLocation)){
-                Direction dirToBuildTower = in.unitController.getLocation().directionTo(objectiveLocation);
-                Location locationToBuildTower = in.unitController.getLocation().add(dirToBuildTower);
+        Location nearestLocationTown = objectiveLocation.add(objectiveLocation.directionTo(in.unitController.getLocation()));
+        if(in.unitController.canSenseLocation(nearestLocationTown)){
+            Direction dirToBuildTower = in.unitController.getLocation().directionTo(nearestLocationTown);
+            Location locationToBuildTower = in.unitController.getLocation().add(dirToBuildTower);
+            if(!in.unitController.isObstructed(in.unitController.getLocation(), nearestLocationTown)){
                 if(in.unitController.senseTerrain(locationToBuildTower) != Terrain.WATER){
                     positionBuildToweFound = true;
                 }
@@ -168,6 +169,11 @@ public class Worker {
                     return true;
                 }
             }
+
+            UnitInfo unit = in.unitController.senseUnit(locationToBuildTower);
+            if(unit != null) {
+                return unit.getType() == UnitType.TOWER;
+            }
         }
         return false;
     }
@@ -176,6 +182,7 @@ public class Worker {
     public void goToRandom(){
         //Scout viewing zone
         Boolean resourceFound = scout("random");
+
 
         //If not resource found
         if(!resourceFound){
@@ -338,7 +345,7 @@ public class Worker {
     public String checkIfMovementIsSafe(Location nextLocation){
         Direction dir = in.staticVariables.myLocation.directionTo(nextLocation);
         //Check if next location is out of the map
-        if(in.unitController.isOutOfMap(nextLocation)){
+        if(in.unitController.isOutOfMap(nextLocation) || !in.unitController.canMove(dir)){
             return "WALL";
         }
         //check if next location is having a catapult attack next turn
@@ -405,34 +412,35 @@ public class Worker {
         Location bestLocation = null;
         Boolean towerObjective = false;
 
+        int units = in.memoryManager.readValue(in.constants.ID_ALLIES_SOLDIER_COUNTER) +
+                in.memoryManager.readValue(in.constants.ID_ALLIES_ARCHER_COUNTER);
+
         int[][] objectives = in.memoryManager.getObjectives();
 
         for (int[] objective: objectives) {
             if(!in.objectives.isFull(objective)){
                 // for now, as heuristic we are going to get the distance to the resource
                 Location newObjectiveLocation = in.objectives.getLocationObjective(objective);
-                if(towerObjective){
-                    if(in.objectives.getObjectiveType(objective) == in.constants.CREATE_TOWER_OBJECTIVE){
-                        int distance = in.staticVariables.myLocation.distanceSquared(objectiveLocation);
-                        if(distance < closestObjective) {
-                            closestObjective = distance;
+                int createdRound = in.objectives.getRound(objective);
+                int lastRound = in.objectives.getUpdatedRound(objective);
+                if(in.objectives.getObjectiveType(objective) == in.constants.CREATE_TOWER_OBJECTIVE &&
+                        in.staticVariables.round > 200 && units > 15 &&
+                        (createdRound == lastRound || in.staticVariables.round > lastRound + 200)) {
+                    for (TownInfo town: in.staticVariables.myTowns) {
+                        if(town.getLocation().isEqual(newObjectiveLocation) && town.getLoyalty() > 20
+                                ) {
+                            closestObjective = in.staticVariables.myLocation.distanceSquared(newObjectiveLocation);
                             bestLocation = newObjectiveLocation;
+                            towerObjective = true;
                         }
                     }
                 }
-                else{
-                    if(in.objectives.getObjectiveType(objective) == in.constants.CREATE_TOWER_OBJECTIVE) {
-                        closestObjective = in.staticVariables.myLocation.distanceSquared(objectiveLocation);
-                        bestLocation = newObjectiveLocation;
-                        towerObjective = true;
-                    }
-                    else{
-                        Location objectiveLocation = in.objectives.getLocationObjective(objective);
-                        int distance = in.staticVariables.myLocation.distanceSquared(objectiveLocation);
-                        if(distance < closestObjective) {
-                            closestObjective = distance;
-                            bestLocation = objectiveLocation;
-                        }
+                else if(!towerObjective){
+                    Location objectiveLocation = in.objectives.getLocationObjective(objective);
+                    int distance = in.staticVariables.myLocation.distanceSquared(objectiveLocation);
+                    if(distance < closestObjective) {
+                        closestObjective = distance;
+                        bestLocation = objectiveLocation;
                     }
                 }
             }
@@ -454,6 +462,10 @@ public class Worker {
         // claim objective
         if(objectiveLocation != null && !directionIsRandom) {
             in.objectives.claimObjective(this.objectiveLocation);
+        }
+
+        if(objectiveLocation == null) {
+            this.fixRandomDirection();
         }
     }
 

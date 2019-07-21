@@ -90,8 +90,9 @@ public class Explorer {
             Location loc = town.getLocation();
             if (in.memoryManager.getTownStatus(loc) == in.constants.ENEMY_TOWN || in.memoryManager.getTownStatus(loc) == in.constants.STOLEN_TOWN) {
                 in.memoryManager.setTownConquest(loc);
-                //int[] newObjective = in.objectives.createTowerObjective(loc);
-                //in.memoryManager.addObjective(UnitType.WORKER, newObjective);
+                int[] newObjective = in.objectives.createTowerObjective(loc);
+                in.memoryManager.addObjective(UnitType.WORKER, newObjective);
+                in.unitController.println("Explorer defends tower at:" + loc.x + " " + loc.y);
                 in.memoryManager.setTownScore(loc, 0);
             }
             else{
