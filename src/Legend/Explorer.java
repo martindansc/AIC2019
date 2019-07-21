@@ -24,7 +24,7 @@ public class Explorer {
     }
 
     public Location getTarget() {
-        if (in.staticVariables.resourcesSeen.length != 0 && in.staticVariables.allenemies.length == 0) {
+        if (in.staticVariables.resourcesSeen.length != 0 && in.staticVariables.allenemies.length == 0 && !enemySeen) {
             if (in.memoryManager.getSafeResources() < 10) {
                 int min = Math.min(in.staticVariables.resourcesSeen.length, 8);
                 int bestDistance = 10000;
@@ -67,7 +67,11 @@ public class Explorer {
                         in.memoryManager.setTownScore(loc, 1);
                     } else {
                         in.memoryManager.setClaimedEnemy(loc);
-                        in.memoryManager.setTownScore(loc, 1);
+                        if (in.staticVariables.myTowns.length != 0) {
+                            in.memoryManager.setTownScore(loc, 2);
+                        } else {
+                            in.memoryManager.setTownScore(loc, 7);
+                        }
                     }
                 }
             } else {

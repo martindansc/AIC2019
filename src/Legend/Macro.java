@@ -18,7 +18,8 @@ public class Macro {
                 enemyTowns++;
             }
         }
-        if (in.staticVariables.myTowns.length > enemyTowns && in.staticVariables.allies.getVictoryPoints() >= in.staticVariables.opponent.getVictoryPoints()) {
+        if ((in.staticVariables.myTowns.length > enemyTowns || in.staticVariables.myTowns.length >= in.staticVariables.allenemytowns.length) &&
+                in.staticVariables.allies.getVictoryPoints() >= in.staticVariables.opponent.getVictoryPoints()) {
             TownInfo defendTown = null;
             int defendDistance = Integer.MAX_VALUE;
             for (TownInfo town: in.staticVariables.myTowns) {
