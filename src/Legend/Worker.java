@@ -22,11 +22,14 @@ public class Worker {
     Direction microDir;
     //Is micro needed?
     Boolean microResult;
+    //Position to build tower found
+    Boolean positionBuildToweFound;
 
     public Worker(Injection in) {
         this.in = in;
         fixRandomDirection();
         unitMoved = false;
+        positionBuildToweFound = false;
     }
 
     public void fixObjectiveLocation(Location loc, Boolean resourceObjective){
@@ -82,7 +85,7 @@ public class Worker {
             microResult = doMicro();
             if (microResult) {
                 in.unitController.move(microDir);
-                currentAction = "GOTORESOURCE";
+                if(currentAction == "GATHERRESOURCE") currentAction = "GOTORESOURCE";
             } else {
                 if (currentAction == "GOTORANDOM") {
                     goToRandom();
@@ -111,7 +114,62 @@ public class Worker {
 
 
     public void goToCreateTower(){
+        //Macro to desired resource
+        Boolean towerBuilt = buildTowerInObjectiveDirection();
+        //If tower is built goto random and erease objective
+        if(towerBuilt){
+            in.memoryManager.removeObjective(objectiveLocation);
+            fixRandomDirection();
+            positionBuildToweFound = false;
+            return;
+        }
+
+        if (in.unitController.canMove() && !positionBuildToweFound) {
+            Direction dir = in.pathfinder.getNextLocationTarget(objectiveLocation,
+                    (Location loc) -> in.memoryManager.isLocationSafe(loc));
+            if (dir != null && dir != Direction.ZERO && in.unitController.senseImpact(in.staticVariables.myLocation.add(dir)) == 0) {
+                String nextMovementIsSafe = checkIfMovementIsSafe(in.staticVariables.myLocation, dir);
+                if(nextMovementIsSafe == "CANMOVE") {
+                    in.unitController.move(dir);
+                    unitMoved = true;
+                }
+            }
+        }
+        towerBuilt = buildTowerInObjectiveDirection();
+
+        //If tower is built goto random and erease objective
+        if(towerBuilt){
+            in.memoryManager.removeObjective(objectiveLocation);
+            fixRandomDirection();
+            positionBuildToweFound = false;
+        }
+        else{
+            in.memoryManager.increaseValueByOne(in.constants.ID_NUMBER_OF_TOWERS_TO_BUILD_COUNTER);
+        }
+        //Scout viewing zone
+        //TODO
         return;
+    }
+
+    public boolean buildTowerInObjectiveDirection(){
+        //Build tower if it is in desired rank of objective
+        if(in.unitController.canSenseLocation(objectiveLocation)){
+            if(!in.unitController.isObstructed(in.unitController.getLocation(), objectiveLocation)){
+                Direction dirToBuildTower = in.unitController.getLocation().directionTo(objectiveLocation);
+                Location locationToBuildTower = in.unitController.getLocation().add(dirToBuildTower);
+                if(in.unitController.senseTerrain(locationToBuildTower) != Terrain.WATER){
+                    positionBuildToweFound = true;
+                }
+                else{
+                    positionBuildToweFound = false;
+                }
+                if(in.unitController.canSpawn(dirToBuildTower, UnitType.TOWER)){
+                    in.unitController.spawn(dirToBuildTower, UnitType.TOWER);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 
@@ -352,20 +410,20 @@ public class Worker {
         for (int[] objective: objectives) {
             if(!in.objectives.isFull(objective)){
                 // for now, as heuristic we are going to get the distance to the resource
+                Location newObjectiveLocation = in.objectives.getLocationObjective(objective);
                 if(towerObjective){
                     if(in.objectives.getObjectiveType(objective) == in.constants.CREATE_TOWER_OBJECTIVE){
-                        Location objectiveLocation = in.objectives.getLocationObjective(objective);
                         int distance = in.staticVariables.myLocation.distanceSquared(objectiveLocation);
                         if(distance < closestObjective) {
                             closestObjective = distance;
-                            bestLocation = objectiveLocation;
+                            bestLocation = newObjectiveLocation;
                         }
                     }
                 }
                 else{
                     if(in.objectives.getObjectiveType(objective) == in.constants.CREATE_TOWER_OBJECTIVE) {
                         closestObjective = in.staticVariables.myLocation.distanceSquared(objectiveLocation);
-                        bestLocation = objectiveLocation;
+                        bestLocation = newObjectiveLocation;
                         towerObjective = true;
                     }
                     else{
@@ -383,7 +441,7 @@ public class Worker {
         if(bestLocation != null){
             if(towerObjective){
                 if(directionIsRandom || currentAction == "GOTORESOURCE"){
-                    //GOTO crete resource
+                    //GOTO create tower
                     this.fixObjectiveLocation(bestLocation, false);
                 }
             }
