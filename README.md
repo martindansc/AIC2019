@@ -1,3 +1,3 @@
 # AIC2019
 
-LilRookie < Rookie < Skilled < Veteran < Expert < Legend
+LilRookie < Rookie < Skilled < Veteran < Expert < Master < Legend
